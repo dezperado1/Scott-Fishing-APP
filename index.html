@@ -674,7 +674,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 </div><!-- /app -->
 
 <!-- Load Leaflet AFTER DOM -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
 <script>
 'use strict';
 
@@ -717,10 +717,16 @@ function showTab(id,btn){
   document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('on');
   if(id==='map'){
-    setTimeout(()=>{
-      initMap();
-      if(map) map.invalidateSize();
-    },80);
+    // Multiple retries to handle CDN load timing on GitHub Pages
+    function tryInit(attempt){
+      if(typeof L !== 'undefined'){
+        initMap();
+        setTimeout(()=>{ if(map) map.invalidateSize(); },150);
+      } else if(attempt < 15){
+        setTimeout(()=>tryInit(attempt+1), 300);
+      }
+    }
+    tryInit(0);
   }
 }
 
