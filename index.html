@@ -518,16 +518,10 @@ async function getWillyLocationId(locName){
 }
 
 async function getWillyForecast(locationId){
-  const p=[
-    'forecasts[wind][days]=7',
-    'forecasts[tides][days]=7',
-    'forecasts[swell][days]=7',
-    'forecasts[rainfallprobability][days]=7',
-    'forecasts[sunrisesunset][days]=7',
-    'forecasts[pressure][days]=7',
-    'forecasts[windgust][days]=7',
-  ].join('&');
-  console.log('[Willy] Getting forecast for locationId='+locationId);
+  // WillyWeather PHP 서버: 쉼표로 연결된 단일 문자열 형태로 보내야 함
+  // 배열 형태(forecasts[wind][days]=7) → 서버에서 explode() 에러 발생
+  const p='forecasts=swell,tides,wind,rainfallprobability,sunrisesunset,pressure,windgust&days=7';
+  console.log('[Willy] Getting forecast for locationId='+locationId+' params='+p);
   const data=await willyFetch('/locations/'+locationId+'/weather.json?'+p);
   console.log('[Willy] Forecast keys:',Object.keys(data||{}).join(','));
   if(!data||!data.forecasts){
