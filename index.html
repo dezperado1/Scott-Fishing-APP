@@ -520,7 +520,8 @@ async function getWillyLocationId(locName){
 async function getWillyForecast(locationId){
   // WillyWeather PHP 서버: 쉼표로 연결된 단일 문자열 형태로 보내야 함
   // 배열 형태(forecasts[wind][days]=7) → 서버에서 explode() 에러 발생
-  const p='forecasts=swell,tides,wind,rainfallprobability,sunrisesunset,pressure,windgust&days=7';
+  // 형 계정 허용 파라미터만 정확히
+  const p='forecasts=swell,tides,wind,rainfall&days=7&observational=wind,rainfall,pressure,windgust';
   console.log('[Willy] Getting forecast for locationId='+locationId+' params='+p);
   const data=await willyFetch('/locations/'+locationId+'/weather.json?'+p);
   console.log('[Willy] Forecast keys:',Object.keys(data||{}).join(','));
@@ -536,8 +537,10 @@ function parseWillyData(data){
   const swD=(fc.swell&&fc.swell.days)||[];
   const wiD=(fc.wind&&fc.wind.days)||[];
   const tiD=(fc.tides&&fc.tides.days)||[];
-  const rnD=(fc.rainfallprobability&&fc.rainfallprobability.days)||[];
-  const suD=(fc.sunrisesunset&&fc.sunrisesunset.days)||[];
+  // rainfall (WillyWeather returns 'rainfall', not 'rainfallprobability' with these params)
+  const rnD=(fc.rainfall&&fc.rainfall.days)||(fc.rainfallprobability&&fc.rainfallprobability.days)||[];
+  // sunrisesunset not in allowed params - use null, sunrise/sunset will default
+  const suD=[];
   const prD=(fc.pressure&&fc.pressure.days)||[];
   const guD=(fc.windgust&&fc.windgust.days)||[];
   const N=Math.min(Math.max(swD.length,wiD.length,1),7);
@@ -552,6 +555,7 @@ function parseWillyData(data){
     const gue=(guD[d]||{}).entries||[];
     const swellH=+avg(se,'height').toFixed(1);
     const swellD=(se[0]||{}).directionText||(se[0]||{}).direction||'SSE';
+    const swellPer=Math.round(avg(se,'period'))||10; // period in seconds
     const windKmh=Math.round(avg(we,'speed'));
     const windD=(we[0]||{}).directionText||(we[0]||{}).direction||'NNE';
     const gustKmh=gue.length?Math.round(Math.max(...gue.map(e=>e.speed||e.speedKnots*1.852||0))):Math.round(windKmh*1.35);
@@ -567,14 +571,14 @@ function parseWillyData(data){
       const near=(arr,fld,def)=>{const e=arr.find(x=>Math.abs(new Date(x.dateTime||0).getHours()-h)<=1);return e?(e[fld]||def):def;};
       hours.push({t,now:d===0&&h===0,
         sw:(near(se,'height',swellH)).toFixed(1)+'m',
-        per:Math.round(near(se,'period',10))+'s',
-        dir:near(se,'directionText',swellD)||swellD,
+        per:Math.round(near(se,'period',swellPer||10))+'s',
+        dir:near(se,'directionText',swellD)||near(se,'direction',swellD)||swellD,
         wind:Math.round(near(we,'speed',windKmh))+'km/h',
         rain:Math.round(near(re,'probability',rain))+'%'});
     }
     const warn=swellH>3?'rough':swellH>2?'moderate':'good';
     days.push({date,dayName:DNs[date.getDay()],dayNum:date.getDate(),isToday:d===0,
-      swellH,swellD,windKmh,windD,windGust:gustKmh,rain,pressure,sst:21,
+      swellH,swellD,swellPer,windKmh,windD,windGust:gustKmh,rain,pressure,sst:21,
       warn,hours,sunrise,sunset,tides,
       condIcon:swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀'});
   }
@@ -688,7 +692,7 @@ function renderSolContent(i){
 // ─── MARINE ──────────────────────────────────────
 function renderMarineDateRow(){
   const row=document.getElementById('marine-date-row');if(!row)return;
-  row.innerHTML=marineDays.map((d,i)=>{const on=i===activeMarineDay;const wc=d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';return`<div class="dchip ${d.isToday?'today':''} ${on?'on':''}" onclick="selectMarineDay(${i})"><div class="dc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div><div class="dc-num" style="color:${on?'var(--accent)':'var(--text)'};">${d.dayNum}</div><div style="font-size:14px;margin:2px 0">${d.condIcon}</div><div class="dc-sw" style="color:${wc}">${d.swellH}m</div></div>`;}).join('');
+  row.innerHTML=marineDays.map((d,i)=>{const on=i===activeMarineDay;const wc=d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';return`<div class="dchip ${d.isToday?'today':''} ${on?'on':''}" onclick="selectMarineDay(${i})"><div class="dc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div><div class="dc-num" style="color:${on?'var(--accent)':'var(--text)'};">${d.dayNum}</div><div style="font-size:14px;margin:2px 0">${d.condIcon}</div><div class="dc-sw" style="color:${wc}">${d.swellH}m/${d.swellPer||'—'}s</div></div>`;}).join('');
 }
 function selectMarineDay(i){activeMarineDay=i;renderMarineDateRow();renderMarineDay(i);}
 function renderMarineDay(i){
@@ -704,12 +708,24 @@ function renderMarineDay(i){
   const hHtml=d.hours.map(h=>`<div class="hc ${h.now?'now':''}"><div style="font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:600">${h.t}</div><div style="font-size:14px;font-weight:600;color:var(--accent)">${h.sw}</div><div style="font-size:9px;color:var(--muted)">${h.per}</div><div style="font-size:16px;margin:3px 0">${h.dir}</div><div style="font-size:10px">${h.wind}</div><div style="font-size:10px;color:#88aaff;margin-top:1px">${h.rain}</div></div>`).join('');
   // Update live bars
   const eid=id=>document.getElementById(id);
-  if(i===0){if(eid('lb-swell'))eid('lb-swell').textContent=d.swellH+'m';if(eid('lb-wind'))eid('lb-wind').textContent=d.windKmh+'km/h';if(eid('lb-sst'))eid('lb-sst').textContent=d.sst+'°C';if(eid('lb-pres'))eid('lb-pres').textContent=d.pressure+'hPa';if(d.tides[0]&&eid('lb-tide'))eid('lb-tide').textContent=f2(d.tides[0].h,d.tides[0].m);const mt=multtae(new Date());if(eid('cb-swell'))eid('cb-swell').textContent=d.swellH+'m';if(eid('cb-dir'))eid('cb-dir').textContent=d.swellD;if(eid('cb-wind'))eid('cb-wind').textContent=d.windKmh+'km/h';if(eid('cb-wdir'))eid('cb-wdir').textContent=d.windD;if(eid('cb-mt'))eid('cb-mt').textContent=mt+'물';if(eid('cb-sst'))eid('cb-sst').textContent=d.sst+'°C';}
+  if(i===0){if(eid('lb-swell'))eid('lb-swell').textContent=d.swellH+'m '+(d.swellPer||'')+'s';if(eid('lb-wind'))eid('lb-wind').textContent=d.windKmh+'km/h';if(eid('lb-sst'))eid('lb-sst').textContent=d.sst+'°C';if(eid('lb-pres'))eid('lb-pres').textContent=d.pressure+'hPa';if(d.tides[0]&&eid('lb-tide'))eid('lb-tide').textContent=f2(d.tides[0].h,d.tides[0].m);const mt=multtae(new Date());if(eid('cb-swell'))eid('cb-swell').textContent=d.swellH+'m';
+    if(eid('cb-dir'))eid('cb-dir').textContent=(d.swellPer||'—')+'s/'+d.swellD;if(eid('cb-dir'))eid('cb-dir').textContent=d.swellD;if(eid('cb-wind'))eid('cb-wind').textContent=d.windKmh+'km/h';if(eid('cb-wdir'))eid('cb-wdir').textContent=d.windD;if(eid('cb-mt'))eid('cb-mt').textContent=mt+'물';if(eid('cb-sst'))eid('cb-sst').textContent=d.sst+'°C';}
   if(LOCS.length>0){const l=LOCS[activeIdx];const wl=eid('windy-link');if(wl)wl.href='https://www.windy.com/'+currentLayer+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+currentLayer+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}
   document.getElementById('marine-content').innerHTML=`
     <div class="alert-bar" style="background:${wBg};border:1px solid ${wBd};color:${wc}">${d.warn==='good'?'✅ Good conditions · Safe to fish':d.warn==='rough'?'⛔ Rough · Caution advised':'⚠ Moderate · Check exposed spots'} · ${d.dayName} ${d.dayNum}</div>
     <div class="g2">
-      <div class="card"><div class="sc-icon">🌊</div><div><span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span></div><div class="sc-label">Swell Height</div><div class="sc-sub">${d.swellD}</div><div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div></div>
+      <div class="card"><div class="sc-icon">🌊</div>
+        <div style="display:flex;align-items:baseline;gap:4px">
+          <span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted)">${d.swellPer||'—'}s</span>
+        </div>
+        <div class="sc-label">Swell Height / Period</div>
+        <div class="sc-sub" style="display:flex;align-items:center;gap:5px">
+          <span style="font-size:13px">🧭</span> ${d.swellD}
+        </div>
+        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-top:3px">${d.swellH}m / ${d.swellPer||'—'}s / ${d.swellD}</div>
+        <div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div>
+      </div>
       <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Wind Speed</div><div class="sc-sub">${d.windD} · Gust ${d.windGust}</div><div class="badge ${d.windKmh>40?'b-warn':'b-ok'}">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div></div>
       <div class="card"><div class="sc-icon">🌡</div><div><span class="sc-big">${d.sst}</span><span class="sc-unit">°C</span></div><div class="sc-label">Sea Temp</div><div class="sc-sub">NSW Coastal</div><div class="badge b-ok">BOM</div></div>
       <div class="card"><div class="sc-icon">📊</div><div><span class="sc-big">${d.pressure}</span><span class="sc-unit">hPa</span></div><div class="sc-label">Pressure</div><div class="sc-sub">${d.pressure>1015?'↑ Rising':'↓ Falling'}</div><div class="badge ${d.pressure>1010?'b-ok':'b-warn'}">${d.pressure>1015?'Stable':'Watch'}</div></div>
