@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NSW Rock Fishing</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,343 +11,259 @@
 <meta name="theme-color" content="#00d4ff">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
-/* ═══════════════════════════════════
-   DESIGN TOKENS
-═══════════════════════════════════ */
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-:root{
-  --bg:#070d18;--bg2:#0d1726;--bg3:#111f33;
-  --card:#0f1e30;--card2:#162640;--border:#1e3450;
-  --accent:#00d4ff;--gold:#f5a623;--warn:#ff6b35;
-  --green:#00e676;--purple:#b06aff;--dim:#3a5570;
-  --text:#e8f4ff;--muted:#6b8aaa;
-}
-html,body{height:100%;background:var(--bg);color:var(--text);
-  font-family:'DM Sans',system-ui,sans-serif;overflow:hidden;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#070d18;--bg2:#0d1726;--bg3:#111f33;--card:#0f1e30;--card2:#162640;--border:#1e3450;--accent:#00d4ff;--gold:#f5a623;--warn:#ff6b35;--green:#00e676;--purple:#b06aff;--dim:#3a5570;--text:#e8f4ff;--muted:#6b8aaa}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',system-ui,sans-serif;overflow:hidden}
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap');
-
-/* ═══════════════════════════════════
-   LAYOUT
-═══════════════════════════════════ */
-.app{max-width:390px;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg);}
-.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
-.tab{display:none;padding:10px 14px 20px;}
-.tab.active{display:block;}
-
-/* ═══════════════════════════════════
-   TOPBAR
-═══════════════════════════════════ */
-.topbar{background:rgba(7,13,24,.97);padding:12px 14px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0;z-index:50;}
-.loc-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.5);}50%{box-shadow:0 0 0 5px rgba(0,212,255,0);}}
-.ib{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px;}
-.ib.hi{border-color:var(--accent);color:var(--accent);}
-
-/* ═══════════════════════════════════
-   BOTTOM NAV
-═══════════════════════════════════ */
-.bnav{display:flex;background:rgba(7,13,24,.98);border-top:1px solid var(--border);flex-shrink:0;}
-.ni{flex:1;padding:9px 2px 14px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:var(--muted);cursor:pointer;font-family:inherit;}
-.ni.on{color:var(--accent);}
-.ni-icon{font-size:17px;}
-.ni-lbl{font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase;}
-
-/* ═══════════════════════════════════
-   COMMON COMPONENTS
-═══════════════════════════════════ */
-.stitle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:12px 0 7px;}
-.stitle:first-child{margin-top:4px;}
-.pill{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-weight:700;margin-left:4px;}
-.pill-f{background:rgba(0,230,118,.13);color:var(--green);}
-.pill-w{background:rgba(245,166,35,.12);color:var(--gold);}
-.pill-a{background:rgba(176,106,255,.15);color:var(--purple);}
-.pill-u{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.2);color:var(--accent);}
-.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px;}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600;margin-top:3px;}
-.b-ok{background:rgba(0,230,118,.13);color:var(--green);}
-.b-warn{background:rgba(255,107,53,.13);color:var(--warn);}
-.b-gold{background:rgba(245,166,35,.12);color:var(--gold);}
-.sc-icon{font-size:19px;margin-bottom:4px;}
-.sc-big{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:var(--accent);}
-.sc-unit{font-size:11px;color:var(--muted);margin-left:2px;}
-.sc-label{font-size:10px;color:var(--muted);margin-top:2px;}
-.sc-sub{font-size:11px;color:var(--text);margin-top:1px;}
-.alert-bar{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:10px;padding:9px 12px;display:flex;gap:8px;align-items:center;margin-bottom:10px;font-size:11px;color:#ff9870;}
-
-/* ═══════════════════════════════════
-   DATE CHIPS
-═══════════════════════════════════ */
-.date-scroll,.sol-scroll{overflow-x:auto;scrollbar-width:none;margin-bottom:10px;}
-.date-scroll::-webkit-scrollbar,.sol-scroll::-webkit-scrollbar{display:none;}
-.date-row,.sol-row{display:flex;gap:6px;min-width:max-content;padding:2px 0;}
-.dchip,.schip{display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:54px;}
-.dchip.on{border-color:var(--accent);background:rgba(0,212,255,.1);}
-.schip.on{border-color:var(--gold);background:rgba(245,166,35,.08);}
-.dchip.today{border-color:rgba(0,212,255,.4);}
-.schip.today{border-color:var(--purple);}
-.dc-day,.sc-day{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
-.dc-num,.sc-num{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;margin:1px 0;}
-.dc-sw{font-size:9px;color:var(--muted);margin-top:1px;}
-.sc-score-sm{font-size:9px;font-weight:600;margin-top:1px;}
-
-/* ═══════════════════════════════════
-   TIDE SVG
-═══════════════════════════════════ */
-.tide-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;}
-.tide-svg-w{height:80px;margin:7px 0;}
-.tide-row{display:flex;justify-content:space-between;}
-.tide-item{text-align:center;}
-.t-hi{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--green);}
-.t-lo{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--warn);}
-.tide-time{font-size:12px;font-weight:600;margin:2px 0;}
-.tide-ht{font-size:11px;color:var(--accent);}
-
-/* ═══════════════════════════════════
-   HOURLY SCROLL
-═══════════════════════════════════ */
-.hscroll{overflow-x:auto;scrollbar-width:none;margin-bottom:10px;}
-.hscroll::-webkit-scrollbar{display:none;}
-.hrow{display:flex;gap:7px;min-width:max-content;}
-.hc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-width:72px;text-align:center;}
-.hc.now{border-color:var(--accent);background:rgba(0,212,255,.06);}
-
-/* ═══════════════════════════════════
-   ACTIVITY TIMELINE
-═══════════════════════════════════ */
-.tl-scroll{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px;}
-.tl-scroll::-webkit-scrollbar{display:none;}
-.tl-row{display:flex;min-width:max-content;}
-.tl-col{width:44px;display:flex;flex-direction:column;align-items:center;gap:3px;}
-.tl-t{font-size:9px;color:var(--muted);}
-.tl-bw{width:26px;height:52px;display:flex;align-items:flex-end;position:relative;}
-.tl-b{width:100%;border-radius:3px 3px 0 0;}
-.now-dot{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--warn);}
-.tl-v{font-size:9px;color:var(--muted);}
-
-/* ═══════════════════════════════════
-   PEAK TIMES
-═══════════════════════════════════ */
-.peak-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
-.pk{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px;position:relative;overflow:hidden;}
-.pk.maj{border-color:rgba(245,166,35,.4);}
-.pk.maj::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent);}
-.pk-type{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;}
-.pk-type.maj{color:var(--gold);}
-.pk-type.min{color:var(--accent);}
-.pk-time{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1.1;margin-top:2px;}
-.pk-range{font-size:11px;font-weight:600;margin-top:1px;}
-.pk-dur{font-size:10px;color:var(--muted);margin-top:1px;}
-.pk-bar{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:7px;}
-.pk-fill{height:100%;border-radius:2px;}
-
-/* ═══════════════════════════════════
-   MOON ROW
-═══════════════════════════════════ */
-.moon-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px;}
-.moon-prog{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:6px;}
-.moon-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#fff3,#fffa);}
-
-/* ═══════════════════════════════════
-   RING CHART
-═══════════════════════════════════ */
-.ring-w{display:flex;justify-content:center;padding:10px 0 6px;position:relative;}
-.ring-w svg{transform:rotate(-90deg);}
-.ring-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;}
-
-/* ═══════════════════════════════════
-   MULTTAE
-═══════════════════════════════════ */
-.mt-hero{background:linear-gradient(135deg,rgba(11,25,55,.9),rgba(7,13,24,1));border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;}
-.mt-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(176,106,255,.15),transparent 70%);}
-.mt-badge{display:inline-block;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px;}
-.mt-sari{background:rgba(255,107,53,.2);color:var(--warn);border:1px solid rgba(255,107,53,.3);}
-.mt-jogeum{background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.25);}
-.mt-mid{background:rgba(0,230,118,.13);color:var(--green);border:1px solid rgba(0,230,118,.25);}
-.mt-cycle{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px;}
-.mt-btn{border-radius:9px;padding:7px 3px;text-align:center;cursor:pointer;border:1px solid var(--border);background:var(--card);}
-.mt-btn.on{border-color:var(--purple);background:rgba(176,106,255,.12);}
-.mt-btn.sari{border-color:rgba(255,107,53,.3);}
-.mt-btn.jogeum{border-color:rgba(0,212,255,.3);}
-.mt-info-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.mt-ic{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;}
-.mt-adv{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
-.ma-item{display:flex;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-.ma-item:last-child{margin:0;padding:0;border:none;}
-.mm-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;}
-.mm-row{display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid rgba(30,52,80,.4);cursor:pointer;}
-.mm-row:last-child{border:none;}
-.mm-row.today{background:rgba(176,106,255,.08);}
-
-/* ═══════════════════════════════════
-   MAP
-═══════════════════════════════════ */
-.fav-scroll{overflow-x:auto;scrollbar-width:none;margin-bottom:8px;}
-.fav-scroll::-webkit-scrollbar{display:none;}
-.fav-row{display:flex;gap:7px;min-width:max-content;padding:2px 0 4px;}
-.fc{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:16px;border:1px solid var(--border);background:var(--card);cursor:pointer;white-space:nowrap;}
-.fc.on{border-color:var(--accent);background:rgba(0,212,255,.1);}
-.fc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.fc-name{font-size:11px;font-weight:500;}
-.fc-dist{font-size:9px;color:var(--muted);}
-.fc-add{border-style:dashed;color:var(--muted);}
-.map-section{border-radius:14px;overflow:hidden;border:1px solid var(--border);margin-bottom:8px;position:relative;z-index:1;isolation:isolate;}
-#leaflet-map{height:300px;width:100%;background:#0a1929;}
-.map-layer-btns{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px;}
-.map-layer-btns::-webkit-scrollbar{display:none;}
-.lbtn{padding:6px 12px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;}
-.lbtn.on{border-color:var(--gold);background:rgba(245,166,35,.08);color:var(--gold);}
-.map-tile-row{display:flex;gap:5px;}
-.tile-btn{padding:5px 10px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:10px;cursor:pointer;font-family:inherit;}
-.tile-btn.on{border-color:var(--accent);color:var(--accent);}
-.windy-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:11px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:10px;}
-.live-bar{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;margin-bottom:8px;}
-.lb-item{text-align:center;}
-.lb-val{font-size:12px;font-weight:600;color:var(--accent);}
-.lb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;}
-
-/* ═══════════════════════════════════
-   SPECIES
-═══════════════════════════════════ */
-.cond-bar{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;margin-bottom:10px;}
-.cb-item{text-align:center;}
-.cb-val{font-size:12px;font-weight:600;color:var(--accent);}
-.cb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;}
-.sp-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding:2px 0;}
-.sp-scroll::-webkit-scrollbar{display:none;}
-.sp-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 7px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:58px;position:relative;flex-shrink:0;}
-.sp-btn.on{border-color:var(--gold);background:rgba(245,166,35,.08);}
-.sp-emoji{font-size:21px;}
-.sp-name{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
-.sp-btn.on .sp-name{color:var(--gold);}
-.sp-score-badge{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg);}
-.rc{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px;}
-.rc-head{padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
-.rc-ring{width:44px;height:44px;position:relative;flex-shrink:0;}
-.rc-ring svg{transform:rotate(-90deg);}
-.rc-rnum{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:14px;line-height:1;}
-.rc-body{padding:13px 14px;}
-.rb-sec{margin-bottom:13px;}
-.rb-stitle{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
-.sl-item{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);margin-bottom:6px;}
-.sl-item:last-child{margin-bottom:0;}
-.sl-item.best{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04);}
-.sl-item.caution{border-color:rgba(255,107,53,.25);background:rgba(255,107,53,.04);}
-.sl-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0;}
-.sl-name{font-size:12px;font-weight:600;}
-.sl-dir{font-size:10px;color:var(--accent);margin-top:1px;}
-.sl-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
-.sl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
-.sl-tag{font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600;}
-.t-safe{background:rgba(0,230,118,.13);color:var(--green);}
-.t-caut{background:rgba(255,107,53,.13);color:var(--warn);}
-.t-info{background:rgba(0,212,255,.12);color:var(--accent);}
-.t-gold{background:rgba(245,166,35,.12);color:var(--gold);}
-.rig-g{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.rig-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px;}
-.rig-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
-.rig-val{font-size:11px;font-weight:600;margin-top:3px;line-height:1.4;}
-.color-strip{display:flex;flex-direction:column;gap:6px;}
-.color-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);}
-.color-chip.top{border-color:rgba(245,166,35,.4);}
-.cswatch{width:18px;height:18px;border-radius:4px;flex-shrink:0;}
-.bait-tbl{width:100%;border-collapse:collapse;}
-.bait-tbl th{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px 6px;text-align:left;border-bottom:1px solid var(--border);}
-.bait-tbl td{font-size:11px;padding:7px 6px;border-bottom:1px solid rgba(30,52,80,.4);vertical-align:middle;}
-.bait-tbl tr:last-child td{border:none;}
-.b-rank{font-family:'Bebas Neue',sans-serif;font-size:16px;}
-.eff-row{display:flex;gap:2px;}
-.ef{width:7px;height:7px;border-radius:50%;background:var(--gold);}
-.ee{width:7px;height:7px;border-radius:50%;background:var(--border);}
-.tide-cond-g{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:8px;}
-.tc-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;}
-.analysis-box{background:rgba(176,106,255,.06);border:1px solid rgba(176,106,255,.2);border-radius:12px;padding:13px;}
-.analysis-text{font-size:12px;line-height:1.75;color:var(--text);}
-.analysis-text p{margin-bottom:7px;}
-.analysis-text p:last-child{margin-bottom:0;}
-.analysis-text strong{color:var(--purple);}
-.ai-loading{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px;}
-.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:blink 1.2s infinite;}
-.ai-dot:nth-child(2){animation-delay:.2s;}
-.ai-dot:nth-child(3){animation-delay:.4s;}
-@keyframes blink{0%,100%{opacity:.3;}50%{opacity:1;}}
-.refresh-btn{display:flex;align-items:center;gap:5px;margin-top:10px;cursor:pointer;font-size:11px;color:var(--purple);}
-
-/* ═══════════════════════════════════
-   MODAL
-═══════════════════════════════════ */
-.modal-bg{position:fixed;inset:0;background:var(--bg2);z-index:400;display:none;flex-direction:column;max-width:390px;margin:0 auto;}
-.modal-bg.on{display:flex;}
-.modal-hd{background:var(--bg2);padding:14px 15px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.modal-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 15px 40px;}
-.mi{width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none;}
-.mi:focus{border-color:var(--accent);}
-.mi::placeholder{color:var(--muted);}
-.mbtn{width:100%;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:6px;}
-.mbtn.p{background:var(--accent);color:#000;}
-.mbtn.s{background:var(--card);color:var(--muted);border:1px solid var(--border);}
-.cp{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block;}
-.cp.on{border-color:#fff;transform:scale(1.15);}
-.sdrop{background:var(--bg3);border:1px solid rgba(0,212,255,.3);border-radius:9px;margin-bottom:8px;overflow:hidden;display:none;max-height:200px;overflow-y:auto;}
-.sdrop-row{padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer;}
-.sdrop-row:last-child{border:none;}
-.sdrop-row:active{background:var(--card2);}
-.sel-prev{display:none;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);border-radius:9px;padding:10px 12px;margin-bottom:8px;}
-.saved-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);margin-bottom:5px;cursor:pointer;}
-.saved-item.active{border-color:var(--accent);background:rgba(0,212,255,.08);}
-
-/* ═══════════════════════════════════
-   MAP PICKER
-═══════════════════════════════════ */
-.picker-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;max-width:390px;margin:0 auto;}
-.picker-overlay.on{display:flex;}
-.picker-box{background:var(--bg2);border-radius:16px;border:1px solid var(--border);width:92%;overflow:hidden;}
-#picker-map{height:300px;width:100%;}
-
-/* Leaflet dark */
-.leaflet-container{background:#0a1929!important;position:relative;z-index:1;will-change:transform;}
-.leaflet-tile-pane{filter:brightness(.85) saturate(.7) hue-rotate(180deg) invert(1) hue-rotate(180deg);}
-.leaflet-popup-content-wrapper{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit;}
-.leaflet-popup-tip{background:var(--card2);}
-.leaflet-popup-content{color:var(--text);font-size:12px;}
-.leaflet-control-zoom a{background:var(--card)!important;color:var(--accent)!important;border-color:var(--border)!important;}
-.leaflet-control-attribution{background:rgba(7,13,24,.7)!important;color:var(--muted)!important;font-size:8px!important;}
-
-/* Sun row */
-.sun-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-around;align-items:center;margin-bottom:10px;}
-.sr-div{width:1px;height:34px;background:var(--border);}
-
-/* Safety warning */
-.safety-warn{background:rgba(255,50,50,.15);border:2px solid rgba(255,50,50,.7);border-radius:12px;padding:12px 14px;margin-bottom:12px;}
-.safety-warn-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#ff4444;margin-bottom:6px;}
-.safety-warn-body{font-size:11px;color:#ffaaaa;line-height:1.6;}
-.safety-warn-body strong{color:#ff6666;}
-
-/* External app buttons */
-.ext-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:14px;}
-.ext-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;text-decoration:none;}
-.ext-btn:active{background:var(--card2);}
-.ext-btn-icon{font-size:22px;}
-.ext-btn-name{font-size:10px;font-weight:600;color:var(--text);}
-.ext-btn-sub{font-size:9px;color:var(--muted);}
-
-/* Loading spinner */
-.loading-msg{text-align:center;padding:24px;font-size:12px;color:var(--muted);}
+.app{max-width:390px;margin:0 auto;height:100%;display:flex;flex-direction:column;background:var(--bg)}
+.content{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.tab{display:none;padding:10px 14px 80px}
+.tab.active{display:block}
+/* TOPBAR */
+.topbar{background:rgba(7,13,24,.97);padding:12px 14px 10px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);flex-shrink:0;z-index:50}
+.loc-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.5)}50%{box-shadow:0 0 0 5px rgba(0,212,255,0)}}
+.ib{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px}
+.ib.hi{border-color:var(--accent);color:var(--accent)}
+/* BOTTOM NAV */
+.bnav{display:flex;background:rgba(7,13,24,.98);border-top:1px solid var(--border);flex-shrink:0}
+.ni{flex:1;padding:9px 2px 14px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:var(--muted);cursor:pointer;font-family:inherit}
+.ni.on{color:var(--accent)}
+.ni-icon{font-size:17px}
+.ni-lbl{font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase}
+/* COMMON */
+.stitle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:12px 0 7px}
+.stitle:first-child{margin-top:4px}
+.pill{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-weight:700;margin-left:4px}
+.pill-f{background:rgba(0,230,118,.13);color:var(--green)}
+.pill-w{background:rgba(245,166,35,.12);color:var(--gold)}
+.pill-a{background:rgba(176,106,255,.15);color:var(--purple)}
+.pill-u{background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.2);color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600;margin-top:3px}
+.b-ok{background:rgba(0,230,118,.13);color:var(--green)}
+.b-warn{background:rgba(255,107,53,.13);color:var(--warn)}
+.b-gold{background:rgba(245,166,35,.12);color:var(--gold)}
+.sc-icon{font-size:19px;margin-bottom:4px}
+.sc-big{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;color:var(--accent)}
+.sc-unit{font-size:11px;color:var(--muted);margin-left:2px}
+.sc-label{font-size:10px;color:var(--muted);margin-top:2px}
+.sc-sub{font-size:11px;color:var(--text);margin-top:1px}
+.alert-bar{border-radius:10px;padding:9px 12px;display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;font-size:11px}
+/* DATE CHIPS */
+.date-scroll,.sol-scroll{overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.date-scroll::-webkit-scrollbar,.sol-scroll::-webkit-scrollbar{display:none}
+.date-row,.sol-row{display:flex;gap:6px;min-width:max-content;padding:2px 0}
+.dchip,.schip{display:flex;flex-direction:column;align-items:center;padding:8px 10px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:54px}
+.dchip.on{border-color:var(--accent);background:rgba(0,212,255,.1)}
+.schip.on{border-color:var(--gold);background:rgba(245,166,35,.08)}
+.dchip.today,.schip.today{border-color:rgba(176,106,255,.5)}
+.dc-day,.sc-day{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.dc-num,.sc-num{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;margin:1px 0}
+.dc-sw,.sc-score-sm{font-size:9px;color:var(--muted);margin-top:1px}
+/* TIDE */
+.tide-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
+.tide-svg-w{height:80px;margin:7px 0}
+.tide-row{display:flex;justify-content:space-between}
+.tide-item{text-align:center}
+.t-hi{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--green)}
+.t-lo{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--warn)}
+.tide-time{font-size:12px;font-weight:600;margin:2px 0}
+.tide-ht{font-size:11px;color:var(--accent)}
+/* HOURLY */
+.hscroll{overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.hscroll::-webkit-scrollbar{display:none}
+.hrow{display:flex;gap:7px;min-width:max-content}
+.hc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-width:72px;text-align:center}
+.hc.now{border-color:var(--accent);background:rgba(0,212,255,.06)}
+/* TIMELINE */
+.tl-scroll{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.tl-scroll::-webkit-scrollbar{display:none}
+.tl-row{display:flex;min-width:max-content}
+.tl-col{width:44px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tl-t{font-size:9px;color:var(--muted)}
+.tl-bw{width:26px;height:52px;display:flex;align-items:flex-end;position:relative}
+.tl-b{width:100%;border-radius:3px 3px 0 0}
+.now-dot{position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:var(--warn)}
+.tl-v{font-size:9px;color:var(--muted)}
+/* PEAK TIMES */
+.peak-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.pk{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px;position:relative;overflow:hidden}
+.pk.maj{border-color:rgba(245,166,35,.4)}
+.pk.maj::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+.pk-type{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;font-weight:700}
+.pk-type.maj{color:var(--gold)}
+.pk-type.min{color:var(--accent)}
+.pk-time{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1.1;margin-top:2px}
+.pk-range{font-size:11px;font-weight:600;margin-top:1px}
+.pk-dur{font-size:10px;color:var(--muted);margin-top:1px}
+.pk-bar{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:7px}
+.pk-fill{height:100%;border-radius:2px}
+/* MOON */
+.moon-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.moon-prog{width:100%;height:3px;background:var(--bg3);border-radius:2px;margin-top:6px}
+.moon-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,#fff3,#fffa)}
+/* RING */
+.ring-w{display:flex;justify-content:center;padding:10px 0 6px;position:relative}
+.ring-w svg{transform:rotate(-90deg)}
+.ring-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+/* MULTTAE */
+.mt-hero{background:linear-gradient(135deg,rgba(11,25,55,.9),rgba(7,13,24,1));border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden}
+.mt-hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(176,106,255,.15),transparent 70%)}
+.mt-badge{display:inline-block;padding:4px 12px;border-radius:8px;font-size:11px;font-weight:700;margin-top:6px}
+.mt-sari{background:rgba(255,107,53,.2);color:var(--warn);border:1px solid rgba(255,107,53,.3)}
+.mt-jogeum{background:rgba(0,212,255,.15);color:var(--accent);border:1px solid rgba(0,212,255,.25)}
+.mt-mid{background:rgba(0,230,118,.13);color:var(--green);border:1px solid rgba(0,230,118,.25)}
+.mt-cycle{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:12px}
+.mt-btn{border-radius:9px;padding:7px 3px;text-align:center;cursor:pointer;border:1px solid var(--border);background:var(--card)}
+.mt-btn.on{border-color:var(--purple);background:rgba(176,106,255,.12)}
+.mt-btn.sari{border-color:rgba(255,107,53,.3)}
+.mt-btn.jogeum{border-color:rgba(0,212,255,.3)}
+.mt-info-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.mt-ic{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+.mt-adv{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px}
+.ma-item{display:flex;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.ma-item:last-child{margin:0;padding:0;border:none}
+.mm-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
+.mm-row{display:flex;align-items:center;padding:9px 13px;border-bottom:1px solid rgba(30,52,80,.4);cursor:pointer}
+.mm-row:last-child{border:none}
+.mm-row.today{background:rgba(176,106,255,.08)}
+/* MAP */
+.fav-scroll{overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+.fav-scroll::-webkit-scrollbar{display:none}
+.fav-row{display:flex;gap:7px;min-width:max-content;padding:2px 0 4px}
+.fc{display:flex;align-items:center;gap:5px;padding:7px 10px;border-radius:16px;border:1px solid var(--border);background:var(--card);cursor:pointer;white-space:nowrap}
+.fc.on{border-color:var(--accent);background:rgba(0,212,255,.1)}
+.fc-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.fc-name{font-size:11px;font-weight:500}
+.fc-dist{font-size:9px;color:var(--muted)}
+.fc-add{border-style:dashed;color:var(--muted)}
+.map-section{border-radius:14px;overflow:hidden;border:1px solid var(--border);margin-bottom:8px;position:relative;z-index:1;isolation:isolate}
+#leaflet-map{height:300px;width:100%;background:#0a1929}
+.map-layer-btns{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:8px}
+.map-layer-btns::-webkit-scrollbar{display:none}
+.lbtn{padding:6px 12px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0}
+.lbtn.on{border-color:var(--gold);background:rgba(245,166,35,.08);color:var(--gold)}
+.map-tile-row{display:flex;gap:5px}
+.tile-btn{padding:5px 10px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:10px;cursor:pointer;font-family:inherit}
+.tile-btn.on{border-color:var(--accent);color:var(--accent)}
+.windy-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:11px;border-radius:11px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.25);color:var(--accent);font-size:12px;font-weight:600;text-decoration:none;margin-bottom:10px}
+.live-bar{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.lb-item{text-align:center}
+.lb-val{font-size:12px;font-weight:600;color:var(--accent)}
+.lb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase}
+/* SPECIES */
+.cond-bar{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.cb-item{text-align:center}
+.cb-val{font-size:12px;font-weight:600;color:var(--accent)}
+.cb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase}
+.sp-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding:2px 0}
+.sp-scroll::-webkit-scrollbar{display:none}
+.sp-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 7px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:58px;position:relative;flex-shrink:0}
+.sp-btn.on{border-color:var(--gold);background:rgba(245,166,35,.08)}
+.sp-emoji{font-size:21px}
+.sp-name{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;white-space:nowrap}
+.sp-btn.on .sp-name{color:var(--gold)}
+.sp-score-badge{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--bg)}
+.rc{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:10px}
+.rc-head{padding:13px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.rc-ring{width:44px;height:44px;position:relative;flex-shrink:0}
+.rc-ring svg{transform:rotate(-90deg)}
+.rc-rnum{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Bebas Neue',sans-serif;font-size:14px;line-height:1}
+.rc-body{padding:13px 14px}
+.rb-sec{margin-bottom:13px}
+.rb-stitle{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.sl-item{display:flex;align-items:flex-start;gap:8px;padding:9px 11px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);margin-bottom:6px}
+.sl-item:last-child{margin-bottom:0}
+.sl-item.best{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)}
+.sl-item.caution{border-color:rgba(255,107,53,.25);background:rgba(255,107,53,.04)}
+.sl-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.sl-name{font-size:12px;font-weight:600}
+.sl-dir{font-size:10px;color:var(--accent);margin-top:1px}
+.sl-desc{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4}
+.sl-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.sl-tag{font-size:9px;padding:2px 6px;border-radius:5px;font-weight:600}
+.t-safe{background:rgba(0,230,118,.13);color:var(--green)}
+.t-caut{background:rgba(255,107,53,.13);color:var(--warn)}
+.t-info{background:rgba(0,212,255,.12);color:var(--accent)}
+.rig-g{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.rig-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px}
+.rig-lbl{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.rig-val{font-size:11px;font-weight:600;margin-top:3px;line-height:1.4}
+.color-strip{display:flex;flex-direction:column;gap:6px}
+.color-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3)}
+.color-chip.top{border-color:rgba(245,166,35,.4)}
+.cswatch{width:18px;height:18px;border-radius:4px;flex-shrink:0}
+.bait-tbl{width:100%;border-collapse:collapse}
+.bait-tbl th{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:5px 6px;text-align:left;border-bottom:1px solid var(--border)}
+.bait-tbl td{font-size:11px;padding:7px 6px;border-bottom:1px solid rgba(30,52,80,.4);vertical-align:middle}
+.bait-tbl tr:last-child td{border:none}
+.b-rank{font-family:'Bebas Neue',sans-serif;font-size:16px}
+.eff-row{display:flex;gap:2px}
+.ef{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+.ee{width:7px;height:7px;border-radius:50%;background:var(--border)}
+.tide-cond-g{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:8px}
+.tc-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center}
+.analysis-box{background:rgba(176,106,255,.06);border:1px solid rgba(176,106,255,.2);border-radius:12px;padding:13px}
+.analysis-text{font-size:12px;line-height:1.75;color:var(--text)}
+.analysis-text p{margin-bottom:7px}
+.analysis-text p:last-child{margin-bottom:0}
+.analysis-text strong{color:var(--purple)}
+.ai-loading{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:var(--purple);animation:blink 1.2s infinite}
+.ai-dot:nth-child(2){animation-delay:.2s}
+.ai-dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+.refresh-btn{display:flex;align-items:center;gap:5px;margin-top:10px;cursor:pointer;font-size:11px;color:var(--purple)}
+.sun-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;justify-content:space-around;align-items:center;margin-bottom:10px}
+.sr-div{width:1px;height:34px;background:var(--border)}
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:var(--bg2);z-index:400;display:none;flex-direction:column;max-width:390px;margin:0 auto}
+.modal-bg.on{display:flex}
+.modal-hd{background:var(--bg2);padding:14px 15px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.modal-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 15px 40px}
+.mi{width:100%;padding:11px 13px;background:var(--bg3);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:13px;font-family:inherit;margin-bottom:8px;outline:none}
+.mi:focus{border-color:var(--accent)}
+.mi::placeholder{color:var(--muted)}
+.mbtn{width:100%;padding:12px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:6px}
+.mbtn.p{background:var(--accent);color:#000}
+.mbtn.s{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.cp{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;display:inline-block}
+.cp.on{border-color:#fff;transform:scale(1.15)}
+.sdrop{background:var(--bg3);border:1px solid rgba(0,212,255,.3);border-radius:9px;margin-bottom:8px;overflow:hidden;display:none;max-height:200px;overflow-y:auto}
+.sdrop-row{padding:11px 13px;border-bottom:1px solid var(--border);cursor:pointer}
+.sdrop-row:last-child{border:none}
+.sel-prev{display:none;background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.25);border-radius:9px;padding:10px 12px;margin-bottom:8px}
+.saved-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);margin-bottom:5px;cursor:pointer}
+.saved-item.active{border-color:var(--accent);background:rgba(0,212,255,.08)}
+/* MAP PICKER */
+.picker-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;max-width:390px;margin:0 auto}
+.picker-overlay.on{display:flex}
+.picker-box{background:var(--bg2);border-radius:16px;border:1px solid var(--border);width:92%;overflow:hidden}
+#picker-map{height:300px;width:100%}
+.leaflet-container{background:#0a1929!important;position:relative;z-index:1}
+.leaflet-tile-pane{filter:brightness(.85) saturate(.7) hue-rotate(180deg) invert(1) hue-rotate(180deg)}
+.leaflet-popup-content-wrapper{background:var(--card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:inherit}
+.leaflet-popup-tip{background:var(--card2)}
+.leaflet-popup-content{color:var(--text);font-size:12px}
+.leaflet-control-zoom a{background:var(--card)!important;color:var(--accent)!important;border-color:var(--border)!important}
+.leaflet-control-attribution{background:rgba(7,13,24,.7)!important;color:var(--muted)!important;font-size:8px!important}
+.loading-msg{text-align:center;padding:24px;font-size:12px;color:var(--muted)}
+.err-msg{text-align:center;padding:24px;font-size:12px;color:var(--warn)}
 </style>
 </head>
 <body>
 <div class="app">
-
   <!-- TOPBAR -->
   <div class="topbar">
-    <div onclick="openModal()" style="cursor:pointer;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent);font-weight:500;">
-        <span class="loc-dot"></span>
-        <span id="tb-name">포인트 없음</span>
+    <div onclick="openModal()" style="cursor:pointer">
+      <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent);font-weight:500">
+        <span class="loc-dot"></span><span id="tb-name">포인트 없음</span>
       </div>
-      <div style="font-size:10px;color:var(--muted);margin-top:1px;" id="tb-coords">+ 버튼으로 포인트 추가</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:1px" id="tb-sub">+ 버튼으로 포인트 추가</div>
     </div>
-    <div style="display:flex;gap:6px;">
+    <div style="display:flex;gap:6px">
       <div class="ib" onclick="openModal()">＋</div>
       <div class="ib hi" onclick="gpsLocate()">⊕</div>
     </div>
@@ -356,110 +272,75 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   <!-- CONTENT -->
   <div class="content">
 
-    <!-- ══ TAB: SOLUNAR ══ -->
+    <!-- TAB: SOLUNAR -->
     <div class="tab active" id="tab-solunar">
       <div class="stitle">날짜 선택 <span class="pill pill-f">SunCalc · 실제 달 계산</span></div>
       <div class="sol-scroll"><div class="sol-row" id="sol-date-row"></div></div>
       <div id="sol-content"><div class="loading-msg">⏳ 계산 중...</div></div>
     </div>
 
-    <!-- ══ TAB: MARINE ══ -->
+    <!-- TAB: MARINE -->
     <div class="tab" id="tab-marine">
-
-      <!-- ⚠ SAFETY WARNING -->
-      <div class="safety-warn">
-        <div class="safety-warn-title">
-          <span style="font-size:20px;">🚨</span>
-          <span>안전 판단용으로 절대 사용 금지</span>
-        </div>
-        <div class="safety-warn-body">
-          이 앱의 스웰·파도·바람 데이터는 <strong>Open-Meteo 글로벌 모델</strong> 기반으로
-          실제 NSW 연안 조건과 <strong>최대 1m 이상 차이</strong>가 날 수 있습니다.<br><br>
-          갯바위 진입·철수 판단은 반드시 아래 <strong>공식 서비스</strong>에서 확인하세요.
-          스웰 2m 이상, 파도 주의보 시 갯바위 접근 금지.
-        </div>
+      <div id="willy-info-bar" style="display:flex;align-items:center;gap:8px;padding:9px 13px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:10px;margin-bottom:10px">
+        <span style="font-size:15px">✅</span>
+        <span style="font-size:12px;color:#b8ffda;line-height:1.45">이 데이터는 <strong style="color:var(--green)">WillyWeather 공식 API</strong>를 기반으로 제공됩니다.</span>
       </div>
-
-      <!-- 외부 앱 바로가기 -->
-      <div class="stitle">📡 실시간 날씨 공식 확인 <span class="pill pill-w">안전 필수</span></div>
-      <div class="ext-btns" id="ext-btns">
-        <!-- 포인트 선택 전 placeholder -->
-        <a class="ext-btn" id="btn-willy" href="https://www.willyweather.com.au/nsw.html" target="_blank">
-          <span class="ext-btn-icon">🌊</span>
-          <span class="ext-btn-name">WillyWeather</span>
-          <span class="ext-btn-sub">파도·조수·스웰</span>
-        </a>
-        <a class="ext-btn" id="btn-seabreeze" href="https://www.seabreeze.com.au/Weather/Wind-Forecast" target="_blank">
-          <span class="ext-btn-icon">💨</span>
-          <span class="ext-btn-name">Seabreeze</span>
-          <span class="ext-btn-sub">바람·파도</span>
-        </a>
-        <a class="ext-btn" id="btn-windfinder" href="https://www.windfinder.com/#12/-33.978/151.254" target="_blank">
-          <span class="ext-btn-icon">🧭</span>
-          <span class="ext-btn-name">Windfinder</span>
-          <span class="ext-btn-sub">바람·스웰</span>
-        </a>
-      </div>
-
-      <div class="stitle">날짜 선택 <span class="pill pill-f">Open-Meteo · 참고용</span></div>
+      <div class="stitle">날짜 선택 <span class="pill" id="src-pill" style="background:rgba(0,212,255,.12);color:var(--accent)">로딩 중...</span></div>
       <div class="date-scroll"><div class="date-row" id="marine-date-row"></div></div>
-      <div id="marine-content"><div class="loading-msg">⏳ 날씨 데이터 불러오는 중...</div></div>
+      <div id="marine-content"><div class="loading-msg">📍 포인트를 추가하면 실시간 날씨가 표시돼</div></div>
     </div>
 
-    <!-- ══ TAB: MAP ══ -->
+    <!-- TAB: MAP -->
     <div class="tab" id="tab-map">
       <div class="stitle">저장된 포인트</div>
       <div class="fav-scroll"><div class="fav-row" id="fav-row"></div></div>
-      <div class="live-bar" id="live-bar">
+      <div class="live-bar">
         <div class="lb-item"><div class="lb-val" id="lb-swell">—</div><div class="lb-lbl">Swell</div></div>
         <div class="lb-item"><div class="lb-val" id="lb-wind">—</div><div class="lb-lbl">Wind</div></div>
         <div class="lb-item"><div class="lb-val" id="lb-sst">—</div><div class="lb-lbl">SST</div></div>
         <div class="lb-item"><div class="lb-val" id="lb-pres">—</div><div class="lb-lbl">hPa</div></div>
         <div class="lb-item"><div class="lb-val" id="lb-curr">—</div><div class="lb-lbl">Current</div></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div class="map-layer-btns" id="layer-btns" style="margin-bottom:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div class="map-layer-btns" style="margin-bottom:0">
           <button class="lbtn on" onclick="setLayer('wind',this)">💨 Wind</button>
           <button class="lbtn" onclick="setLayer('waves',this)">🌊 Swell</button>
           <button class="lbtn" onclick="setLayer('sst',this)">🌡 SST</button>
           <button class="lbtn" onclick="setLayer('currents',this)">🌀 Current</button>
           <button class="lbtn" onclick="setLayer('rain',this)">🌧 Rain</button>
           <button class="lbtn" onclick="setLayer('pressure',this)">📊 Pressure</button>
-          <button class="lbtn" onclick="setLayer('clouds',this)">☁ Cloud</button>
-          <button class="lbtn" onclick="setLayer('thunder',this)">⚡ Thunder</button>
         </div>
-        <div class="map-tile-row" style="flex-shrink:0;margin-left:6px;">
-          <button class="tile-btn on" id="btn-map" onclick="setTile('map',this)">🗺</button>
-          <button class="tile-btn" id="btn-sat" onclick="setTile('sat',this)">🛰</button>
+        <div class="map-tile-row" style="flex-shrink:0;margin-left:6px">
+          <button class="tile-btn on" onclick="setTile('map',this)">🗺</button>
+          <button class="tile-btn" onclick="setTile('sat',this)">🛰</button>
         </div>
       </div>
       <div class="map-section"><div id="leaflet-map"></div></div>
-      <a id="windy-link" class="windy-btn" href="https://www.windy.com" target="_blank">
+      <a id="windy-link" class="windy-btn" href="https://www.windy.com" target="_blank" rel="noopener">
         🌐 Windy.com에서 라이브 날씨 레이어 보기 ↗
       </a>
     </div>
 
-    <!-- ══ TAB: 물때 ══ -->
+    <!-- TAB: 물때 -->
     <div class="tab" id="tab-multtae">
       <div class="stitle">오늘의 물때 <span class="pill pill-f">음력 계산 · 실제</span></div>
       <div id="mt-content"><div class="loading-msg">⏳ 음력 계산 중...</div></div>
     </div>
 
-    <!-- ══ TAB: 어종 ══ -->
+    <!-- TAB: 어종 -->
     <div class="tab" id="tab-species">
       <div class="stitle">Today's Conditions</div>
-      <div class="cond-bar" id="cond-bar">
+      <div class="cond-bar">
         <div class="cb-item"><div class="cb-val" id="cb-swell">—</div><div class="cb-lbl">Swell</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-dir">—</div><div class="cb-lbl">Dir</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-wind">—</div><div class="cb-lbl">Wind</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-wdir">—</div><div class="cb-lbl">Wind Dir</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-mt">—물</div><div class="cb-lbl">물때</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-sst">—°C</div><div class="cb-lbl">SST</div></div>
-        <div id="cb-warn" style="display:none;" class="badge b-warn">⚠ Moderate</div>
       </div>
       <div class="stitle">어종 선택 <span class="pill pill-a">실제 조건 분석</span></div>
       <div class="sp-scroll" id="sp-scroll"></div>
-      <div id="sp-result"></div>
+      <div id="sp-result"><div class="loading-msg">위에서 어종을 선택해줘</div></div>
     </div>
 
   </div><!-- /content -->
@@ -473,55 +354,55 @@ html,body{height:100%;background:var(--bg);color:var(--text);
     <button class="ni" onclick="showTab('species',this)"><span class="ni-icon">🐟</span><span class="ni-lbl">어종</span></button>
   </nav>
 
-  <!-- MODAL: 포인트 관리 -->
+  <!-- MODAL -->
   <div class="modal-bg" id="modal">
     <div class="modal-hd">
-      <div style="font-size:15px;font-weight:600;">📍 낚시 포인트 관리</div>
-      <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;">✕</button>
+      <div style="font-size:15px;font-weight:600">📍 낚시 포인트 관리</div>
+      <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1">✕</button>
     </div>
     <div class="modal-body">
-      <div id="saved-list" style="margin-bottom:14px;"></div>
-      <div style="border-top:1px solid var(--border);margin-bottom:14px;"></div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">➕ 새 포인트 추가</div>
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;">① 이름 & 메모</div>
+      <div id="saved-list" style="margin-bottom:14px"></div>
+      <div style="border-top:1px solid var(--border);margin-bottom:14px"></div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">➕ 새 포인트 추가</div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">① 이름 & 메모</div>
       <input class="mi" id="m-name" placeholder="포인트 이름 (예: Kiama Downs LBG)"/>
       <input class="mi" id="m-note" placeholder="메모 (LBG · 에깅 · 드러머)"/>
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px;">② 위치 선택</div>
-      <div style="position:relative;margin-bottom:4px;">
-        <input class="mi" id="m-search" placeholder="🔍 장소 검색 (예: Kiama Downs)" oninput="onSearch(this.value)" autocomplete="off" style="margin-bottom:0;padding-right:36px;"/>
-        <span id="spin" style="display:none;position:absolute;right:12px;top:13px;font-size:14px;color:var(--accent);">⟳</span>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px">② 위치 선택</div>
+      <div style="position:relative;margin-bottom:4px">
+        <input class="mi" id="m-search" placeholder="🔍 장소 검색 (예: Kiama Downs)" oninput="onSearch(this.value)" autocomplete="off" style="margin-bottom:0;padding-right:36px"/>
+        <span id="spin" style="display:none;position:absolute;right:12px;top:13px;font-size:14px;color:var(--accent)">⟳</span>
       </div>
       <div class="sdrop" id="sdrop"></div>
       <div class="sel-prev" id="sel-prev">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;justify-content:space-between">
           <div>
-            <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">✓ 선택된 위치</div>
-            <div style="font-size:13px;font-weight:600;" id="prev-name">—</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="prev-coords">—</div>
+            <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">✓ 선택된 위치</div>
+            <div style="font-size:13px;font-weight:600" id="prev-name">—</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px" id="prev-coords">—</div>
           </div>
-          <button onclick="clearSel()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+          <button onclick="clearSel()" style="background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer">✕</button>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;">
-        <button class="mbtn s" onclick="useGPS()" style="margin-bottom:0;font-size:11px;padding:10px 4px;">📡 GPS</button>
-        <button class="mbtn s" onclick="openPicker()" style="margin-bottom:0;font-size:11px;padding:10px 4px;">🗺 지도</button>
-        <button class="mbtn s" onclick="toggleDirect()" style="margin-bottom:0;font-size:11px;padding:10px 4px;">✏️ 좌표</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px">
+        <button class="mbtn s" onclick="useGPS()" style="margin-bottom:0;font-size:11px;padding:10px 4px">📡 GPS</button>
+        <button class="mbtn s" onclick="openPicker()" style="margin-bottom:0;font-size:11px;padding:10px 4px">🗺 지도</button>
+        <button class="mbtn s" onclick="toggleDirect()" style="margin-bottom:0;font-size:11px;padding:10px 4px">✏️ 좌표</button>
       </div>
-      <div id="direct-input" style="display:none;margin-bottom:8px;">
-        <div style="display:flex;gap:7px;">
-          <input class="mi" id="m-lat-d" placeholder="위도 -34.671" style="margin-bottom:0;" oninput="syncDirect()"/>
-          <input class="mi" id="m-lng-d" placeholder="경도 150.849" style="margin-bottom:0;" oninput="syncDirect()"/>
+      <div id="direct-input" style="display:none;margin-bottom:8px">
+        <div style="display:flex;gap:7px">
+          <input class="mi" id="m-lat-d" placeholder="위도 -34.671" style="margin-bottom:0" oninput="syncDirect()"/>
+          <input class="mi" id="m-lng-d" placeholder="경도 150.849" style="margin-bottom:0" oninput="syncDirect()"/>
         </div>
       </div>
       <input type="hidden" id="m-lat"/><input type="hidden" id="m-lng"/>
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px;">③ 마커 색상</div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;" id="color-picker">
-        <div class="cp on" style="background:#00d4ff;" data-c="#00d4ff" onclick="pickColor(this)"></div>
-        <div class="cp" style="background:#f5a623;" data-c="#f5a623" onclick="pickColor(this)"></div>
-        <div class="cp" style="background:#00e676;" data-c="#00e676" onclick="pickColor(this)"></div>
-        <div class="cp" style="background:#ff6b35;" data-c="#ff6b35" onclick="pickColor(this)"></div>
-        <div class="cp" style="background:#b06aff;" data-c="#b06aff" onclick="pickColor(this)"></div>
-        <div class="cp" style="background:#ff4444;" data-c="#ff4444" onclick="pickColor(this)"></div>
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px">③ 마커 색상</div>
+      <div style="display:flex;gap:8px;margin-bottom:16px" id="color-picker">
+        <div class="cp on" style="background:#00d4ff" data-c="#00d4ff" onclick="pickColor(this)"></div>
+        <div class="cp" style="background:#f5a623" data-c="#f5a623" onclick="pickColor(this)"></div>
+        <div class="cp" style="background:#00e676" data-c="#00e676" onclick="pickColor(this)"></div>
+        <div class="cp" style="background:#ff6b35" data-c="#ff6b35" onclick="pickColor(this)"></div>
+        <div class="cp" style="background:#b06aff" data-c="#b06aff" onclick="pickColor(this)"></div>
+        <div class="cp" style="background:#ff4444" data-c="#ff4444" onclick="pickColor(this)"></div>
       </div>
       <button class="mbtn p" onclick="saveLoc()">저장하기</button>
     </div>
@@ -530,48 +411,39 @@ html,body{height:100%;background:var(--bg);color:var(--text);
   <!-- MAP PICKER -->
   <div class="picker-overlay" id="picker-overlay">
     <div class="picker-box">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border);">
-        <div style="font-size:14px;font-weight:600;">🗺 지도에서 위치 선택</div>
-        <button onclick="closePicker()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;">✕</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border)">
+        <div style="font-size:14px;font-weight:600">🗺 지도에서 위치 선택</div>
+        <button onclick="closePicker()" style="background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer">✕</button>
       </div>
-      <div style="font-size:11px;color:var(--accent);padding:7px 14px;background:rgba(0,212,255,.06);">💡 원하는 위치를 탭/클릭하세요</div>
+      <div style="font-size:11px;color:var(--accent);padding:7px 14px;background:rgba(0,212,255,.06)">💡 원하는 위치를 탭/클릭하세요</div>
       <div id="picker-map"></div>
-      <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">
-        <div style="font-size:11px;color:var(--muted);" id="picker-coords">위치를 선택해주세요</div>
-        <button id="picker-confirm" onclick="confirmPick()" style="display:none;background:var(--accent);color:#000;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">선택 ✓</button>
+      <div style="padding:10px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:11px;color:var(--muted)" id="picker-coords-txt">위치를 선택해주세요</div>
+        <button id="picker-confirm" onclick="confirmPick()" style="display:none;background:var(--accent);color:#000;border:none;border-radius:9px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">선택 ✓</button>
       </div>
     </div>
   </div>
 
 </div><!-- /app -->
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin=""></script>
 <script>
 'use strict';
-
-// ═══════════════════════════════════════════════════
-// MODULE 1: STATE
-// ═══════════════════════════════════════════════════
-let LOCS = JSON.parse(localStorage.getItem('v5_locs') || '[]');
-let activeIdx = 0;
-let selColor = '#00d4ff';
-let searchTimer = null;
-let pickedLatLng = null;
-let userLat = null, userLng = null;
-let weatherData = null; // cached API data
-let activeMtDay = 1;
-let activeSolDay = 0;
-let activeMarineDay = 0;
-let activeSpecies = 'squid';
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let LOCS = [];
+try { LOCS = JSON.parse(localStorage.getItem('v5_locs') || '[]'); } catch(e) { LOCS = []; }
+let activeIdx = 0, selColor = '#00d4ff', searchTimer = null;
+let pickedLatLng = null, userLat = null, userLng = null;
+let marineDays = [], activeSolDay = 0, activeMarineDay = 0, activeSpecies = 'squid';
 let mapL = null, pickerMapL = null, mapMarkers = [], pickerMarker = null;
-let currentLayer = 'wind', currentTile = 'map';
-let osmTileLayer = null;
+let currentLayer = 'wind';
 
 function saveLocs() { try { localStorage.setItem('v5_locs', JSON.stringify(LOCS)); } catch(e) {} }
 
-// ═══════════════════════════════════════════════════
-// MODULE 2: LUNAR MATH (real calculation)
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════
+// LUNAR MATH (real calculation, no mock)
+// ═══════════════════════════════════════════
 const LUNAR_REF = new Date('2025-01-29T12:36:00Z');
 const LUNAR_CYCLE = 29.53058867;
 
@@ -579,194 +451,238 @@ function lunarAge(date) {
   const d = (date - LUNAR_REF) / 86400000;
   return ((d % LUNAR_CYCLE) + LUNAR_CYCLE) % LUNAR_CYCLE;
 }
-
 function moonPhase(age) {
-  if (age < 1.85)  return { n: 'New Moon',         e: '🌑', pct: 2 };
-  if (age < 7.38)  return { n: 'Waxing Crescent',  e: '🌒', pct: Math.round(age/7.38*48)+2 };
-  if (age < 9.22)  return { n: 'First Quarter',    e: '🌓', pct: 50 };
-  if (age < 14.76) return { n: 'Waxing Gibbous',   e: '🌔', pct: Math.round(50+(age-9.22)/5.54*48) };
-  if (age < 16.61) return { n: 'Full Moon',         e: '🌕', pct: 98 };
-  if (age < 22.15) return { n: 'Waning Gibbous',   e: '🌖', pct: Math.round(98-(age-14.76)/7.38*48) };
-  if (age < 23.99) return { n: 'Last Quarter',      e: '🌗', pct: 50 };
-  return { n: 'Waning Crescent', e: '🌘', pct: Math.round((29.53-age)/5.54*48) };
+  if (age < 1.85)  return { n:'New Moon',        e:'🌑', pct:2 };
+  if (age < 7.38)  return { n:'Waxing Crescent', e:'🌒', pct:Math.round(age/7.38*48)+2 };
+  if (age < 9.22)  return { n:'First Quarter',   e:'🌓', pct:50 };
+  if (age < 14.76) return { n:'Waxing Gibbous',  e:'🌔', pct:Math.round(50+(age-9.22)/5.54*48) };
+  if (age < 16.61) return { n:'Full Moon',        e:'🌕', pct:98 };
+  if (age < 22.15) return { n:'Waning Gibbous',  e:'🌖', pct:Math.round(98-(age-14.76)/7.38*48) };
+  if (age < 23.99) return { n:'Last Quarter',     e:'🌗', pct:50 };
+  return { n:'Waning Crescent', e:'🌘', pct:Math.round((29.53-age)/5.54*48) };
 }
-
 function multtae(date) {
   const age = lunarAge(date);
   let day = Math.floor(age) + 1;
-  if (day > 15) day = day - 15;
+  if (day > 15) day -= 15;
   return Math.max(1, Math.min(15, day));
 }
-
 function solScore(age) {
-  // Best near full moon and new moon
-  if (age < 2 || age > 27.5) return { s: 72, g: 'Good', c: '#00d4ff' };
-  if (age < 4)  return { s: 65, g: 'Fair',      c: '#6b8aaa' };
-  if (age < 8)  return { s: 75, g: 'Good',      c: '#00d4ff' };
-  if (age < 11) return { s: 82, g: 'Great ✅',  c: '#00e676' };
-  if (age < 17) return { s: 90, g: 'Prime ⭐',  c: '#f5a623' };
-  if (age < 21) return { s: 78, g: 'Good',      c: '#00d4ff' };
-  if (age < 25) return { s: 55, g: 'Fair',      c: '#6b8aaa' };
-  return { s: 45, g: 'Poor', c: '#3a5570' };
+  if (age < 2 || age > 27.5) return { s:72, g:'Good',       c:'#00d4ff' };
+  if (age < 4)  return { s:65, g:'Fair',       c:'#6b8aaa' };
+  if (age < 8)  return { s:75, g:'Good',       c:'#00d4ff' };
+  if (age < 11) return { s:82, g:'Great ✅',   c:'#00e676' };
+  if (age < 17) return { s:90, g:'Prime ⭐',   c:'#f5a623' };
+  if (age < 21) return { s:78, g:'Good',       c:'#00d4ff' };
+  if (age < 25) return { s:55, g:'Fair',       c:'#6b8aaa' };
+  return { s:45, g:'Poor', c:'#3a5570' };
 }
-
-// Solunar peak times based on moon transit
 function solunarPeaks(date) {
-  const lunarDay = 24 * 60 + 50; // lunar day in minutes
+  const LDA = 24*60+50;
   const ref = new Date('2025-01-29T00:00:00Z');
-  const diffMin = (date - ref) / 60000;
-  const offset = ((diffMin % lunarDay) + lunarDay) % lunarDay;
-  function toHM(m) {
-    const h = Math.floor(m / 60) % 24;
-    const mn = Math.floor(m % 60);
-    return String(h).padStart(2,'0') + ':' + String(mn).padStart(2,'0');
-  }
-  function addM(hm, mins) {
-    const [h,m] = hm.split(':').map(Number);
-    const t = h*60+m+mins;
-    return String(Math.floor(t/60)%24).padStart(2,'0') + ':' + String(t%60).padStart(2,'0');
-  }
-  const m1 = toHM(offset);
-  const m2 = toHM((offset + lunarDay/2) % lunarDay);
-  const n1 = toHM((offset + lunarDay/4) % lunarDay);
-  const n2 = toHM((offset + 3*lunarDay/4) % lunarDay);
-  return {
-    m1, m1e: addM(m1,120),
-    m2, m2e: addM(m2,120),
-    n1, n1e: addM(n1,60),
-    n2, n2e: addM(n2,60)
-  };
+  const off = ((((date-ref)/60000) % LDA) + LDA) % LDA;
+  function hm(m) { return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(Math.floor(m%60)).padStart(2,'0'); }
+  function add(t,n) { const [h,m]=t.split(':').map(Number); const v=h*60+m+n; return String(Math.floor(v/60)%24).padStart(2,'0')+':'+String(v%60).padStart(2,'0'); }
+  const m1=hm(off), m2=hm((off+LDA/2)%LDA), n1=hm((off+LDA/4)%LDA), n2=hm((off+3*LDA/4)%LDA);
+  return { m1, m1e:add(m1,120), m2, m2e:add(m2,120), n1, n1e:add(n1,60), n2, n2e:add(n2,60) };
 }
-
 function activityHourly(peaks, score) {
-  const vals = [];
-  function ph(hm) { const [h,m]=hm.split(':').map(Number); return h+m/60; }
-  const pm1=ph(peaks.m1), pm2=ph(peaks.m2), pn1=ph(peaks.n1), pn2=ph(peaks.n2);
-  for (let h=0; h<24; h++) {
-    function dist(p) { return Math.min(Math.abs(h-p), 24-Math.abs(h-p)); }
-    const v = Math.max(
-      score * Math.max(0, 1 - dist(pm1)/2),
-      score * Math.max(0, 1 - dist(pm2)/2),
-      score * 0.55 * Math.max(0, 1 - dist(pn1)/1.5),
-      score * 0.55 * Math.max(0, 1 - dist(pn2)/1.5),
-      12
-    );
-    vals.push(Math.round(Math.min(99, v)));
-  }
-  return vals;
+  function ph(t) { const [h,m]=t.split(':').map(Number); return h+m/60; }
+  const pm1=ph(peaks.m1),pm2=ph(peaks.m2),pn1=ph(peaks.n1),pn2=ph(peaks.n2);
+  return Array.from({length:24},(_,h)=>{
+    function dst(p){return Math.min(Math.abs(h-p),24-Math.abs(h-p));}
+    return Math.round(Math.min(99,Math.max(12,
+      score*Math.max(0,1-dst(pm1)/2),score*Math.max(0,1-dst(pm2)/2),
+      score*.55*Math.max(0,1-dst(pn1)/1.5),score*.55*Math.max(0,1-dst(pn2)/1.5))));
+  });
 }
-
-// Tide times via M2 harmonic (calibrated for Sydney)
 function calcTides(dayOffset) {
-  const M2 = 12.4206; // hours
-  const refHigh = new Date('2025-01-01T04:30:00+11:00');
-  const base = new Date();
-  base.setDate(base.getDate() + dayOffset);
-  base.setHours(0, 0, 0, 0);
-  const hrsSince = (base - refHigh) / 3600000;
-  let phase = ((hrsSince % M2) + M2) % M2;
-  let h = M2 - phase;
-  const tides = [];
-  while (h < 24) {
-    const htDate = new Date(base.getTime() + h*3600000);
-    const ag = lunarAge(htDate);
-    const ht = (1.38 + 0.28*Math.sin(ag/14.76*Math.PI)).toFixed(2);
-    tides.push({ type:'high', h:htDate.getHours(), m:htDate.getMinutes(), height:+ht });
-    const lt = h + M2/2;
-    if (lt < 24) {
-      const ltDate = new Date(base.getTime() + lt*3600000);
-      const lt2 = (0.32 - 0.08*Math.sin(lunarAge(ltDate)/14.76*Math.PI)).toFixed(2);
-      tides.push({ type:'low', h:ltDate.getHours(), m:ltDate.getMinutes(), height:+lt2 });
-    }
-    h += M2;
+  const M2=12.4206, ref=new Date('2025-01-01T04:30:00+11:00');
+  const base=new Date(); base.setDate(base.getDate()+dayOffset); base.setHours(0,0,0,0);
+  let h=((-(base-ref)/3600000)%M2+M2)%M2; h=M2-h; if(h<0) h+=M2;
+  const tides=[];
+  while(h<24){
+    const hd=new Date(base.getTime()+h*3600000);
+    const ag=lunarAge(hd);
+    tides.push({type:'high',h:hd.getHours(),m:hd.getMinutes(),height:+(1.38+0.28*Math.sin(ag/14.76*Math.PI)).toFixed(2)});
+    const lt=h+M2/2;
+    if(lt<24){const ld=new Date(base.getTime()+lt*3600000); tides.push({type:'low',h:ld.getHours(),m:ld.getMinutes(),height:+(0.32-0.08*Math.sin(lunarAge(ld)/14.76*Math.PI)).toFixed(2)}); }
+    h+=M2;
   }
-  return tides.sort((a,b) => (a.h*60+a.m)-(b.h*60+b.m));
+  return tides.sort((a,b)=>(a.h*60+a.m)-(b.h*60+b.m));
+}
+function fmt2(h,m){return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0');}
+
+// ═══════════════════════════════════════════
+// WILLY API KEY — 형이 여기 교체
+// ═══════════════════════════════════════════
+const WILLY_KEY = 'NjlkY2U4NDMyNTAxYzcxMjU1NTE4Ym';
+
+// CORS 프록시 3개 순서대로 시도
+const PROXIES = [
+  u => 'https://corsproxy.io/?'+encodeURIComponent(u),
+  u => 'https://api.allorigins.win/get?url='+encodeURIComponent(u),
+  u => 'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(u),
+];
+
+async function willyFetch(path) {
+  const rawUrl = 'https://api.willyweather.com.au/v2/'+WILLY_KEY+path;
+  let lastErr = null;
+  for (let i = 0; i < PROXIES.length; i++) {
+    const proxyUrl = PROXIES[i](rawUrl);
+    console.log('[Willy] proxy#'+i+' trying...');
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(()=>ctrl.abort(), 9000);
+      const res = await fetch(proxyUrl, {signal: ctrl.signal});
+      clearTimeout(tid);
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      const json = await res.json();
+      // allorigins wraps in {contents}, corsproxy/codetabs return raw
+      const raw = (json && json.contents !== undefined) ? json.contents : JSON.stringify(json);
+      const parsed = JSON.parse(raw);
+      console.log('[Willy] proxy#'+i+' ✓');
+      return parsed;
+    } catch(e) {
+      console.warn('[Willy] proxy#'+i+' ✗', e.message);
+      lastErr = e;
+    }
+  }
+  throw new Error('All proxies failed: '+(lastErr ? lastErr.message : 'unknown'));
 }
 
-function fmt(h,m) { return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'); }
-
-// ═══════════════════════════════════════════════════
-// MODULE 3: OPEN-METEO API (real weather)
-// ═══════════════════════════════════════════════════
 async function fetchWeather(lat, lng) {
-  const marine = `https://marine-api.open-meteo.com/v1/marine`
-    + `?latitude=${lat}&longitude=${lng}`
-    + `&hourly=wave_height,wave_direction,wave_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction`
-    + `&wind_speed_unit=kmh&forecast_days=14&timezone=Australia%2FSydney`;
-  const weather = `https://api.open-meteo.com/v1/forecast`
-    + `?latitude=${lat}&longitude=${lng}`
-    + `&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,surface_pressure,temperature_2m`
-    + `&daily=sunrise,sunset&wind_speed_unit=kmh&forecast_days=14&timezone=Australia%2FSydney`;
-
-  const [mr, wr] = await Promise.all([fetch(marine), fetch(weather)]);
-  const md = await mr.json();
-  const wd = await wr.json();
-
-  // Parse into daily array
-  const days = [];
-  const now = new Date();
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-
-  function degToCompass(deg) {
-    const d = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
-    return d[Math.round(deg/22.5)%16];
-  }
-  function avg(arr) { const a=arr.filter(v=>v!=null); return a.length?a.reduce((x,y)=>x+y,0)/a.length:0; }
-
-  for (let d = 0; d < 14; d++) {
-    const s = d*24, e = s+24;
-    const swells = md.hourly.wave_height.slice(s,e);
-    const wds    = md.hourly.wave_direction.slice(s,e);
-    const winds  = wd.hourly.wind_speed_10m.slice(s,e);
-    const wdirs  = wd.hourly.wind_direction_10m.slice(s,e);
-    const rains  = wd.hourly.precipitation_probability.slice(s,e);
-    const pres   = wd.hourly.surface_pressure.slice(s,e);
-    const ssts   = md.hourly.sea_surface_temperature.slice(s,e);
-    const currs  = md.hourly.ocean_current_velocity.slice(s,e);
-
-    const swellH  = +avg(swells).toFixed(1);
-    const swellD  = degToCompass(avg(wds));
-    const windKmh = Math.round(avg(winds));
-    const windD   = degToCompass(avg(wdirs));
-    const rain    = Math.round(avg(rains));
-    const pressure= Math.round(avg(pres));
-    const sst     = +avg(ssts).toFixed(1);
-    const currMs  = avg(currs);
-    const currKmh = +(currMs*3.6).toFixed(2);
-    const currKt  = +(currMs*1.944).toFixed(2);
-
-    const warn = swellH>3?'rough':swellH>2?'moderate':'good';
-
-    // Hourly for this day
-    const hours = [];
-    for (let h=0; h<24; h+=2) {
-      const hi = s+h;
-      const t = h===0?(d===0?'NOW':(h||12)+'AM'):(h<12?h+'AM':(h===12?'12PM':(h-12)+'PM'));
-      hours.push({
-        t, now: d===0&&h===0,
-        sw: ((md.hourly.wave_height[hi]||0)).toFixed(1)+'m',
-        per: Math.round(md.hourly.wave_period[hi]||10)+'s',
-        dir: degToCompass(md.hourly.wave_direction[hi]||180),
-        wind: Math.round(wd.hourly.wind_speed_10m[hi]||0)+'km/h',
-        rain: Math.round(wd.hourly.precipitation_probability[hi]||0)+'%'
-      });
+  console.log('[fetchWeather] lat='+lat+' lng='+lng+' key='+WILLY_KEY.substring(0,6)+'...');
+  if (WILLY_KEY && WILLY_KEY !== 'YOUR_API_KEY_HERE') {
+    try {
+      console.log('[fetchWeather] Trying WillyWeather...');
+      const searchData = await willyFetch('/search.json?lat='+lat.toFixed(4)+'&lng='+lng.toFixed(4)+'&units=distance:km');
+      if (!searchData || !searchData.length) throw new Error('No location found');
+      const locId = searchData[0].id;
+      console.log('[fetchWeather] locationId='+locId+' name='+searchData[0].name);
+      const params=[
+        'forecasts[wind][days]=7','forecasts[tides][days]=7','forecasts[swell][days]=7',
+        'forecasts[rainfallprobability][days]=7','forecasts[sunrisesunset][days]=7',
+        'forecasts[pressure][days]=7','forecasts[windgust][days]=7'
+      ].join('&');
+      const forecastData = await willyFetch('/locations/'+locId+'/weather.json?'+params);
+      console.log('[fetchWeather] WillyWeather ✓ parsing...');
+      const days = parseWilly(forecastData);
+      console.log('[fetchWeather] Parsed '+days.length+' days from WillyWeather');
+      updateSrcPill('WillyWeather BOM · 정확', '#00e676', 'rgba(0,230,118,.15)');
+      return days;
+    } catch(e) {
+      console.error('[fetchWeather] WillyWeather failed:', e.message, '→ fallback to Open-Meteo');
+      updateSrcPill('Open-Meteo · 참고용', '#f5a623', 'rgba(245,166,35,.12)');
     }
+  } else {
+    console.log('[fetchWeather] No API key → Open-Meteo');
+    updateSrcPill('Open-Meteo · 참고용', '#f5a623', 'rgba(245,166,35,.12)');
+  }
+  return await fetchOpenMeteo(lat, lng);
+}
 
+function updateSrcPill(txt, col, bg) {
+  const p = document.getElementById('src-pill');
+  if (!p) return;
+  p.textContent = txt; p.style.color = col; p.style.background = bg;
+  // Update info bar
+  const bar = document.getElementById('willy-info-bar');
+  if (!bar) return;
+  const isWilly = txt.includes('WillyWeather');
+  bar.style.background = isWilly ? 'rgba(0,230,118,.08)' : 'rgba(245,166,35,.07)';
+  bar.style.borderColor = isWilly ? 'rgba(0,230,118,.25)' : 'rgba(245,166,35,.25)';
+  bar.querySelector('span:last-child').innerHTML = isWilly
+    ? '이 데이터는 <strong style="color:var(--green)">WillyWeather 공식 API</strong>를 기반으로 제공됩니다.'
+    : '현재 <strong style="color:var(--gold)">Open-Meteo</strong> 데이터 표시 중 (API 키 확인 필요)';
+}
+
+function parseWilly(data) {
+  const fc = data.forecasts || {};
+  const swD = (fc.swell && fc.swell.days) || [];
+  const wiD = (fc.wind  && fc.wind.days)  || [];
+  const tiD = (fc.tides && fc.tides.days) || [];
+  const rnD = (fc.rainfallprobability && fc.rainfallprobability.days) || [];
+  const suD = (fc.sunrisesunset && fc.sunrisesunset.days) || [];
+  const prD = (fc.pressure && fc.pressure.days) || [];
+  const guD = (fc.windgust && fc.windgust.days) || [];
+  const N = Math.min(Math.max(swD.length, wiD.length, 1), 7);
+  const now = new Date(), DNs = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const days = [];
+  for (let d = 0; d < N; d++) {
     const date = new Date(now); date.setDate(date.getDate()+d);
-    const sunrise = wd.daily.sunrise[d] ? new Date(wd.daily.sunrise[d]).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:false}) : '06:17';
-    const sunset  = wd.daily.sunset[d]  ? new Date(wd.daily.sunset[d]).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:false}) : '17:52';
-
-    days.push({ date, dayName:dayNames[date.getDay()], dayNum:date.getDate(), isToday:d===0,
-      swellH, swellD, windKmh, windD, rain, pressure, sst, currKmh, currKt, warn, hours, sunrise, sunset,
-      tides: calcTides(d), condIcon: swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀' });
+    function avgE(arr, fld) { const v=arr.map(e=>e[fld]||0).filter(x=>x!=null); return v.length?v.reduce((a,b)=>a+b,0)/v.length:0; }
+    function maxE(arr, fld) { const v=arr.map(e=>e[fld]||0).filter(x=>x!=null); return v.length?Math.max(...v):0; }
+    const se = (swD[d]||{}).entries||[], we=(wiD[d]||{}).entries||[];
+    const te = (tiD[d]||{}).entries||[], re=(rnD[d]||{}).entries||[];
+    const sue=(suD[d]||{}).entries||[], pre=(prD[d]||{}).entries||[];
+    const gue=(guD[d]||{}).entries||[];
+    const swellH=+avgE(se,'height').toFixed(1), swellD=(se[0]||{}).directionText||(se[0]||{}).direction||'SSE';
+    const windKmh=Math.round(avgE(we,'speed')), windD=(we[0]||{}).directionText||(we[0]||{}).direction||'NNE';
+    const gustKmh=gue.length?Math.round(maxE(gue,'speed')):Math.round(windKmh*1.35);
+    const rain=Math.round(avgE(re,'probability')), pressure=Math.round(avgE(pre,'pressure')||1015);
+    const tides=te.map(e=>{const dt=new Date(e.dateTime);return{type:e.type==='high'?'high':'low',h:dt.getHours(),m:dt.getMinutes(),height:+(e.height||0).toFixed(2)};}).sort((a,b)=>(a.h*60+a.m)-(b.h*60+b.m));
+    const sr=sue.find(e=>e.type==='sunrise')||{}, ss=sue.find(e=>e.type==='sunset')||{};
+    const fmtDT=dt=>dt?new Date(dt).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:false}):null;
+    const sunrise=fmtDT(sr.dateTime)||'06:17', sunset=fmtDT(ss.dateTime)||'17:52';
+    const hours=[];
+    for(let h=0;h<24;h+=2){
+      const t=h===0?(d===0?'NOW':'12AM'):(h<12?h+'AM':(h===12?'12PM':(h-12)+'PM'));
+      function near(arr,dT,fld,def){const e=arr.find(x=>Math.abs(new Date(x.dateTime||0).getHours()-h)<=1);return e?(e[fld]||def):def;}
+      hours.push({t,now:d===0&&h===0,sw:(near(se,h,'height',swellH)).toFixed(1)+'m',
+        per:Math.round(near(se,h,'period',10))+'s',dir:near(se,h,'directionText',swellD)||swellD,
+        wind:Math.round(near(we,h,'speed',windKmh))+'km/h',rain:Math.round(near(re,h,'probability',rain))+'%'});
+    }
+    const warn=swellH>3?'rough':swellH>2?'moderate':'good';
+    days.push({date,dayName:DNs[date.getDay()],dayNum:date.getDate(),isToday:d===0,
+      swellH,swellD,windKmh,windD,windGust:gustKmh,rain,pressure,sst:21,
+      currKmh:'—',currKt:'—',warn,hours,sunrise,sunset,
+      tides:tides.length>0?tides:calcTides(d),
+      condIcon:swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀',
+      src:'WillyWeather'});
   }
   return days;
 }
 
-// ═══════════════════════════════════════════════════
-// MODULE 4: MT DATA
-// ═══════════════════════════════════════════════════
-const MT = [
+async function fetchOpenMeteo(lat, lng) {
+  console.log('[OpenMeteo] fetching...');
+  const marine='https://marine-api.open-meteo.com/v1/marine?latitude='+lat+'&longitude='+lng+'&hourly=wave_height,wave_direction,wave_period,sea_surface_temperature,ocean_current_velocity,ocean_current_direction&wind_speed_unit=kmh&forecast_days=7&timezone=Australia%2FSydney';
+  const weather='https://api.open-meteo.com/v1/forecast?latitude='+lat+'&longitude='+lng+'&hourly=wind_speed_10m,wind_direction_10m,precipitation_probability,surface_pressure&daily=sunrise,sunset&wind_speed_unit=kmh&forecast_days=7&timezone=Australia%2FSydney';
+  const ctrl=new AbortController(); const tid=setTimeout(()=>ctrl.abort(),12000);
+  const [mr,wr]=await Promise.all([fetch(marine,{signal:ctrl.signal}),fetch(weather,{signal:ctrl.signal})]);
+  clearTimeout(tid);
+  if(!mr.ok||!wr.ok) throw new Error('OpenMeteo HTTP error');
+  const md=await mr.json(), wd=await wr.json();
+  console.log('[OpenMeteo] ✓');
+  const now=new Date(),DNs=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  function d2c(deg){const a=['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return a[Math.round((deg||0)/22.5)%16];}
+  function avg(arr){const a=(arr||[]).filter(v=>v!=null);return a.length?a.reduce((x,y)=>x+y,0)/a.length:0;}
+  const days=[];
+  for(let d=0;d<7;d++){
+    const s=d*24,e=s+24,date=new Date(now);date.setDate(date.getDate()+d);
+    const swellH=+avg(md.hourly.wave_height.slice(s,e)).toFixed(1);
+    const swellD=d2c(avg(md.hourly.wave_direction.slice(s,e)));
+    const windKmh=Math.round(avg(wd.hourly.wind_speed_10m.slice(s,e)));
+    const windD=d2c(avg(wd.hourly.wind_direction_10m.slice(s,e)));
+    const rain=Math.round(avg(wd.hourly.precipitation_probability.slice(s,e)));
+    const pressure=Math.round(avg(wd.hourly.surface_pressure.slice(s,e)));
+    const sst=+avg(md.hourly.sea_surface_temperature.slice(s,e)).toFixed(1);
+    const cMs=avg(md.hourly.ocean_current_velocity.slice(s,e));
+    const sunrise=wd.daily.sunrise[d]?new Date(wd.daily.sunrise[d]).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:false}):'06:17';
+    const sunset=wd.daily.sunset[d]?new Date(wd.daily.sunset[d]).toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',hour12:false}):'17:52';
+    const hours=[];
+    for(let h=0;h<24;h+=2){const hi=s+h;const t=h===0?(d===0?'NOW':'12AM'):(h<12?h+'AM':(h===12?'12PM':(h-12)+'PM'));
+      hours.push({t,now:d===0&&h===0,sw:((md.hourly.wave_height[hi]||0)).toFixed(1)+'m',per:Math.round(md.hourly.wave_period[hi]||10)+'s',dir:d2c(md.hourly.wave_direction[hi]||180),wind:Math.round(wd.hourly.wind_speed_10m[hi]||0)+'km/h',rain:Math.round(wd.hourly.precipitation_probability[hi]||0)+'%'});}
+    const warn=swellH>3?'rough':swellH>2?'moderate':'good';
+    days.push({date,dayName:DNs[date.getDay()],dayNum:date.getDate(),isToday:d===0,swellH,swellD,windKmh,windD,windGust:Math.round(windKmh*1.35),rain,pressure,sst,currKmh:(cMs*3.6).toFixed(2),currKt:(cMs*1.944).toFixed(2),warn,hours,sunrise,sunset,tides:calcTides(d),condIcon:swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀',src:'OpenMeteo'});
+  }
+  return days;
+}
+
+// ═══════════════════════════════════════════
+// MT DATA
+// ═══════════════════════════════════════════
+const MT=[
   {day:1,name:'한물',type:'sari',strength:'강함',range:1.45,score:55,fish:'킹피시·트레발리',time:'만조 2시간 전',spot:'수중여·홈통',current:'강한 조류',advice:['사리 직후. 조류 강해 포인트 선정 중요.','강한 조류 등지는 포인트. 봉돌 무게 늘려야 해.','킹피시·트레발리 회유 활발.']},
   {day:2,name:'두물',type:'sari',strength:'매우강함',range:1.52,score:50,fish:'킹피시·방어',time:'만조 전 3시간',spot:'조류 맞는 여밭',current:'매우 강한 조류',advice:['사리 중 조류 최강.','무거운 봉돌 필수. 채비 유실 주의.','방어·킹피시 최상급 찬스.']},
   {day:3,name:'세물',type:'sari',strength:'매우강함',range:1.55,score:48,fish:'방어·참돔',time:'만조 전 2시간',spot:'조류 센 수중여',current:'최강 조류',advice:['물때 중 조류 최강.','바닥 채비 불가. 지깅 위주.','갯목 포인트 최우선.']},
@@ -774,1124 +690,402 @@ const MT = [
   {day:5,name:'다섯물',type:'mid',strength:'보통강',range:1.38,score:70,fish:'스내퍼·킹피시',time:'만조 전후',spot:'갯바위 전반',current:'적당한 조류',advice:['낚시하기 좋은 물때.','에깅 시작하기 좋음.','스내퍼 바닥 채비 가능.']},
   {day:6,name:'여섯물',type:'mid',strength:'보통강',range:1.28,score:74,fish:'스내퍼·오징어',time:'만조 ±2시간',spot:'넓은 여밭',current:'적당한 조류',advice:['에깅 최적 물때 시작.','스내퍼 바닥 채비 극대화.','포인트 선택 자유도 높음.']},
   {day:7,name:'일곱물',type:'mid',strength:'보통',range:1.14,score:78,fish:'스내퍼·오징어',time:'만조 전후 2시간',spot:'갯바위·여밭',current:'보통 조류',advice:['에깅 황금 물때.','스내퍼 + 에기 교대 운용.','체력 소모 적은 조류.']},
-  {day:8,name:'여덟물',type:'mid',strength:'보통',range:1.05,score:80,fish:'오징어·스내퍼',time:'하루 종일',spot:'전 포인트',current:'잔잔한 조류',advice:['에깅 최전성기! 조류 딱 좋아.','스내퍼·도미 전층 유영.','초보도 낚기 좋은 물때.']},
+  {day:8,name:'여덟물',type:'mid',strength:'보통',range:1.05,score:80,fish:'오징어·스내퍼',time:'하루 종일',spot:'전 포인트',current:'잔잔한 조류',advice:['에깅 최전성기!','스내퍼·도미 전층 유영.','초보도 낚기 좋은 물때.']},
   {day:9,name:'아홉물',type:'mid',strength:'약함',range:0.92,score:75,fish:'오징어·감성돔',time:'해질 무렵',spot:'만·홈통',current:'약한 조류',advice:['채비 가라앉기 좋아짐.','감성돔 야간 시작.','에깅은 계속 유효.']},
-  {day:10,name:'열물',type:'mid',strength:'약함',range:0.78,score:68,fish:'감성돔·오징어',time:'야간',spot:'홈통·방파제',current:'약한 조류',advice:['감성돔 활성 물때.','바닥 채비 안정적.','전통 찌낚시 효과 좋음.']},
+  {day:10,name:'열물',type:'mid',strength:'약함',range:0.78,score:68,fish:'감성돔·오징어',time:'야간',spot:'홈통·방파제',current:'약한 조류',advice:['감성돔 활성 물때.','바닥 채비 안정적.','전통 찌낚시 효과.']},
   {day:11,name:'열한물',type:'jogeum',strength:'아주약함',range:0.58,score:55,fish:'감성돔·볼락',time:'야간 전반',spot:'여밭 안쪽',current:'거의 정조',advice:['조금 접근. 회유어 감소.','감성돔·볼락 야간 위주.','채비 무게 가볍게.']},
-  {day:12,name:'열두물',type:'jogeum',strength:'아주약함',range:0.45,score:45,fish:'볼락·도다리',time:'해 뜰 무렵',spot:'내만·방파제',current:'정조',advice:['조류 거의 없음.','볼락·도다리 소형어 위주.','낚시 난이도 높음.']},
+  {day:12,name:'열두물',type:'jogeum',strength:'아주약함',range:0.45,score:45,fish:'볼락·도다리',time:'해 뜰 무렵',spot:'내만·방파제',current:'정조',advice:['조류 거의 없음.','볼락·도다리 소형어.','낚시 난이도 높음.']},
   {day:13,name:'열세물',type:'jogeum',strength:'아주약함',range:0.42,score:42,fish:'볼락·학꽁치',time:'오전 이른',spot:'내만',current:'정조',advice:['조금 최극기.','소형 어종 위주.','LBG·에깅 비추.']},
   {day:14,name:'열네물',type:'jogeum',strength:'아주약함',range:0.48,score:48,fish:'볼락·전갱이',time:'만조 전',spot:'내만',current:'서서히 생김',advice:['조금에서 회복 시작.','볼락 야간 나쁘지 않음.','내일 포인트 답사 추천.']},
-  {day:15,name:'열다섯물',type:'sari',strength:'보통',range:0.85,score:60,fish:'킹피시·스내퍼',time:'만조 전 2시간',spot:'여밭',current:'조류 살아남',advice:['한사리 시작. 조류 서서히 강해짐.','킹피시·스내퍼 기지개.','내일부터 본격 사리.']},
+  {day:15,name:'열다섯물',type:'sari',strength:'보통',range:0.85,score:60,fish:'킹피시·스내퍼',time:'만조 전 2시간',spot:'여밭',current:'조류 살아남',advice:['한사리 시작.','킹피시·스내퍼 기지개.','내일부터 본격 사리.']},
 ];
-const KNUM = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
+const KNUM=['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
 
-// ═══════════════════════════════════════════════════
-// MODULE 5: SPECIES DATA
-// ═══════════════════════════════════════════════════
-const SPECIES = [
-  { id:'drummer', emoji:'🐟', name:'Drummer', col:'#00e676',
-    rig:{ml:'20lb Mono/Braid',ld:'30lb Fluoro',hk:'#4–#2 Suicide',wt:'Ball 1–2oz',dp:'Bottom to 3m',tc:'Float / Running sinker'},
-    baits:[{r:1,n:'Green Cunjevoi',e:5,w:'드러머 No.1'},{r:2,n:'Bread dough',e:4,w:'고압 안정기'},{r:3,n:'Abalone gut',e:4,w:'현지 검증'},{r:4,n:'Cabbage weed',e:3,w:'자연 서식'}],
-    colors:null,
-    tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'만조 직전~만조 후 2시간',tidalState:'만조 (High Tide)',tidalNote:'파도가 바위 덮으며 먹이 씻겨내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'드러머는 만조 전후가 압도적으로 좋아. 파도가 바위를 덮으면서 커네보이 같은 먹이가 씻겨 내려와 드러머가 모여들어.'}},
-  { id:'bream', emoji:'🐠', name:'Bream', col:'#00d4ff',
-    rig:{ml:'6–8lb Mono',ld:'8lb Fluoro',hk:'#6–#4 Circle',wt:'Split shot 0–1/8oz',dp:'Bottom hugging',tc:'Finesse / Bream SP'},
-    baits:[{r:1,n:'Nippers (Yabbies)',e:5,w:'Incoming tide 최강'},{r:2,n:'Prawns (fresh)',e:5,w:'올라운드'},{r:3,n:'Peeled prawn tail',e:4,w:'작은 바늘'},{r:4,n:'Bread crust',e:3,w:'표층 피딩'}],
-    colors:null,
-    tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'간조 후 1시간부터 만조까지',tidalState:'들물 (Incoming)',tidalNote:'신선한 물·먹이 유입으로 활성',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'브림은 들물 때가 최고야. 들물이 베이트피시와 갑각류를 안으로 몰아줘.'}},
-  { id:'snapper', emoji:'🐡', name:'Snapper', col:'#ff6b9d',
-    rig:{ml:'20–30lb Braid',ld:'30–40lb Fluoro',hk:'3/0–5/0 Circle',wt:'Paternoster 2–4oz',dp:'Bottom to 5m up',tc:'Paternoster / Slow jig'},
-    baits:[{r:1,n:'Fresh squid (whole)',e:5,w:'에깅으로 직접 잡은'},{r:2,n:'Pilchard (rigged)',e:5,w:'검증 미끼'},{r:3,n:'Prawns (large)',e:4,w:'파터노스터'},{r:4,n:'Slow jig 40–80g',e:4,w:'조류에 슬로우지그'}],
-    colors:[{n:'Pink / Red',h:'#ff4488',top:true,w:'흐린날·깊은수심 No.1'},{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린 조건 2위'},{n:'White / Pearl',h:'#ddeeff',top:false,w:'맑은물 얕은 곳'},{n:'Blue / Purple',h:'#5544ff',top:false,w:'20m+ 깊은 수심'}],
-    tide:{bestTime:'만조 전후 2–3시간',bestTimeNote:'일몰 전후 만조 조합 최강',tidalState:'만조 + 날물 초반',tidalNote:'수심 깊어지고 조류 흘러야 활성',highTide:5,risingTide:3,lowTide:2,fallingTide:4,tip:'스내퍼는 만조 전후 깊은 수중 암초에서 가장 활발해. 날물 초반 조류가 먹이를 암초 쪽으로 밀어줘서 좋아.'}},
-  { id:'jewfish', emoji:'🦈', name:'Jewfish', col:'#b06aff',
-    rig:{ml:'PE 3–5 Braid',ld:'60–80lb Fluoro',hk:'5/0–8/0 Circle',wt:'60–120g',dp:'Bottom structure',tc:'Live bait / SP / Bottom jig'},
-    baits:[{r:1,n:'Live Tailor / Mullet',e:5,w:'라이브베이트 최강'},{r:2,n:'Fresh squid (large)',e:5,w:'오늘 잡은 통째'},{r:3,n:'Large SP 5–7"',e:4,w:'Zman / Gulp'},{r:4,n:'Pilchard gang rig',e:4,w:'표준 갱훅'}],
-    colors:[{n:'White / Pearl SP',h:'#ddeeff',top:true,w:'야간 No.1'},{n:'Black / Purple',h:'#330055',top:true,w:'야간 실루엣'},{n:'Motor oil',h:'#553311',top:false,w:'탁한물 낮'},{n:'Chartreuse',h:'#aadd00',top:false,w:'조명 있는 부두'}],
-    tide:{bestTime:'날물 하반기 + 야간',bestTimeNote:'만조 후 2–3시간 + 야간',tidalState:'날물 (Outgoing) + 야간',tidalNote:'베이트피시가 조류 타고 흘러내려옴',highTide:3,risingTide:3,lowTide:2,fallingTide:5,tip:'쥬피시는 날물 때 베이트피시가 조류를 타고 내려오는 채널 포인트가 최고야. 특히 야간 + 날물 조합이 시즌 최강.'}},
-  { id:'kingfish', emoji:'🐠', name:'Kingfish', col:'#f5a623',
-    rig:{ml:'PE 3–4 Braid',ld:'80–100lb Fluoro',hk:'4/0–6/0 Assist',wt:'60–120g slow jig',dp:'20–40m',tc:'Slow pitch / Speed jigging'},
-    baits:[{r:1,n:'Live Yakka / Slimy',e:5,w:'라이브베이트 최강'},{r:2,n:'Slow pitch jig 80–120g',e:5,w:'오늘 조류 적합'},{r:3,n:'Stickbait 140mm',e:4,w:'표층 보일 때'},{r:4,n:'Pilchard (rigged)',e:3,w:'바닥 브레이크'}],
-    colors:[{n:'Pink / White',h:'#ff9ecd',top:true,w:'흐린날 + 파도 있을때 No.1'},{n:'Chartreuse',h:'#c6ff00',top:false,w:'맑은물 고압'},{n:'Blue / Silver',h:'#60b8ff',top:false,w:'맑은물 베이트'},{n:'Red / Orange',h:'#ff5533',top:false,w:'탁한물 새벽'}],
-    tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'조류 강하게 흐를 때',tidalState:'들물 (Incoming) 중반',tidalNote:'강한 조류 타고 베이트 쫓음',highTide:4,risingTide:5,lowTide:1,fallingTide:3,tip:'킹피시는 조류 강하게 흐를 때 활성 최고야. 들물 중반부터 수중 봄보라나 딥레지 조류 세임에서 베이트 쫓아다녀.'}},
-  { id:'tuna', emoji:'🐟', name:'Tuna', col:'#ff6b35',
-    rig:{ml:'PE 4–6 Braid',ld:'100–150lb Fluoro',hk:'6/0–8/0 Ganged',wt:'Poppers 160mm+ / Jig',dp:'Surface to 50m',tc:'Popper / Stickbait offshore'},
-    baits:[{r:1,n:'Poppers 160mm+ (offshore)',e:5,w:'오프쇼어 보일링'},{r:2,n:'Trolling bibless 200mm',e:5,w:'오프쇼어 트롤링'},{r:3,n:'Knife jig 150–200g',e:4,w:'빠른 리트리브'},{r:4,n:'Live bait rigged',e:5,w:'라이브베이트'}],
-    colors:[{n:'Pink / White Popper',h:'#ff9ecd',top:true,w:'흐린날 시인성 최고'},{n:'Blue / Chrome',h:'#4499ff',top:false,w:'맑은 파란물'},{n:'Flying Fish',h:'#88ccff',top:false,w:'오프쇼어 트롤링'},{n:'Red / Black',h:'#cc2200',top:false,w:'새벽 조용할 때'}],
-    tide:{bestTime:'조류 전환기 전후',bestTimeNote:'만조·간조 전환 직전 30분',tidalState:'조류 전환기 (Slack Water)',tidalNote:'오프쇼어 — 조류보다 조경선 중요',highTide:3,risingTide:4,lowTide:3,fallingTide:4,tip:'오프쇼어 참치는 EAC 조경선 위치가 더 중요해. 조류 전환 시점에 베이트 표층으로 올라오면서 보일링 발생 확률 높아.'}},
-  { id:'squid', emoji:'🦑', name:'Squid', col:'#b06aff',
-    rig:{ml:'PE 0.6–0.8 Braid',ld:'2–3号 Fluoro 1m',hk:'Egi 3.0–3.5호',wt:'Egi 15–20g',dp:'Mid to bottom',tc:'Slow fall · Bottom drag'},
-    baits:[],
-    colors:[{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린날 + 조류 있을때 No.1!'},{n:'Pink / UV',h:'#ff44cc',top:true,w:'흐린날 탁한물 2위. 야간도 효과'},{n:'Brown / Natural',h:'#885533',top:false,w:'맑은물 낮'},{n:'Chartreuse / Green',h:'#aadd00',top:false,w:'맑은물 밝을 때'},{n:'Blue / Night',h:'#3366ff',top:false,w:'야간 + 조명 있는 곳'}],
-    tide:{bestTime:'일몰 후 2시간 + 들물',bestTimeNote:'야간 들물 = 에깅 황금 타임',tidalState:'들물 (Incoming) + 야간',tidalNote:'조류 있어야 에기가 자연스럽게 흘러',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'오징어 에깅은 조류가 약간 흐를 때가 최고야. 들물 때 에기가 조류 타고 자연스럽게 흘러. 정조엔 에기 액션 부자연스러워져 반응 급감.'}},
+// ═══════════════════════════════════════════
+// SPECIES DATA
+// ═══════════════════════════════════════════
+const SPECIES=[
+  {id:'drummer',emoji:'🐟',name:'Drummer',col:'#00e676',
+   rig:{ml:'20lb Mono/Braid',ld:'30lb Fluoro',hk:'#4–#2 Suicide',wt:'Ball 1–2oz',dp:'Bottom to 3m',tc:'Float / Running sinker'},
+   baits:[{r:1,n:'Green Cunjevoi',e:5,w:'드러머 No.1'},{r:2,n:'Bread dough',e:4,w:'고압 안정기'},{r:3,n:'Abalone gut',e:4,w:'현지 검증'},{r:4,n:'Cabbage weed',e:3,w:'자연 서식'}],
+   colors:null,
+   tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'만조 직전~만조 후 2시간',tidalState:'만조',tidalNote:'파도가 바위 덮으며 먹이 씻겨내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'드러머는 만조 전후가 압도적으로 좋아. 파도가 바위를 덮으면서 커네보이 같은 먹이가 씻겨 내려와.'}},
+  {id:'bream',emoji:'🐠',name:'Bream',col:'#00d4ff',
+   rig:{ml:'6–8lb Mono',ld:'8lb Fluoro',hk:'#6–#4 Circle',wt:'Split shot 0–1/8oz',dp:'Bottom hugging',tc:'Finesse / Bream SP'},
+   baits:[{r:1,n:'Nippers (Yabbies)',e:5,w:'Incoming tide 최강'},{r:2,n:'Prawns (fresh)',e:5,w:'올라운드'},{r:3,n:'Peeled prawn tail',e:4,w:'작은 바늘'},{r:4,n:'Bread crust',e:3,w:'표층 피딩'}],
+   colors:null,
+   tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'간조 후 1시간부터 만조까지',tidalState:'들물',tidalNote:'신선한 물·먹이 유입으로 활성',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'브림은 들물 때가 최고야. 들물이 베이트피시와 갑각류를 안으로 몰아줘.'}},
+  {id:'snapper',emoji:'🐡',name:'Snapper',col:'#ff6b9d',
+   rig:{ml:'20–30lb Braid',ld:'30–40lb Fluoro',hk:'3/0–5/0 Circle',wt:'Paternoster 2–4oz',dp:'Bottom to 5m up',tc:'Paternoster / Slow jig'},
+   baits:[{r:1,n:'Fresh squid (whole)',e:5,w:'직접 잡은 것'},{r:2,n:'Pilchard (rigged)',e:5,w:'검증 미끼'},{r:3,n:'Prawns (large)',e:4,w:'파터노스터'},{r:4,n:'Slow jig 40–80g',e:4,w:'슬로우지그'}],
+   colors:[{n:'Pink / Red',h:'#ff4488',top:true,w:'흐린날·깊은수심 No.1'},{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린 조건 2위'},{n:'White / Pearl',h:'#ddeeff',top:false,w:'맑은물 얕은 곳'},{n:'Blue / Purple',h:'#5544ff',top:false,w:'20m+ 깊은 수심'}],
+   tide:{bestTime:'만조 전후 2–3시간',bestTimeNote:'일몰 전후 만조 조합 최강',tidalState:'만조 + 날물 초반',tidalNote:'수심 깊어지고 조류 흘러야 활성',highTide:5,risingTide:3,lowTide:2,fallingTide:4,tip:'스내퍼는 만조 전후 깊은 수중 암초에서 가장 활발해.'}},
+  {id:'jewfish',emoji:'🦈',name:'Jewfish',col:'#b06aff',
+   rig:{ml:'PE 3–5 Braid',ld:'60–80lb Fluoro',hk:'5/0–8/0 Circle',wt:'60–120g',dp:'Bottom structure',tc:'Live bait / SP / Bottom jig'},
+   baits:[{r:1,n:'Live Tailor / Mullet',e:5,w:'라이브베이트 최강'},{r:2,n:'Fresh squid (large)',e:5,w:'오늘 잡은 통째'},{r:3,n:'Large SP 5–7"',e:4,w:'Zman / Gulp'},{r:4,n:'Pilchard gang rig',e:4,w:'표준 갱훅'}],
+   colors:[{n:'White / Pearl SP',h:'#ddeeff',top:true,w:'야간 No.1'},{n:'Black / Purple',h:'#330055',top:true,w:'야간 실루엣'},{n:'Motor oil',h:'#553311',top:false,w:'탁한물 낮'},{n:'Chartreuse',h:'#aadd00',top:false,w:'조명 있는 부두'}],
+   tide:{bestTime:'날물 하반기 + 야간',bestTimeNote:'만조 후 2–3시간 + 야간',tidalState:'날물 + 야간',tidalNote:'베이트피시가 조류 타고 흘러내려옴',highTide:3,risingTide:3,lowTide:2,fallingTide:5,tip:'쥬피시는 날물 때 채널 포인트가 최고야. 야간 + 날물 조합이 시즌 최강.'}},
+  {id:'kingfish',emoji:'🐠',name:'Kingfish',col:'#f5a623',
+   rig:{ml:'PE 3–4 Braid',ld:'80–100lb Fluoro',hk:'4/0–6/0 Assist',wt:'60–120g slow jig',dp:'20–40m',tc:'Slow pitch / Speed jigging'},
+   baits:[{r:1,n:'Live Yakka / Slimy',e:5,w:'라이브베이트 최강'},{r:2,n:'Slow pitch jig 80–120g',e:5,w:'조류 적합'},{r:3,n:'Stickbait 140mm',e:4,w:'표층 보일 때'},{r:4,n:'Pilchard (rigged)',e:3,w:'바닥 브레이크'}],
+   colors:[{n:'Pink / White',h:'#ff9ecd',top:true,w:'흐린날+파도 No.1'},{n:'Chartreuse',h:'#c6ff00',top:false,w:'맑은물 고압'},{n:'Blue / Silver',h:'#60b8ff',top:false,w:'맑은물 베이트'},{n:'Red / Orange',h:'#ff5533',top:false,w:'탁한물 새벽'}],
+   tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'조류 강하게 흐를 때',tidalState:'들물 중반',tidalNote:'강한 조류 타고 베이트 쫓음',highTide:4,risingTide:5,lowTide:1,fallingTide:3,tip:'킹피시는 조류 강하게 흐를 때 활성 최고야.'}},
+  {id:'tuna',emoji:'🐟',name:'Tuna',col:'#ff6b35',
+   rig:{ml:'PE 4–6 Braid',ld:'100–150lb Fluoro',hk:'6/0–8/0 Ganged',wt:'Poppers 160mm+',dp:'Surface to 50m',tc:'Popper / Stickbait offshore'},
+   baits:[{r:1,n:'Poppers 160mm+ (offshore)',e:5,w:'오프쇼어 보일링'},{r:2,n:'Trolling bibless 200mm',e:5,w:'오프쇼어 트롤링'},{r:3,n:'Knife jig 150–200g',e:4,w:'빠른 리트리브'},{r:4,n:'Live bait rigged',e:5,w:'라이브베이트'}],
+   colors:[{n:'Pink / White Popper',h:'#ff9ecd',top:true,w:'흐린날 시인성 최고'},{n:'Blue / Chrome',h:'#4499ff',top:false,w:'맑은 파란물'},{n:'Flying Fish',h:'#88ccff',top:false,w:'오프쇼어 트롤링'},{n:'Red / Black',h:'#cc2200',top:false,w:'새벽'}],
+   tide:{bestTime:'조류 전환기 전후',bestTimeNote:'만조·간조 전환 직전 30분',tidalState:'조류 전환기',tidalNote:'오프쇼어 — 조경선 위치 중요',highTide:3,risingTide:4,lowTide:3,fallingTide:4,tip:'오프쇼어 참치는 EAC 조경선이 더 중요해.'}},
+  {id:'squid',emoji:'🦑',name:'Squid',col:'#b06aff',
+   rig:{ml:'PE 0.6–0.8 Braid',ld:'2–3号 Fluoro 1m',hk:'Egi 3.0–3.5호',wt:'Egi 15–20g',dp:'Mid to bottom',tc:'Slow fall · Bottom drag'},
+   baits:[],
+   colors:[{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린날+조류 No.1!'},{n:'Pink / UV',h:'#ff44cc',top:true,w:'흐린날 탁한물 2위'},{n:'Brown / Natural',h:'#885533',top:false,w:'맑은물 낮'},{n:'Chartreuse / Green',h:'#aadd00',top:false,w:'맑은물 밝을 때'},{n:'Blue / Night',h:'#3366ff',top:false,w:'야간+조명'}],
+   tide:{bestTime:'일몰 후 2시간 + 들물',bestTimeNote:'야간 들물 = 에깅 황금 타임',tidalState:'들물 + 야간',tidalNote:'조류 있어야 에기가 자연스럽게 흘러',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'에깅은 조류가 약간 흐를 때가 최고야. 들물 때 에기가 조류 타고 자연스럽게 흘러.'}},
 ];
 
-
-// ═══════════════════════════════════════════════════
-// MODULE 6: TAB SWITCHING
-// ═══════════════════════════════════════════════════
-function showTab(id, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.ni').forEach(b => b.classList.remove('on'));
-  document.getElementById('tab-' + id).classList.add('active');
+// ═══════════════════════════════════════════
+// TAB / GPS
+// ═══════════════════════════════════════════
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(b=>b.classList.remove('on'));
+  document.getElementById('tab-'+id).classList.add('active');
   btn.classList.add('on');
-  if (id === 'map') setTimeout(() => { initMap(); if (mapL) mapL.invalidateSize(); }, 80);
+  if(id==='map') setTimeout(()=>{initMap();if(mapL)mapL.invalidateSize();},80);
 }
+function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/180;const x=Math.sin(dL/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(dN/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x));}
+function distStr(lat,lng){if(userLat===null)return'—';const d=haversine(userLat,userLng,lat,lng);return d<1?Math.round(d*1000)+'m':d.toFixed(1)+' km';}
+function gpsLocate(){if(!navigator.geolocation){alert('GPS 미지원');return;}navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;renderFavs();renderSavedList();if(mapL)mapL.setView([userLat,userLng],12);},()=>alert('GPS 오류'));}
+function useGPS(){if(!navigator.geolocation){alert('GPS 미지원');return;}navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;document.getElementById('m-lat').value=userLat.toFixed(5);document.getElementById('m-lng').value=userLng.toFixed(5);showSel('📡 현재 GPS',userLat.toFixed(4)+'°S · '+userLng.toFixed(4)+'°E');},()=>alert('GPS 오류'));}
 
-// ═══════════════════════════════════════════════════
-// MODULE 7: GPS & DISTANCE
-// ═══════════════════════════════════════════════════
-function haversine(lat1, lng1, lat2, lng2) {
-  const R = 6371, dL = (lat2-lat1)*Math.PI/180, dN = (lng2-lng1)*Math.PI/180;
-  const a = Math.sin(dL/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dN/2)**2;
-  return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-function distStr(lat, lng) {
-  if (userLat===null) return '—';
-  const d = haversine(userLat, userLng, lat, lng);
-  return d < 1 ? Math.round(d*1000)+'m' : d.toFixed(1)+' km';
-}
-function gpsLocate() {
-  if (!navigator.geolocation) { alert('GPS 미지원'); return; }
-  navigator.geolocation.getCurrentPosition(p => {
-    userLat = p.coords.latitude; userLng = p.coords.longitude;
-    renderFavs(); renderSavedList();
-    if (mapL) mapL.setView([userLat, userLng], 12);
-  }, () => alert('GPS를 가져오지 못했어.'));
-}
-function useGPS() {
-  if (!navigator.geolocation) { alert('GPS 미지원'); return; }
-  navigator.geolocation.getCurrentPosition(p => {
-    userLat = p.coords.latitude; userLng = p.coords.longitude;
-    document.getElementById('m-lat').value = userLat.toFixed(5);
-    document.getElementById('m-lng').value = userLng.toFixed(5);
-    showSel('📡 현재 GPS 위치', userLat.toFixed(4)+'°S · '+userLng.toFixed(4)+'°E');
-    renderFavs(); renderSavedList();
-  }, () => alert('GPS를 가져오지 못했어.'));
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 8: SOLUNAR RENDER
-// ═══════════════════════════════════════════════════
-let solDays = [];
-
-function buildSolDays() {
-  solDays = [];
-  const now = new Date();
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(now); d.setDate(d.getDate()+i); d.setHours(12,0,0,0);
-    const age = lunarAge(d);
-    const moon = moonPhase(age);
-    const sol = solScore(age);
-    const peaks = solunarPeaks(d);
-    const act = activityHourly(peaks, sol.s);
-    const mt = multtae(d);
-    solDays.push({ date:d, dayName:dayNames[d.getDay()], dayNum:d.getDate(), isToday:i===0,
-      age, moon, sol, peaks, act, mt, mtName:MT[mt-1].name });
+// ═══════════════════════════════════════════
+// SOLUNAR
+// ═══════════════════════════════════════════
+let solDays=[];
+function buildSolDays(){
+  solDays=[];
+  const now=new Date(),DNs=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  for(let i=0;i<14;i++){
+    const d=new Date(now);d.setDate(d.getDate()+i);d.setHours(12,0,0,0);
+    const age=lunarAge(d),moon=moonPhase(age),sol=solScore(age),peaks=solunarPeaks(d),act=activityHourly(peaks,sol.s),mt=multtae(d);
+    solDays.push({date:d,dayName:DNs[d.getDay()],dayNum:d.getDate(),isToday:i===0,age,moon,sol,peaks,act,mt,mtName:MT[mt-1].name});
   }
 }
-
-function renderSolDateRow() {
-  const row = document.getElementById('sol-date-row');
-  if (!row) return;
-  row.innerHTML = solDays.map((d,i) => {
-    const on = i===activeSolDay;
-    return `<div class="schip ${d.isToday?'today':''} ${on?'on':''}" onclick="selectSolDay(${i})">
-      <div class="sc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div>
-      <div class="sc-num" style="color:${on?d.sol.c:'var(--text)'};">${d.dayNum}</div>
-      <div style="font-size:13px;margin:2px 0;">${d.moon.e}</div>
-      <div class="sc-score-sm" style="color:${d.sol.c};">${d.sol.s}</div>
-    </div>`;
-  }).join('');
+function renderSolDateRow(){
+  const row=document.getElementById('sol-date-row');if(!row)return;
+  row.innerHTML=solDays.map((d,i)=>`<div class="schip ${d.isToday?'today':''} ${i===activeSolDay?'on':''}" onclick="selectSolDay(${i})"><div class="sc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div><div class="sc-num" style="color:${i===activeSolDay?d.sol.c:'var(--text)'};">${d.dayNum}</div><div style="font-size:13px;margin:2px 0">${d.moon.e}</div><div class="sc-score-sm" style="color:${d.sol.c}">${d.sol.s}</div></div>`).join('');
 }
-
-function selectSolDay(i) {
-  activeSolDay = i;
-  renderSolDateRow();
-  renderSolContent(i);
-}
-
-function renderSolContent(i) {
-  const d = solDays[i];
-  const cf = 2*Math.PI*62, off = cf*(1-d.sol.s/100);
-  const now = new Date().getHours();
-  const tlHtml = d.act.map((v,h) => {
-    const lbl = h===0?'12AM':h<12?h+'AM':h===12?'12PM':(h-12)+'PM';
-    const col = v>75?'var(--gold)':v>50?'var(--accent)':'var(--dim)';
-    const isNow = i===0 && h===now;
-    return `<div class="tl-col">
-      <div class="tl-t">${lbl}</div>
-      <div class="tl-bw">${isNow?'<div class="now-dot"></div>':''}
-        <div class="tl-b" style="height:${v}%;background:${col};width:100%;"></div>
-      </div>
-      <div class="tl-v">${v}</div>
-    </div>`;
-  }).join('');
-
-  const dateLabel = i===0 ? '' : `<div style="font-size:10px;color:var(--muted);margin-top:2px;">${d.dayName} ${d.dayNum} ${d.date.toLocaleString('en',{month:'short'})}</div>`;
-
-  document.getElementById('sol-content').innerHTML = `
+function selectSolDay(i){activeSolDay=i;renderSolDateRow();renderSolContent(i);}
+function renderSolContent(i){
+  const d=solDays[i];if(!d)return;
+  const cf=2*Math.PI*62,off=cf*(1-d.sol.s/100),nowH=new Date().getHours();
+  const tlHtml=d.act.map((v,h)=>{const lbl=h===0?'12AM':h<12?h+'AM':h===12?'12PM':(h-12)+'PM';const col=v>75?'var(--gold)':v>50?'var(--accent)':'var(--dim)';const isNow=i===0&&h===nowH;return`<div class="tl-col"><div class="tl-t">${lbl}</div><div class="tl-bw">${isNow?'<div class="now-dot"></div>':''}<div class="tl-b" style="height:${v}%;background:${col};width:100%"></div></div><div class="tl-v">${v}</div></div>`;}).join('');
+  const dl=i===0?'':`<div style="font-size:10px;color:var(--muted);margin-top:2px">${d.dayName} ${d.dayNum} ${d.date.toLocaleString('en',{month:'short'})}</div>`;
+  document.getElementById('sol-content').innerHTML=`
     <div class="ring-w">
-      <svg width="152" height="152" viewBox="0 0 152 152">
-        <circle cx="76" cy="76" r="62" fill="none" stroke="#1e3450" stroke-width="9"/>
-        <circle cx="76" cy="76" r="62" fill="none" stroke="url(#sg)" stroke-width="9"
-          stroke-dasharray="389.56" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/>
-        <defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#f5a623"/>
-        </linearGradient></defs>
-      </svg>
-      <div class="ring-c">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--accent);line-height:1;">${d.sol.s}</div>
-        <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">Fish Index</div>
-        <div style="font-size:11px;font-weight:600;color:${d.sol.c};margin-top:2px;">${d.sol.g}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:1px;">${d.mt}물 · ${d.mtName}</div>
-        ${dateLabel}
-      </div>
+      <svg width="152" height="152" viewBox="0 0 152 152"><circle cx="76" cy="76" r="62" fill="none" stroke="#1e3450" stroke-width="9"/><circle cx="76" cy="76" r="62" fill="none" stroke="url(#sg)" stroke-width="9" stroke-dasharray="389.56" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/><defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#f5a623"/></linearGradient></defs></svg>
+      <div class="ring-c"><div style="font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--accent);line-height:1">${d.sol.s}</div><div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Fish Index</div><div style="font-size:11px;font-weight:600;color:${d.sol.c};margin-top:2px">${d.sol.g}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${d.mt}물 · ${d.mtName}</div>${dl}</div>
     </div>
-    <div class="stitle">Peak Times <span style="font-size:10px;color:var(--muted);font-weight:400;">실제 달 위치 기반</span></div>
+    <div class="stitle">Peak Times <span style="font-size:10px;color:var(--muted);font-weight:400">실제 달 위치 기반</span></div>
     <div class="peak-g">
-      <div class="pk maj">
-        <div class="pk-type maj">★ Major</div>
-        <div class="pk-time">${d.peaks.m1}</div>
-        <div class="pk-range" style="color:var(--gold);">${d.peaks.m1} – ${d.peaks.m1e}</div>
-        <div class="pk-dur">2시간 · 최적 피딩타임</div>
-        <div class="pk-bar"><div class="pk-fill" style="width:90%;background:var(--gold)"></div></div>
-      </div>
-      <div class="pk maj">
-        <div class="pk-type maj">★ Major</div>
-        <div class="pk-time">${d.peaks.m2}</div>
-        <div class="pk-range" style="color:var(--gold);">${d.peaks.m2} – ${d.peaks.m2e}</div>
-        <div class="pk-dur">2시간 · 최적 피딩타임</div>
-        <div class="pk-bar"><div class="pk-fill" style="width:85%;background:var(--gold)"></div></div>
-      </div>
-      <div class="pk">
-        <div class="pk-type min">◆ Minor</div>
-        <div class="pk-time">${d.peaks.n1}</div>
-        <div class="pk-range" style="color:var(--accent);">${d.peaks.n1} – ${d.peaks.n1e}</div>
-        <div class="pk-dur">1시간 · 보조 피딩타임</div>
-        <div class="pk-bar"><div class="pk-fill" style="width:55%;background:var(--accent)"></div></div>
-      </div>
-      <div class="pk">
-        <div class="pk-type min">◆ Minor</div>
-        <div class="pk-time">${d.peaks.n2}</div>
-        <div class="pk-range" style="color:var(--accent);">${d.peaks.n2} – ${d.peaks.n2e}</div>
-        <div class="pk-dur">1시간 · 보조 피딩타임</div>
-        <div class="pk-bar"><div class="pk-fill" style="width:40%;background:var(--accent)"></div></div>
-      </div>
+      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m1}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m1} – ${d.peaks.m1e}</div><div class="pk-dur">2시간 · 최적 피딩타임</div><div class="pk-bar"><div class="pk-fill" style="width:90%;background:var(--gold)"></div></div></div>
+      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m2}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m2} – ${d.peaks.m2e}</div><div class="pk-dur">2시간 · 최적 피딩타임</div><div class="pk-bar"><div class="pk-fill" style="width:85%;background:var(--gold)"></div></div></div>
+      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n1}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n1} – ${d.peaks.n1e}</div><div class="pk-dur">1시간 · 보조 피딩타임</div><div class="pk-bar"><div class="pk-fill" style="width:55%;background:var(--accent)"></div></div></div>
+      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n2}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n2} – ${d.peaks.n2e}</div><div class="pk-dur">1시간 · 보조 피딩타임</div><div class="pk-bar"><div class="pk-fill" style="width:40%;background:var(--accent)"></div></div></div>
     </div>
     <div class="stitle">Moon Phase</div>
-    <div class="moon-row">
-      <div style="font-size:32px;">${d.moon.e}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;">${d.moon.n}</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:1px;">Illumination: ${d.moon.pct}%</div>
-        <div class="moon-prog"><div class="moon-fill" style="width:${d.moon.pct}%"></div></div>
-      </div>
-    </div>
-    <div class="stitle">Hourly Activity Index <span style="font-size:10px;color:var(--muted);font-weight:400;">달 위치 기반</span></div>
-    <div class="tl-scroll"><div class="tl-row">${tlHtml}</div></div>
-  `;
+    <div class="moon-row"><div style="font-size:32px">${d.moon.e}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${d.moon.n}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Illumination: ${d.moon.pct}%</div><div class="moon-prog"><div class="moon-fill" style="width:${d.moon.pct}%"></div></div></div></div>
+    <div class="stitle">Hourly Activity Index <span style="font-size:10px;color:var(--muted);font-weight:400">달 위치 기반</span></div>
+    <div class="tl-scroll"><div class="tl-row">${tlHtml}</div></div>`;
 }
 
-// ═══════════════════════════════════════════════════
-// MODULE 9: MARINE RENDER
-// ═══════════════════════════════════════════════════
-let marineDays = [];
-
-function renderMarineDateRow() {
-  const row = document.getElementById('marine-date-row');
-  if (!row) return;
-  row.innerHTML = marineDays.map((d,i) => {
-    const on = i===activeMarineDay;
-    const wc = d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';
-    return `<div class="dchip ${d.isToday?'today':''} ${on?'on':''}" onclick="selectMarineDay(${i})">
-      <div class="dc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div>
-      <div class="dc-num" style="color:${on?'var(--accent)':'var(--text)'};">${d.dayNum}</div>
-      <div style="font-size:14px;margin:2px 0;">${d.condIcon}</div>
-      <div class="dc-sw" style="color:${wc};">${d.swellH}m</div>
-    </div>`;
-  }).join('');
+// ═══════════════════════════════════════════
+// MARINE
+// ═══════════════════════════════════════════
+function renderMarineDateRow(){
+  const row=document.getElementById('marine-date-row');if(!row)return;
+  row.innerHTML=marineDays.map((d,i)=>{const on=i===activeMarineDay;const wc=d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';return`<div class="dchip ${d.isToday?'today':''} ${on?'on':''}" onclick="selectMarineDay(${i})"><div class="dc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div><div class="dc-num" style="color:${on?'var(--accent)':'var(--text)'};">${d.dayNum}</div><div style="font-size:14px;margin:2px 0">${d.condIcon}</div><div class="dc-sw" style="color:${wc}">${d.swellH}m</div></div>`;}).join('');
 }
-
-function selectMarineDay(i) {
-  activeMarineDay = i;
-  renderMarineDateRow();
-  renderMarineContent(i);
-}
-
-function renderMarineContent(i) {
-  const d = marineDays[i];
-  const warnCol = d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';
-  const warnBg  = d.warn==='good'?'rgba(0,230,118,.1)':d.warn==='rough'?'rgba(255,107,53,.1)':'rgba(245,166,35,.08)';
-  const warnBdr = d.warn==='good'?'rgba(0,230,118,.3)':d.warn==='rough'?'rgba(255,107,53,.3)':'rgba(245,166,35,.3)';
-  const warnTxt = d.warn==='good'?'Good conditions · Safe to fish':d.warn==='rough'?'Rough · Caution advised':'Moderate · Check exposed spots';
-  const warnIcon= d.warn==='good'?'✅':d.warn==='rough'?'⛔':'⚠';
-
-  const hourlyHtml = d.hours.map(h => `
-    <div class="hc ${h.now?'now':''}">
-      <div style="font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:600;">${h.t}</div>
-      <div style="font-size:14px;font-weight:600;color:var(--accent);">${h.sw}</div>
-      <div style="font-size:9px;color:var(--muted);">${h.per}</div>
-      <div style="font-size:16px;margin:3px 0;">${h.dir}</div>
-      <div style="font-size:10px;">${h.wind}</div>
-      <div style="font-size:10px;color:#88aaff;margin-top:1px;">${h.rain}</div>
-    </div>`).join('');
-
-  // Tide SVG
-  const tides4 = d.tides.slice(0,4);
-  const tideRowHtml = tides4.map(t => `
-    <div class="tide-item">
-      <div class="${t.type==='high'?'t-hi':'t-lo'}">${t.type==='high'?'HIGH':'LOW'}</div>
-      <div class="tide-time">${fmt(t.h,t.m)}</div>
-      <div class="tide-ht">${t.height} m</div>
-    </div>`).join('');
-
-  // Build tide path for SVG (simplified sinusoidal based on tide times)
-  function tidePath() {
-    const pts = [];
-    for (let x=0; x<=340; x+=5) {
-      const hr = x/340*24;
-      let y = 40;
-      tides4.forEach((t,idx) => {
-        const phase = (hr - (t.h+t.m/60));
-        y += (t.type==='high'?-25:25) * Math.exp(-phase*phase/8);
-      });
-      pts.push([x, Math.max(10, Math.min(70, y))]);
-    }
-    return pts.map((p,i) => (i===0?'M':'L')+p[0]+','+p[1]).join(' ');
-  }
-  const path = tidePath();
-
+function selectMarineDay(i){activeMarineDay=i;renderMarineDateRow();renderMarineDay(i);}
+function renderMarineDay(i){
+  if(!marineDays[i]){document.getElementById('marine-content').innerHTML='<div class="err-msg">데이터 없음</div>';return;}
+  const d=marineDays[i];
+  const wc=d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';
+  const wBg=d.warn==='good'?'rgba(0,230,118,.1)':d.warn==='rough'?'rgba(255,107,53,.1)':'rgba(245,166,35,.08)';
+  const wBd=d.warn==='good'?'rgba(0,230,118,.3)':d.warn==='rough'?'rgba(255,107,53,.3)':'rgba(245,166,35,.3)';
+  const wTxt=d.warn==='good'?'✅ Good conditions':d.warn==='rough'?'⛔ Rough — Caution':'⚠ Moderate';
+  const tides4=d.tides.slice(0,4);
+  const tideRowHtml=tides4.map(t=>`<div class="tide-item"><div class="${t.type==='high'?'t-hi':'t-lo'}">${t.type==='high'?'HIGH':'LOW'}</div><div class="tide-time">${fmt2(t.h,t.m)}</div><div class="tide-ht">${t.height} m</div></div>`).join('');
+  const pts=[];
+  for(let x=0;x<=340;x+=5){let y=40;tides4.forEach(t=>{const ph=x/340*24-(t.h+t.m/60);y+=(t.type==='high'?-25:25)*Math.exp(-ph*ph/8);});pts.push([x,Math.max(10,Math.min(70,y))]); }
+  const path=pts.map((p,j)=>(j===0?'M':'L')+p[0]+','+p[1]).join(' ');
+  const hourlyHtml=d.hours.map(h=>`<div class="hc ${h.now?'now':''}"><div style="font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:600">${h.t}</div><div style="font-size:14px;font-weight:600;color:var(--accent)">${h.sw}</div><div style="font-size:9px;color:var(--muted)">${h.per}</div><div style="font-size:16px;margin:3px 0">${h.dir}</div><div style="font-size:10px">${h.wind}</div><div style="font-size:10px;color:#88aaff;margin-top:1px">${h.rain}</div></div>`).join('');
   // Update live bar
-  if (i===0) updateLiveBar(d);
-
-  document.getElementById('marine-content').innerHTML = `
-    <div class="alert-bar" style="background:${warnBg};border-color:${warnBdr};">
-      <span>${warnIcon}</span>
-      <span style="color:${warnCol};">${warnTxt} · ${d.dayName} ${d.dayNum}</span>
+  const s=id=>document.getElementById(id);
+  if(i===0){if(s('lb-swell'))s('lb-swell').textContent=d.swellH+'m';if(s('lb-wind'))s('lb-wind').textContent=d.windKmh+'km/h';if(s('lb-sst'))s('lb-sst').textContent=d.sst+'°C';if(s('lb-pres'))s('lb-pres').textContent=d.pressure+'hPa';if(s('lb-curr'))s('lb-curr').textContent=d.currKmh+'km/h';
+    const mt=multtae(new Date());if(s('cb-swell'))s('cb-swell').textContent=d.swellH+'m';if(s('cb-dir'))s('cb-dir').textContent=d.swellD;if(s('cb-wind'))s('cb-wind').textContent=d.windKmh+'km/h';if(s('cb-wdir'))s('cb-wdir').textContent=d.windD;if(s('cb-mt'))s('cb-mt').textContent=mt+'물';if(s('cb-sst'))s('cb-sst').textContent=d.sst+'°C';}
+  if(LOCS.length>0){const l=LOCS[activeIdx];const wl=s('windy-link');if(wl)wl.href='https://www.windy.com/'+currentLayer+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+currentLayer+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}
+  document.getElementById('marine-content').innerHTML=`
+    <div class="alert-bar" style="background:${wBg};border:1px solid ${wBd};color:${wc}">${d.warn==='good'?'✅ Good conditions · Safe to fish':d.warn==='rough'?'⛔ Rough · Caution advised':'⚠ Moderate · Check exposed spots'} · ${d.dayName} ${d.dayNum}</div>
+    <div class="g2">
+      <div class="card"><div class="sc-icon">🌊</div><div><span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span></div><div class="sc-label">Swell Height</div><div class="sc-sub">${d.swellD}</div><div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div></div>
+      <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Wind Speed</div><div class="sc-sub">${d.windD} · Gust ${d.windGust}</div><div class="badge ${d.windKmh>40?'b-warn':'b-ok'}">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div></div>
+      <div class="card"><div class="sc-icon">🌡</div><div><span class="sc-big">${d.sst}</span><span class="sc-unit">°C</span></div><div class="sc-label">Sea Temp SST</div><div class="sc-sub">NSW Coastal</div><div class="badge b-ok">Normal</div></div>
+      <div class="card"><div class="sc-icon">📊</div><div><span class="sc-big">${d.pressure}</span><span class="sc-unit">hPa</span></div><div class="sc-label">Pressure</div><div class="sc-sub">${d.pressure>1015?'↑ Rising':'↓ Falling'}</div><div class="badge ${d.pressure>1010?'b-ok':'b-warn'}">${d.pressure>1015?'Stable':'Watch'}</div></div>
+      <div class="card"><div class="sc-icon">🌀</div><div><span class="sc-big">${d.currKmh}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Sea Current</div><div class="sc-sub">${d.currKt} kt</div><div class="badge b-ok">EAC</div></div>
+      <div class="card"><div class="sc-icon">🌧</div><div><span class="sc-big">${d.rain}</span><span class="sc-unit">%</span></div><div class="sc-label">Rain Chance</div><div class="sc-sub">${d.rain>30?'Showers likely':'Mostly clear'}</div><div class="badge ${d.rain>40?'b-warn':'b-ok'}">${d.rain>50?'High':d.rain>20?'Moderate':'Low'}</div></div>
     </div>
-    <div class="g2" style="margin-bottom:10px;">
-      <div class="card"><div class="sc-icon">🌊</div><div><span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span></div>
-        <div class="sc-label">Swell Height</div><div class="sc-sub">${d.swellD}</div>
-        <div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div></div>
-      <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div>
-        <div class="sc-label">Wind Speed</div><div class="sc-sub">${d.windD} · Gust ${Math.round(d.windKmh*1.35)}</div>
-        <div class="badge ${d.windKmh>40?'b-warn':'b-ok'}">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div></div>
-      <div class="card"><div class="sc-icon">🌡</div><div><span class="sc-big">${d.sst}</span><span class="sc-unit">°C</span></div>
-        <div class="sc-label">Sea Temp SST</div><div class="sc-sub">Air ~${d.sst-2}°C</div>
-        <div class="badge b-ok">NSW Normal</div></div>
-      <div class="card"><div class="sc-icon">📊</div><div><span class="sc-big">${d.pressure}</span><span class="sc-unit">hPa</span></div>
-        <div class="sc-label">Pressure</div><div class="sc-sub">${d.pressure>1015?'↑ Rising':'↓ Falling'}</div>
-        <div class="badge ${d.pressure>1010?'b-ok':'b-warn'}">${d.pressure>1015?'Stable':'Watch'}</div></div>
-      <div class="card"><div class="sc-icon">🌀</div><div><span class="sc-big">${d.currKmh}</span><span class="sc-unit">km/h</span></div>
-        <div class="sc-label">Sea Current</div><div class="sc-sub">${d.currKt} kt</div>
-        <div class="badge b-ok">${d.currKmh<1?'Weak':d.currKmh<2?'Moderate':'Strong'}</div></div>
-      <div class="card"><div class="sc-icon">🌧</div><div><span class="sc-big">${d.rain}</span><span class="sc-unit">%</span></div>
-        <div class="sc-label">Rain Chance</div><div class="sc-sub">${d.rain>30?'Showers likely':'Mostly clear'}</div>
-        <div class="badge ${d.rain>40?'b-warn':'b-ok'}">${d.rain>50?'High':d.rain>20?'Moderate':'Low'}</div></div>
-    </div>
-    <div class="stitle">Tide · Sydney <span class="pill pill-f">M2 조화 계산</span></div>
+    <div class="stitle">Tide · NSW <span class="pill pill-f">${d.src==='WillyWeather'?'WillyWeather BOM':'M2 계산'}</span></div>
     <div class="tide-card">
-      <div class="tide-svg-w">
-        <svg viewBox="0 0 340 80" preserveAspectRatio="none" style="width:100%;height:100%;">
-          <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="rgba(0,212,255,.25)"/>
-            <stop offset="100%" stop-color="rgba(0,212,255,0)"/>
-          </linearGradient></defs>
-          <path d="${path} L340,80 L0,80 Z" fill="url(#tg)"/>
-          <path d="${path}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
-          ${tides4.map((t,idx) => {
-            const x = (t.h+t.m/60)/24*340;
-            const col = t.type==='high'?'var(--green)':'var(--warn)';
-            const y = t.type==='high'?12:62;
-            return `<circle cx="${x}" cy="${y}" r="4" fill="${col}"/>
-              <rect x="${Math.max(0,x-18)}" y="${t.type==='high'?1:65}" width="36" height="13" rx="3" fill="${t.type==='high'?'rgba(0,230,118,.2)':'rgba(255,107,53,.2)'}"/>
-              <text x="${Math.max(18,x)}" y="${t.type==='high'?10:74}" fill="${col}" font-size="8" text-anchor="middle" font-weight="600">${t.height}m</text>`;
-          }).join('')}
-          ${i===0?'<line x1="170" y1="0" x2="170" y2="80" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/><text x="174" y="9" fill="var(--warn)" font-size="7">Now</text>':''}
-        </svg>
-      </div>
+      <div class="tide-svg-w"><svg viewBox="0 0 340 80" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(0,212,255,.25)"/><stop offset="100%" stop-color="rgba(0,212,255,0)"/></linearGradient></defs><path d="${path} L340,80 L0,80 Z" fill="url(#tg)"/><path d="${path}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>${tides4.map(t=>{const x=(t.h+t.m/60)/24*340;const col=t.type==='high'?'var(--green)':'var(--warn)';const y=t.type==='high'?12:62;return`<circle cx="${x}" cy="${y}" r="4" fill="${col}"/><text x="${Math.max(18,Math.min(322,x))}" y="${t.type==='high'?10:74}" fill="${col}" font-size="8" text-anchor="middle" font-weight="600">${t.height}m</text>`;}).join('')}${i===0?'<line x1="170" y1="0" x2="170" y2="80" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/><text x="174" y="9" fill="var(--warn)" font-size="7">Now</text>':''}</svg></div>
       <div class="tide-row">${tideRowHtml}</div>
     </div>
     <div class="stitle">Hourly Forecast <span class="pill pill-u">km/h · m</span></div>
     <div class="hscroll"><div class="hrow">${hourlyHtml}</div></div>
-    <div class="sun-row">
-      <div style="text-align:center;"><div style="font-size:21px;margin-bottom:2px;">🌅</div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Sunrise</div>
-        <div style="font-size:14px;font-weight:600;margin-top:2px;">${d.sunrise}</div></div>
-      <div class="sr-div"></div>
-      <div style="text-align:center;"><div style="font-size:21px;margin-bottom:2px;">☀</div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">UV Index</div>
-        <div style="font-size:14px;font-weight:600;margin-top:2px;color:var(--gold);">Live ↗</div></div>
-      <div class="sr-div"></div>
-      <div style="text-align:center;"><div style="font-size:21px;margin-bottom:2px;">🌇</div>
-        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;">Sunset</div>
-        <div style="font-size:14px;font-weight:600;margin-top:2px;">${d.sunset}</div></div>
-    </div>
-  `;
+    <div class="sun-row"><div style="text-align:center"><div style="font-size:21px;margin-bottom:2px">🌅</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">Sunrise</div><div style="font-size:14px;font-weight:600;margin-top:2px">${d.sunrise}</div></div><div class="sr-div"></div><div style="text-align:center"><div style="font-size:21px;margin-bottom:2px">☀</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">UV Index</div><div style="font-size:14px;font-weight:600;margin-top:2px;color:var(--gold)">Live ↗</div></div><div class="sr-div"></div><div style="text-align:center"><div style="font-size:21px;margin-bottom:2px">🌇</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px">Sunset</div><div style="font-size:14px;font-weight:600;margin-top:2px">${d.sunset}</div></div></div>`;
 }
 
-function updateLiveBar(d) {
-  const el = id => document.getElementById(id);
-  if (el('lb-swell')) el('lb-swell').textContent = d.swellH+'m';
-  if (el('lb-wind'))  el('lb-wind').textContent  = d.windKmh+'km/h';
-  if (el('lb-sst'))   el('lb-sst').textContent   = d.sst+'°C';
-  if (el('lb-pres'))  el('lb-pres').textContent  = d.pressure+'hPa';
-  if (el('lb-curr'))  el('lb-curr').textContent  = d.currKmh+'km/h';
-  // Species cond bar
-  const mt = multtae(new Date());
-  if (el('cb-swell'))  el('cb-swell').textContent  = d.swellH+'m';
-  if (el('cb-dir'))    el('cb-dir').textContent    = d.swellD;
-  if (el('cb-wind'))   el('cb-wind').textContent   = d.windKmh+'km/h';
-  if (el('cb-wdir'))   el('cb-wdir').textContent   = d.windD;
-  if (el('cb-mt'))     el('cb-mt').textContent     = mt+'물';
-  if (el('cb-sst'))    el('cb-sst').textContent    = d.sst+'°C';
-  const warnEl = el('cb-warn');
-  if (warnEl) { warnEl.style.display = d.warn!=='good'?'flex':'none'; warnEl.textContent = d.warn==='rough'?'⛔ Rough':'⚠ Moderate'; }
-  // Windy link
-  if (LOCS.length>0) {
-    const l = LOCS[activeIdx];
-    const wl = document.getElementById('windy-link');
-    if (wl) wl.href = `https://www.windy.com/${currentLayer}/${l.lat.toFixed(3)}/${l.lng.toFixed(3)}?${currentLayer},${l.lat.toFixed(3)},${l.lng.toFixed(3)},10`;
-    // Update external app buttons with location coords
-    updateExtButtons(l.lat, l.lng, l.name);
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 10: MULTTAE RENDER
-// ═══════════════════════════════════════════════════
-function renderMulttae(dayNum) {
-  activeMtDay = dayNum;
-  const d = MT[dayNum-1];
-  const scol = d.score>70?'var(--gold)':d.score>55?'var(--accent)':'var(--muted)';
-
-  // 15-day cycle
-  const cycleHtml = MT.map(m => {
-    const col = m.score>70?'var(--gold)':m.score>55?'var(--accent)':'var(--dim)';
-    const cls = m.type==='sari'?'sari':m.type==='jogeum'?'jogeum':'';
-    return `<div class="mt-btn ${cls} ${m.day===dayNum?'on':''}" onclick="renderMulttae(${m.day})">
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:${m.day===dayNum?'var(--purple)':col};">${m.day}</div>
-      <div style="font-size:8px;color:var(--muted);margin-top:1px;">${m.name.replace('물','')}</div>
-      <div style="width:5px;height:5px;border-radius:50%;margin:3px auto 0;background:${col};"></div>
-    </div>`;
-  }).join('');
-
-  // Monthly calendar (real lunar)
-  const now = new Date();
-  const year = now.getFullYear(), month = now.getMonth()+1;
-  const daysInMonth = new Date(year, month, 0).getDate();
-  const dayNames7 = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const monthRows = [];
-  for (let day=1; day<=daysInMonth; day++) {
-    const date = new Date(year, month-1, day);
-    const age = lunarAge(date);
-    const mt = multtae(date);
-    const moon = moonPhase(age);
-    const mData = MT[mt-1];
-    const col = mData.score>70?'var(--gold)':mData.score>55?'var(--accent)':'var(--muted)';
-    const isToday = day===now.getDate();
-    monthRows.push(`<div class="mm-row ${isToday?'today':''}" onclick="renderMulttae(${mt})">
-      <div style="width:64px;font-size:11px;color:${isToday?'var(--accent)':'var(--muted)'};font-weight:${isToday?600:400};">${isToday?'오늘':dayNames7[date.getDay()]+' '+day}</div>
-      <div style="font-size:14px;margin-right:8px;">${moon.e}</div>
-      <div style="flex:1;font-size:12px;font-weight:500;">${mt}물 · ${mData.name}</div>
-      <div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;margin:0 8px;">
-        <div style="height:100%;width:${mData.score}%;background:${col};border-radius:2px;"></div>
-      </div>
-      <div style="font-size:11px;font-weight:600;min-width:24px;text-align:right;color:${col};">${mData.score}</div>
-    </div>`);
-  }
-
-  const badge = d.type==='sari'?'<div class="mt-badge mt-sari">사리 (Spring Tide)</div>'
-    : d.type==='jogeum'?'<div class="mt-badge mt-jogeum">조금 (Neap Tide)</div>'
-    : '<div class="mt-badge mt-mid">중간물 (Moderate Tide)</div>';
-
-  document.getElementById('mt-content').innerHTML = `
+// ═══════════════════════════════════════════
+// MULTTAE
+// ═══════════════════════════════════════════
+function renderMulttae(dayNum){
+  const d=MT[dayNum-1];
+  const scol=d.score>70?'var(--gold)':d.score>55?'var(--accent)':'var(--muted)';
+  const cycleHtml=MT.map(m=>{const col=m.score>70?'var(--gold)':m.score>55?'var(--accent)':'var(--dim)';const cls=m.type==='sari'?'sari':m.type==='jogeum'?'jogeum':'';return`<div class="mt-btn ${cls} ${m.day===dayNum?'on':''}" onclick="renderMulttae(${m.day})"><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;line-height:1;color:${m.day===dayNum?'var(--purple)':col}">${m.day}</div><div style="font-size:8px;color:var(--muted);margin-top:1px">${m.name.replace('물','')}</div><div style="width:5px;height:5px;border-radius:50%;margin:3px auto 0;background:${col}"></div></div>`;}).join('');
+  const now=new Date(),year=now.getFullYear(),month=now.getMonth()+1,dim=new Date(year,month,0).getDate();
+  const DNs=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const monthRows=[];
+  for(let day=1;day<=dim;day++){const date=new Date(year,month-1,day);const mt=multtae(date);const moon=moonPhase(lunarAge(date));const mD=MT[mt-1];const col=mD.score>70?'var(--gold)':mD.score>55?'var(--accent)':'var(--muted)';const isT=day===now.getDate();monthRows.push(`<div class="mm-row ${isT?'today':''}" onclick="renderMulttae(${mt})"><div style="width:64px;font-size:11px;color:${isT?'var(--accent)':'var(--muted)'};font-weight:${isT?600:400}">${isT?'오늘':DNs[date.getDay()]+' '+day}</div><div style="font-size:14px;margin-right:8px">${moon.e}</div><div style="flex:1;font-size:12px;font-weight:500">${mt}물 · ${mD.name}</div><div style="flex:1;height:4px;background:var(--bg3);border-radius:2px;margin:0 8px"><div style="height:100%;width:${mD.score}%;background:${col};border-radius:2px"></div></div><div style="font-size:11px;font-weight:600;min-width:24px;text-align:right;color:${col}">${mD.score}</div></div>`);}
+  const badge=d.type==='sari'?'<div class="mt-badge mt-sari">사리 (Spring Tide)</div>':d.type==='jogeum'?'<div class="mt-badge mt-jogeum">조금 (Neap Tide)</div>':'<div class="mt-badge mt-mid">중간물 (Moderate Tide)</div>';
+  document.getElementById('mt-content').innerHTML=`
     <div class="mt-hero">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-        <div>
-          <div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;">오늘의 물때</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;color:var(--purple);">${dayNum}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:-4px;">물 · ${KNUM[dayNum-1]}物</div>
-          ${badge}
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:10px;color:var(--muted);">조차 (m)</div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1.1;">${d.range.toFixed(2)}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:8px;">물살 세기</div>
-          <div style="font-size:13px;font-weight:600;">${d.strength}</div>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">오늘의 물때</div><div style="font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:1;color:var(--purple)">${dayNum}</div><div style="font-size:12px;color:var(--muted);margin-top:-4px">물 · ${KNUM[dayNum-1]}物</div>${badge}</div>
+        <div style="text-align:right"><div style="font-size:10px;color:var(--muted)">조차 (m)</div><div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1.1">${d.range.toFixed(2)}</div><div style="font-size:10px;color:var(--muted);margin-top:8px">물살 세기</div><div style="font-size:13px;font-weight:600">${d.strength}</div></div>
       </div>
-      <div style="margin-top:12px;">
-        <div style="font-size:10px;color:var(--muted);margin-bottom:5px;">낚시 종합 점수</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;">
-            <div style="height:100%;width:${d.score}%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:4px;"></div>
-          </div>
-          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;min-width:32px;text-align:right;color:${scol};">${d.score}</div>
-        </div>
-      </div>
+      <div style="margin-top:12px"><div style="font-size:10px;color:var(--muted);margin-bottom:5px">낚시 종합 점수</div><div style="display:flex;align-items:center;gap:10px"><div style="flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden"><div style="height:100%;width:${d.score}%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:4px"></div></div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;min-width:32px;text-align:right;color:${scol}">${d.score}</div></div></div>
     </div>
     <div class="stitle">15일 물때 사이클</div>
     <div class="mt-cycle">${cycleHtml}</div>
     <div class="stitle">오늘 물때 특성</div>
     <div class="mt-info-g">
-      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px;">🌊</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;">조류</div><div style="font-size:13px;font-weight:600;margin-top:4px;">${d.strength} 조류</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${d.current}</div></div>
-      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px;">🎣</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;">추천 어종</div><div style="font-size:13px;font-weight:600;margin-top:4px;">${d.fish.split('·')[0].trim()}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${d.fish}</div></div>
-      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px;">⏰</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;">베스트 타임</div><div style="font-size:13px;font-weight:600;margin-top:4px;">${d.time}</div></div>
-      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px;">📍</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;">포인트</div><div style="font-size:13px;font-weight:600;margin-top:4px;">${d.spot.split('·')[0].trim()}</div><div style="font-size:10px;color:var(--muted);margin-top:2px;">${d.spot}</div></div>
+      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px">🌊</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">조류</div><div style="font-size:13px;font-weight:600;margin-top:4px">${d.strength} 조류</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${d.current}</div></div>
+      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px">🎣</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">추천 어종</div><div style="font-size:13px;font-weight:600;margin-top:4px">${d.fish.split('·')[0].trim()}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${d.fish}</div></div>
+      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px">⏰</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">베스트 타임</div><div style="font-size:13px;font-weight:600;margin-top:4px">${d.time}</div></div>
+      <div class="mt-ic"><div style="font-size:18px;margin-bottom:5px">📍</div><div style="font-size:10px;color:var(--muted);text-transform:uppercase">포인트</div><div style="font-size:13px;font-weight:600;margin-top:4px">${d.spot.split('·')[0].trim()}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${d.spot}</div></div>
     </div>
-    <div class="mt-adv">
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px;">💡 오늘의 낚시 가이드</div>
-      ${d.advice.map(a => `<div class="ma-item"><span style="font-size:13px;min-width:18px;">→</span><span style="font-size:11px;color:var(--muted);line-height:1.5;">${a}</span></div>`).join('')}
-    </div>
+    <div class="mt-adv"><div style="font-size:13px;font-weight:600;margin-bottom:10px">💡 오늘의 낚시 가이드</div>${d.advice.map(a=>`<div class="ma-item"><span style="font-size:13px;min-width:18px">→</span><span style="font-size:11px;color:var(--muted);line-height:1.5">${a}</span></div>`).join('')}</div>
     <div class="stitle">이달 물때 (${now.toLocaleString('en',{month:'long'})} ${year})</div>
-    <div class="mm-card">
-      <div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;">날짜 · 물때 · 낚시 지수</div>
-      ${monthRows.join('')}
-    </div>
-  `;
+    <div class="mm-card"><div style="padding:10px 13px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600">날짜 · 물때 · 낚시 지수</div>${monthRows.join('')}</div>`;
 }
 
-// ═══════════════════════════════════════════════════
-// MODULE 11: SPECIES RENDER
-// ═══════════════════════════════════════════════════
-function scCol(sc) { return sc>=80?'#00e676':sc>=65?'#f5a623':sc>=50?'#00d4ff':'#6b8aaa'; }
-
-function renderSpScroll() {
-  document.getElementById('sp-scroll').innerHTML = SPECIES.map(s => {
-    const c = s.col||scCol(80);
-    return `<div class="sp-btn ${s.id===activeSpecies?'on':''}" onclick="selectSpecies('${s.id}')">
-      <div class="sp-score-badge" style="background:${c};color:#000;">${getSpeciesScore(s.id)}</div>
-      <div class="sp-emoji">${s.emoji}</div>
-      <div class="sp-name">${s.name}</div>
-    </div>`;
-  }).join('');
+// ═══════════════════════════════════════════
+// SPECIES
+// ═══════════════════════════════════════════
+function spScore(id){
+  const t=marineDays[0];if(!t)return 70;
+  const sw=t.swellH,mt=multtae(new Date());
+  const M={drummer:sw<2?88:sw<3?75:55,bream:sw<2?82:sw<3?70:55,snapper:sw<2.5?80:sw<3.5?68:50,jewfish:72,kingfish:sw<2?75:sw<3?65:50,tuna:t.sst>=20?62:45,squid:(mt>=6&&mt<=10)?90:(mt>=5&&mt<=11)?78:60};
+  return M[id]||70;
 }
+function renderSpScroll(){
+  document.getElementById('sp-scroll').innerHTML=SPECIES.map(s=>{const sc=spScore(s.id);return`<div class="sp-btn ${s.id===activeSpecies?'on':''}" onclick="selectSp('${s.id}')"><div class="sp-score-badge" style="background:${s.col};color:#000">${sc}</div><div class="sp-emoji">${s.emoji}</div><div class="sp-name">${s.name}</div></div>`;}).join('');
+}
+function selectSp(id){activeSpecies=id;renderSpScroll();renderSpResult(id);}
 
-function getSpeciesScore(id) {
-  const today = marineDays[0];
-  if (!today) return '—';
-  const swell = today.swellH, mt = multtae(new Date());
-  const scores = {
-    drummer: swell<2?88:swell<3?75:55,
-    bream:   swell<2?82:swell<3?70:55,
-    snapper: swell<2.5?80:swell<3.5?68:50,
-    jewfish: 72,
-    kingfish:swell<2?75:swell<3?65:50,
-    tuna:    today.sst>=20?62:45,
-    squid:   (mt>=6&&mt<=10)?90:(mt>=5&&mt<=11)?78:60,
+function genAnalysis(id){
+  const t=marineDays[0];
+  if(!t)return'포인트를 추가하고 인터넷 연결하면 실제 조건 분석이 시작돼.';
+  const sw=t.swellH,wi=t.windKmh,sst=t.sst,rain=t.rain,pres=t.pressure;
+  const sd=t.swellD,wd=t.windD,mt=multtae(new Date()),mD=MT[mt-1];
+  const age=lunarAge(new Date()),sol=solScore(age),moon=moonPhase(age);
+  const tides=t.tides,nh=tides.find(x=>x.type==='high');
+  const ts=nh?'만조 '+fmt2(nh.h,nh.m)+' ('+nh.height+'m)':'조수 로딩 중';
+  const ok=sw<2.5&&wi<35,good=sw<1.8&&wi<25,pu=pres>1015;
+  const A={
+    drummer:()=>`오늘 드러머 조건: <strong>스웰 ${sw}m ${sd} · 바람 ${wi}km/h ${wd}</strong>\n\n${ok&&sw>0.8?(pu?'✅ 최적 조건!':'🔵 좋은 조건.'):'⚠ 파도 주의.'} ${pu?'기압 '+pres+'hPa 상승 중.':''}\n\n<strong>${ts}</strong> 기준 만조 전후 2시간. ${mt}물 — ${mD.name}, 조류 ${mD.strength}.\n\n미끼: ${sst>20?'Cunjevoi 최우선 (수온 '+sst+'°C).':'Cunjevoi + Bread dough 병행.'}`,
+    bream:()=>`브림 오늘 조건: <strong>스웰 ${sw}m · 바람 ${wi}km/h</strong>\n\n${good?'✅ 좋은 조건.':ok?'🔵 가능한 조건.':'⚠ 만 안쪽 추천.'}\n\n${mt}물 (${mD.name}) — 들물 때 가장 활성. ${ts}\n\n${wd.includes('N')?'NNE 바람이 베이트 만 안으로.':'바람 방향 고려 포인트 선택.'} 수온 ${sst}°C.`,
+    snapper:()=>`스내퍼 조건: <strong>스웰 ${sw}m · SST ${sst}°C · ${mt}물</strong>\n\n${sol.s>=75?'⭐ 솔루나 '+sol.s+'점 — 피딩 좋은 날.':'솔루나 '+sol.s+'점.'} 기압 ${pres}hPa ${pu?'↑ 상승.':'→ 안정.'}\n\n${ts} — 만조 전후 수중 암초 집중.\n\n미끼: ${sw<2?'파터노스터 + 생오징어.':'슬로우지그 80-100g.'}`,
+    jewfish:()=>`쥬피시 조건: <strong>${mt}물 · 스웰 ${sw}m</strong>\n\n${new Date().getHours()>=18||new Date().getHours()<6?'🌙 지금 야간 — 쥬피시 피딩 타임!':'야간이 진짜야. 일몰 후 집중.'}\n\n${mt>=6&&mt<=10?'✅ 6~10물 — 황금 물때.':mt>=11?'조금 — 딥홀 집중.':'사리 — 채널 입구.'}\n\n미끼: 생 오징어 통째 (${sst}°C).`,
+    kingfish:()=>`킹피시 조건: <strong>스웰 ${sw}m · ${mt}물</strong>\n\n${sw>2.5?'⚠ 딥레지 위주.':good?'✅ 좋은 조건.':'🔵 가능.'}\n\n${mD.strength.includes('강')?'조류 강함 — 슬로우지그 80-120g.':'조류 약 — 스틱베이트+라이브베이트.'}\n\n솔루나 ${sol.s}점. ${moon.n} ${moon.pct}%.`,
+    tuna:()=>`참치 조건: <strong>스웰 ${sw}m · SST ${sst}°C</strong>\n\n${sw>2.5?'⚠ 오프쇼어만.':'갯바위 가능한 조건.'}\n\nSST ${sst}°C — ${sst>=20?'✅ 수온 양호.':'수온 낮음.'} ${new Date().getMonth()>=11||new Date().getMonth()<=3?'피크 시즌!':'시즌 아웃.'}\n\n조류 전환기 전후 보일링 확률 높아.`,
+    squid:()=>`에깅 조건: <strong>스웰 ${sw}m · 바람 ${wi}km/h · ${mt}물</strong>\n\n${good&&mt>=6&&mt<=10?'⭐ 에깅 최적! 트리플 콤보.':ok?'🔵 에깅 가능. 바람 등지는 포인트.':'⚠ 만 안쪽 포인트.'}\n\n${mt}물 — ${mD.strength.includes('강')?'조류 강함. 에기 20g+.':mD.strength.includes('약')?'조류 약. 변환기 노려.':'에깅 황금 물때!'}\n\n컬러: ${sw>2||rain>30?'Orange/Gold 1순위.':sst>21?'Brown/Natural 또는 Pink UV.':'Orange/Gold 기본.'} 수온 ${sst}°C.`,
   };
-  return scores[id]||70;
+  return (A[id]&&A[id]())||'분석 불가.';
 }
 
-function selectSpecies(id) {
-  activeSpecies = id;
-  renderSpScroll();
-  renderSpResult(id);
-}
-
-function generateAnalysis(id) {
-  const today = marineDays[0];
-  if (!today) return '포인트를 추가하고 인터넷에 연결하면 실제 조건 분석이 시작돼.';
-  const swell=today.swellH, wind=today.windKmh, sst=today.sst;
-  const rain=today.rain, pres=today.pressure;
-  const swellD=today.swellD, windD=today.windD;
-  const mt=multtae(new Date()), mtD=MT[mt-1];
-  const age=lunarAge(new Date()), sol=solScore(age), moon=moonPhase(age);
-  const tides=today.tides, nextHigh=tides.find(t=>t.type==='high');
-  const tideStr=nextHigh?'만조 '+fmt(nextHigh.h,nextHigh.m)+' ('+nextHigh.height+'m)':'조수 로딩 중';
-  const condOK=swell<2.5&&wind<35, condGood=swell<1.8&&wind<25, presUp=pres>1015;
-
-  const A = {
-    drummer: ()=>{
-      const r=condOK&&swell>0.8?(presUp?'최적':'좋음'):'주의';
-      return '오늘 드러머 조건: <strong>스웰 '+swell+'m '+swellD+' · 바람 '+wind+'km/h '+windD+'</strong>\n\n'
-        +(r==='최적'?'✅ 최적 조건!':r==='좋음'?'🔵 좋은 조건.':'⚠ 파도 주의.')
-        +' '+(presUp?'기압 '+pres+'hPa 상승 — 드러머 피딩 타임 접근.':'')+'\n\n'
-        +'<strong>'+tideStr+'</strong> 기준 만조 전후 2시간이 황금 타임. '
-        +mt+'물 — '+mtD.name+', 조류 '+mtD.strength+'.\n\n'
-        +'미끼: '+(sst>20?'Cunjevoi 최우선 (수온 '+sst+'°C).':'Cunjevoi + Bread dough 병행.');
-    },
-    bream: ()=>{
-      return '브림 오늘 조건: <strong>스웰 '+swell+'m · 바람 '+wind+'km/h</strong>\n\n'
-        +(condGood?'✅ 좋은 조건.':condOK?'🔵 가능한 조건.':'⚠ 만 안쪽 추천.')+'\n\n'
-        +mt+'물 ('+mtD.name+') — 들물 때 가장 활성. '+tideStr+'\n\n'
-        +(windD.includes('N')?'NNE 바람이 베이트를 만 안으로 몰아줘서 좋아.':'바람 방향 고려해서 포인트 선택.')
-        +' 수온 '+sst+'°C.';
-    },
-    snapper: ()=>{
-      return '스내퍼 조건: <strong>스웰 '+swell+'m · SST '+sst+'°C · '+mt+'물</strong>\n\n'
-        +(sol.s>=75?'⭐ 솔루나 '+sol.s+'점 — 피딩 좋은 날.':'솔루나 '+sol.s+'점.')
-        +' 기압 '+pres+'hPa '+(presUp?'↑ 상승.':'→ 안정.')+'\n\n'
-        +tideStr+' — 만조 전후 수중 암초 집중.\n\n'
-        +'미끼: '+(swell<2?'파터노스터 + 생오징어.':'슬로우지그 80-100g 추천.');
-    },
-    jewfish: ()=>{
-      const isNight=new Date().getHours()>=18||new Date().getHours()<6;
-      return '쥬피시 조건: <strong>'+mt+'물 · 스웰 '+swell+'m</strong>\n\n'
-        +(isNight?'🌙 지금 야간 — 쥬피시 피딩 타임!':'야간이 진짜야. 일몰 후 집중.')+'\n\n'
-        +(mt>=6&&mt<=10?'✅ 6~10물 — 쥬피시 황금 물때.':mt>=11?'조금 — 딥홀 집중.':'사리 — 채널 입구 공략.')+'\n\n'
-        +'미끼: 생 오징어 통째 ('+sst+'°C).';
-    },
-    kingfish: ()=>{
-      return '킹피시 조건: <strong>스웰 '+swell+'m · '+mt+'물</strong>\n\n'
-        +(swell>2.5?'⚠ 스웰 커서 딥레지 위주.':condGood?'✅ 좋은 조건.':'🔵 가능.')+'\n\n'
-        +(mtD.strength.includes('강')?'조류 강함 — 슬로우지그 80-120g 최적.':'조류 약 — 스틱베이트 + 라이브베이트.')+'\n\n'
-        +'솔루나 '+sol.s+'점. '+moon.n+' '+moon.pct+'%.';
-    },
-    tuna: ()=>{
-      return '참치 조건: <strong>스웰 '+swell+'m · SST '+sst+'°C</strong>\n\n'
-        +(swell>2.5?'⚠ 갯바위 비추. 오프쇼어만.':'갯바위 가능한 조건.')+'\n\n'
-        +'SST '+sst+'°C — '+(sst>=20?'✅ 수온 양호. EAC 조경선 파란물.':'수온 낮음. 활성 감소.')
-        +' '+(new Date().getMonth()>=11||new Date().getMonth()<=3?'피크 시즌!':'시즌 아웃.'+'\n\n'
-        +'조류 전환기 전후 보일링 확률 높아.');
-    },
-    squid: ()=>{
-      return '에깅 조건: <strong>스웰 '+swell+'m · 바람 '+wind+'km/h · '+mt+'물</strong>\n\n'
-        +(condGood&&mt>=6&&mt<=10?'⭐ 에깅 최적! 스웰·물때·조류 트리플 콤보.':condOK?'🔵 에깅 가능. 바람 등지는 포인트.':'⚠ 만 안쪽 포인트로.')+'\n\n'
-        +mt+'물 — '+(mtD.strength.includes('강')?'조류 강함. 에기 20g+.':mtD.strength.includes('약')?'조류 약. 정조 피해 변환기 노려.':'에깅 황금 물때!')+'\n\n'
-        +'컬러: '+(swell>2||rain>30?'Orange/Gold 1순위.':sst>21?'Brown/Natural 또는 Pink UV.':'Orange/Gold 기본.')
-        +' 수온 '+sst+'°C.';
-    },
-  };
-  return (A[id]&&A[id]()) || '오늘 조건 분석 불가.';
-}
-
-function renderSpResult(id) {
-  const s = SPECIES.find(x=>x.id===id);
-  const score = getSpeciesScore(id);
-  const c = s.col||scCol(score);
-  const cf = 2*Math.PI*17, off = cf*(1-(typeof score==='number'?score:70)/100);
-
-  // Dynamic pts from saved LOCS
-  function buildPts() {
-    if (!LOCS.length) return [{t:'caution',name:'포인트를 추가해줘',dir:'📍 + 버튼으로 포인트 추가',desc:'포인트를 추가하면 실제 조건 기반 추천이 나와.',tags:[['포인트 없음','t-info']],lat:null,lng:null}];
-    const today = marineDays[0];
-    return LOCS.map((loc,i) => {
-      const swell = today?today.swellH:2.0, wind = today?today.windKmh:25;
-      const safe = swell<2.5&&wind<35;
-      const dist = distStr(loc.lat,loc.lng);
-      return {
-        t: safe?'best':'caution',
-        lat: loc.lat, lng: loc.lng,
-        name: loc.name+(i===activeIdx?' ★':''),
-        dir: `📍 ${Math.abs(loc.lat).toFixed(3)}°S · ${loc.lng.toFixed(3)}°E · ${dist}`,
-        desc: safe?`스웰 ${swell}m · 바람 ${wind}km/h — 낚시 가능 조건`:`스웰 ${swell}m · 바람 ${wind}km/h — 오늘 주의`,
-        tags: safe?[['조건 양호','t-safe'],[loc.note||'Custom','t-info']]:[['파도 주의','t-caut'],['안전 확인','t-caut']]
-      };
-    });
-  }
-
-  const pts = buildPts();
-  const pHtml = pts.map(p => `
-    <div class="sl-item ${p.t}">
-      <div class="sl-dot" style="background:${p.t==='best'?'var(--green)':'var(--warn)'}"></div>
-      <div style="flex:1;">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:4px;">
-          <div class="sl-name">${p.name}</div>
-          ${p.lat?`<button onclick="showOnMap(${p.lat},${p.lng},'${p.name.replace(/'/g,'')}')" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--accent);cursor:pointer;flex-shrink:0;">🗺 지도</button>`:''}
-        </div>
-        <div class="sl-dir">${p.dir}</div>
-        <div class="sl-desc">${p.desc}</div>
-        <div class="sl-tags">${p.tags.map(([t,cls])=>`<span class="sl-tag ${cls}">${t}</span>`).join('')}</div>
-      </div>
-    </div>`).join('');
-
-  // Tidal conditions
-  const td = s.tide;
-  function star(r,col){return'<span style="font-size:13px;color:'+col+';">'+'★'.repeat(r)+'</span><span style="font-size:13px;color:var(--dim);">'+'★'.repeat(5-r)+'</span>';}
-  const tidalHtml = `
-    <div class="rb-sec">
-      <div class="rb-stitle">🌊 최적 조수 조건</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px;">
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">최적 시간대</div>
-          <div style="font-size:13px;font-weight:600;color:var(--accent);">${td.bestTime}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${td.bestTimeNote}</div>
-        </div>
-        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px;">
-          <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">조수 상태</div>
-          <div style="font-size:13px;font-weight:600;color:var(--gold);">${td.tidalState}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${td.tidalNote}</div>
+function renderSpResult(id){
+  const s=SPECIES.find(x=>x.id===id);if(!s)return;
+  const sc=spScore(id),c=s.col,cf=2*Math.PI*17,off=cf*(1-sc/100);
+  // Pts from saved LOCS
+  let pHtml='';
+  if(!LOCS.length){pHtml='<div class="sl-item caution"><div class="sl-dot" style="background:var(--warn)"></div><div><div class="sl-name">포인트를 추가해줘</div><div class="sl-dir">📍 + 버튼으로 포인트 추가</div><div class="sl-desc">포인트 추가 시 실제 조건 기반 추천이 나와.</div></div></div>';}
+  else{const t=marineDays[0];pHtml=LOCS.map((loc,i)=>{const sw=t?t.swellH:2,wi=t?t.windKmh:25,safe=sw<2.5&&wi<35;return`<div class="sl-item ${safe?'best':'caution'}"><div class="sl-dot" style="background:${safe?'var(--green)':'var(--warn)'}"></div><div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:4px"><div class="sl-name">${loc.name}${i===activeIdx?' ★':''}</div><button onclick="showOnMap(${loc.lat},${loc.lng},'${loc.name.replace(/'/g,'')}')" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--accent);cursor:pointer;flex-shrink:0">🗺 지도</button></div><div class="sl-dir">📍 ${Math.abs(loc.lat).toFixed(3)}°S · ${loc.lng.toFixed(3)}°E · ${distStr(loc.lat,loc.lng)}</div><div class="sl-desc">${safe?'스웰 '+sw+'m · 바람 '+wi+'km/h — 낚시 가능':'스웰 '+sw+'m · 바람 '+wi+'km/h — 오늘 주의'}</div><div class="sl-tags">${safe?'<span class="sl-tag t-safe">조건 양호</span><span class="sl-tag t-info">'+(loc.note||'Custom')+'</span>':'<span class="sl-tag t-caut">파도 주의</span><span class="sl-tag t-caut">안전 확인</span>'}</div></div></div>`;}).join('');}
+  // Tide conditions
+  const td=s.tide;function star(r,col){return'<span style="font-size:13px;color:'+col+';">'+'★'.repeat(r)+'</span><span style="font-size:13px;color:var(--dim);">'+'★'.repeat(5-r)+'</span>';}
+  const tidalHtml=`<div class="rb-sec"><div class="rb-stitle">🌊 최적 조수 조건</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px"><div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">최적 시간대</div><div style="font-size:13px;font-weight:600;color:var(--accent)">${td.bestTime}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${td.bestTimeNote}</div></div><div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">조수 상태</div><div style="font-size:13px;font-weight:600;color:var(--gold)">${td.tidalState}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${td.tidalNote}</div></div></div><div class="tide-cond-g">${[['만조',td.highTide],['들물',td.risingTide],['간조',td.lowTide],['날물',td.fallingTide]].map(([l,r])=>{const col=r>=5?'#f5a623':r>=4?'#00e676':r>=3?'#00d4ff':'#6b8aaa';return`<div class="tc-item"><div style="font-size:10px;color:var(--muted);margin-bottom:5px">${l}</div><div>${star(r,col)}</div></div>`;}).join('')}</div><div style="background:var(--bg3);border:1px solid rgba(0,212,255,.2);border-radius:9px;padding:10px 12px"><div style="font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">💡 조수 팁</div><div style="font-size:11px;color:var(--muted);line-height:1.65">${td.tip}</div></div></div>`;
+  const rigHtml=`<div class="rig-g"><div class="rig-card"><div class="rig-lbl">Main Line</div><div class="rig-val">${s.rig.ml}</div></div><div class="rig-card"><div class="rig-lbl">Leader</div><div class="rig-val">${s.rig.ld}</div></div><div class="rig-card"><div class="rig-lbl">Hook</div><div class="rig-val">${s.rig.hk}</div></div><div class="rig-card"><div class="rig-lbl">Weight/Lure</div><div class="rig-val">${s.rig.wt}</div></div><div class="rig-card"><div class="rig-lbl">Depth</div><div class="rig-val">${s.rig.dp}</div></div><div class="rig-card"><div class="rig-lbl">Technique</div><div class="rig-val">${s.rig.tc}</div></div></div>`;
+  const colorHtml=s.colors?`<div class="rb-sec"><div class="rb-stitle">🎨 오늘 추천 컬러</div><div class="color-strip">${s.colors.map(cc=>`<div class="color-chip ${cc.top?'top':''}"><div class="cswatch" style="background:${cc.h}"></div><div><div style="font-size:11px;font-weight:600">${cc.top?'⭐ ':''}${cc.n}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${cc.w}</div></div></div>`).join('')}</div></div>`:'';
+  const baitHtml=s.baits.length?`<div class="rb-sec"><div class="rb-stitle">🪱 미끼 추천</div><table class="bait-tbl"><tr><th>#</th><th>미끼</th><th>효과</th><th>이유</th></tr>${s.baits.map((b,i)=>{const rc=i===0?'var(--gold)':i===1?'var(--accent)':'var(--muted)';const dots='<div class="eff-row">'+[1,2,3,4,5].map(j=>`<div class="${j<=b.e?'ef':'ee'}"></div>`).join('')+'</div>';return`<tr><td><span class="b-rank" style="color:${rc}">${b.r}</span></td><td style="font-weight:500">${b.n}</td><td>${dots}</td><td style="color:var(--muted);font-size:10px">${b.w}</td></tr>`;}).join('')}</table></div>`:'';
+  const analysis=genAnalysis(id);
+  document.getElementById('sp-result').innerHTML=`
+    <div class="rc"><div class="rc-head"><div style="font-size:28px">${s.emoji}</div><div style="flex:1"><div style="font-size:16px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">오늘 조건 기반 점수</div></div><div class="rc-ring"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="17" fill="none" stroke="var(--border)" stroke-width="4"/><circle cx="22" cy="22" r="17" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${cf.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="rc-rnum" style="color:${c}">${sc}</div></div></div>
+    <div class="rc-body">
+      <div class="rb-sec"><div class="rb-stitle">📍 포인트 추천 (저장 포인트 기준)</div>${pHtml}</div>
+      ${tidalHtml}
+      <div class="rb-sec"><div class="rb-stitle">🎣 채비 세팅</div>${rigHtml}</div>
+      ${colorHtml}${baitHtml}
+      <div class="rb-sec" style="margin-bottom:0"><div class="rb-stitle">💡 오늘 조건 분석 <span class="pill pill-a">실제 날씨 기반</span></div>
+        <div class="analysis-box" id="abox-${id}">
+          <div class="analysis-text">${analysis.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
+          <div class="refresh-btn" onclick="refreshAnalysis('${id}')">↻ 다시 분석</div>
         </div>
       </div>
-      <div class="tide-cond-g">
-        ${[['만조',td.highTide],['들물',td.risingTide],['간조',td.lowTide],['날물',td.fallingTide]].map(([lbl,r])=>{
-          const col=r>=5?'#f5a623':r>=4?'#00e676':r>=3?'#00d4ff':'#6b8aaa';
-          return`<div class="tc-item"><div style="font-size:10px;color:var(--muted);margin-bottom:5px;">${lbl}</div><div>${star(r,col)}</div></div>`;
-        }).join('')}
-      </div>
-      <div style="background:var(--bg3);border:1px solid rgba(0,212,255,.2);border-radius:9px;padding:10px 12px;">
-        <div style="font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">💡 조수 팁</div>
-        <div style="font-size:11px;color:var(--muted);line-height:1.65;">${td.tip}</div>
-      </div>
-    </div>`;
-
-  // Rig
-  const rigHtml = `<div class="rig-g">
-    <div class="rig-card"><div class="rig-lbl">Main Line</div><div class="rig-val">${s.rig.ml}</div></div>
-    <div class="rig-card"><div class="rig-lbl">Leader</div><div class="rig-val">${s.rig.ld}</div></div>
-    <div class="rig-card"><div class="rig-lbl">Hook</div><div class="rig-val">${s.rig.hk}</div></div>
-    <div class="rig-card"><div class="rig-lbl">Weight/Lure</div><div class="rig-val">${s.rig.wt}</div></div>
-    <div class="rig-card"><div class="rig-lbl">Depth</div><div class="rig-val">${s.rig.dp}</div></div>
-    <div class="rig-card"><div class="rig-lbl">Technique</div><div class="rig-val">${s.rig.tc}</div></div>
-  </div>`;
-
-  // Colors
-  const colorHtml = s.colors ? `<div class="rb-sec"><div class="rb-stitle">🎨 오늘 추천 컬러</div>
-    <div class="color-strip">${s.colors.map(cc=>`
-      <div class="color-chip ${cc.top?'top':''}">
-        <div class="cswatch" style="background:${cc.h};"></div>
-        <div><div style="font-size:11px;font-weight:600;">${cc.top?'⭐ ':''}${cc.n}</div>
-        <div style="font-size:10px;color:var(--muted);margin-top:1px;">${cc.w}</div></div>
-      </div>`).join('')}
-    </div></div>` : '';
-
-  // Baits
-  const baitHtml = s.baits.length ? `<div class="rb-sec"><div class="rb-stitle">🪱 미끼 추천</div>
-    <table class="bait-tbl"><tr><th>#</th><th>미끼</th><th>효과</th><th>이유</th></tr>
-    ${s.baits.map((b,i)=>{
-      const rc=i===0?'var(--gold)':i===1?'var(--accent)':'var(--muted)';
-      const dots='<div class="eff-row">'+[1,2,3,4,5].map(j=>`<div class="${j<=b.e?'ef':'ee'}"></div>`).join('')+'</div>';
-      return `<tr><td><span class="b-rank" style="color:${rc};">${b.r}</span></td><td style="font-weight:500;">${b.n}</td><td>${dots}</td><td style="color:var(--muted);font-size:10px;">${b.w}</td></tr>`;
-    }).join('')}
-    </table></div>` : '';
-
-  const analysis = generateAnalysis(id);
-
-  document.getElementById('sp-result').innerHTML = `
-    <div class="rc">
-      <div class="rc-head">
-        <div style="font-size:28px;">${s.emoji}</div>
-        <div style="flex:1;">
-          <div style="font-size:16px;font-weight:600;">${s.name}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:1px;">오늘 조건 기반 점수</div>
-        </div>
-        <div class="rc-ring">
-          <svg width="44" height="44" viewBox="0 0 44 44">
-            <circle cx="22" cy="22" r="17" fill="none" stroke="var(--border)" stroke-width="4"/>
-            <circle cx="22" cy="22" r="17" fill="none" stroke="${c}" stroke-width="4"
-              stroke-dasharray="${cf.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/>
-          </svg>
-          <div class="rc-rnum" style="color:${c};">${score}</div>
-        </div>
-      </div>
-      <div class="rc-body">
-        <div class="rb-sec"><div class="rb-stitle">📍 포인트 추천 (저장된 포인트 기준)</div>${pHtml}</div>
-        ${tidalHtml}
-        <div class="rb-sec"><div class="rb-stitle">🎣 채비 세팅</div>${rigHtml}</div>
-        ${colorHtml}
-        ${baitHtml}
-        <div class="rb-sec" style="margin-bottom:0;">
-          <div class="rb-stitle">💡 오늘 조건 분석 <span class="pill pill-a">실제 날씨 기반</span></div>
-          <div class="analysis-box" id="abox-${id}">
-            <div class="analysis-text">${analysis.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div>
-            <div class="refresh-btn" onclick="refreshAnalysis('${id}')">↻ 다시 분석</div>
-          </div>
-        </div>
-      </div>
-    </div>`;
+    </div></div>`;
 }
-
-function refreshAnalysis(id) {
-  const box = document.getElementById('abox-'+id);
-  if (!box) return;
-  box.innerHTML = '<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:6px;">오늘 실제 조건 분석 중...</span></div>';
-  setTimeout(() => {
-    const analysis = generateAnalysis(id);
-    box.innerHTML = `<div class="analysis-text">${analysis.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div><div class="refresh-btn" onclick="refreshAnalysis('${id}')">↻ 다시 분석</div>`;
-  }, 600);
+function refreshAnalysis(id){
+  const box=document.getElementById('abox-'+id);if(!box)return;
+  box.innerHTML='<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div><span style="margin-left:6px">분석 중...</span></div>';
+  setTimeout(()=>{const a=genAnalysis(id);box.innerHTML=`<div class="analysis-text">${a.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div><div class="refresh-btn" onclick="refreshAnalysis('${id}')">↻ 다시 분석</div>`;},600);
 }
+function showOnMap(lat,lng,name){const btn=document.querySelector('.ni:nth-child(3)');if(btn)showTab('map',btn);setTimeout(()=>{initMap();if(mapL){mapL.setView([lat,lng],14);L.marker([lat,lng],{icon:makeIcon('#f5a623')}).addTo(mapL).bindPopup('<b>'+name+'</b>').openPopup();}},150);}
 
-function showOnMap(lat, lng, name) {
-  const btn = document.querySelector('.ni:nth-child(3)');
-  if (btn) showTab('map', btn);
-  setTimeout(() => {
-    initMap();
-    if (mapL) {
-      mapL.setView([lat, lng], 14);
-      L.marker([lat, lng], {icon: makeIcon('#f5a623')}).addTo(mapL)
-        .bindPopup('<b>' + name + '</b>').openPopup();
-    }
-  }, 150);
-}
-
-
-// ═══════════════════════════════════════════════════
-// EXTERNAL APP BUTTONS — Android intent + iOS/web fallback
-// ═══════════════════════════════════════════════════
-function updateExtButtons(lat, lng, locName) {
-  const latF = lat.toFixed(4);
-  const lngF = lng.toFixed(4);
-  const locSlug = encodeURIComponent(locName || 'NSW');
-
-  // WillyWeather: find nearest location page
-  // URL: willyweather.com.au/nsw/illawarra/kiama-downs.html style — use search fallback
-  const willyWeb = `https://www.willyweather.com.au/nsw.html`;
-  // WillyWeather search by coords (closest location)
-  const willySearch = `https://www.willyweather.com.au/nsw.html?lat=${latF}&lng=${lngF}`;
-
-  // Seabreeze: direct location wind forecast
-  const seabreezeWeb = `https://www.seabreeze.com.au/Weather/Wind-Forecast/?lat=${latF}&lon=${lngF}`;
-
-  // Windfinder: map centered on location
-  const windfinderWeb = `https://www.windfinder.com/#12/${latF}/${lngF}`;
-
-  // Android intent URLs (open app if installed, fallback to web)
-  const isAndroid = /Android/i.test(navigator.userAgent);
-  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  // Update WillyWeather button
-  const willyBtn = document.getElementById('btn-willy');
-  if (willyBtn) {
-    if (isAndroid) {
-      // Android: intent to WillyWeather app, fallback to web
-      willyBtn.href = `intent://willyweather.com.au/nsw.html?lat=${latF}&lng=${lngF}#Intent;scheme=https;package=com.willyweather.android;S.browser_fallback_url=${encodeURIComponent(willySearch)};end`;
-    } else {
-      // iOS or desktop: direct web URL
-      willyBtn.href = willySearch;
-    }
-    willyBtn.querySelector('.ext-btn-sub').textContent = `${latF}°S`;
-  }
-
-  // Update Seabreeze button
-  const seabreezeBtn = document.getElementById('btn-seabreeze');
-  if (seabreezeBtn) {
-    if (isAndroid) {
-      seabreezeBtn.href = `intent://seabreeze.com.au/Weather/Wind-Forecast/?lat=${latF}&lon=${lngF}#Intent;scheme=https;package=au.com.seabreeze;S.browser_fallback_url=${encodeURIComponent(seabreezeWeb)};end`;
-    } else {
-      seabreezeBtn.href = seabreezeWeb;
-    }
-    seabreezeBtn.querySelector('.ext-btn-sub').textContent = `${latF}°S`;
-  }
-
-  // Update Windfinder button
-  const windfinderBtn = document.getElementById('btn-windfinder');
-  if (windfinderBtn) {
-    if (isAndroid) {
-      windfinderBtn.href = `intent://windfinder.com/#12/${latF}/${lngF}#Intent;scheme=https;package=com.stormchaser.windfinder;S.browser_fallback_url=${encodeURIComponent(windfinderWeb)};end`;
-    } else {
-      windfinderBtn.href = windfinderWeb;
-    }
-    windfinderBtn.querySelector('.ext-btn-sub').textContent = `${latF}°S`;
-  }
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 12: MAP
-// ═══════════════════════════════════════════════════
-function makeIcon(color) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32">
-    <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill="${color}" stroke="white" stroke-width="1.5"/>
-    <circle cx="12" cy="12" r="5" fill="white" opacity=".9"/></svg>`;
-  return L.icon({ iconUrl:'data:image/svg+xml;base64,'+btoa(svg), iconSize:[24,32], iconAnchor:[12,32], popupAnchor:[0,-34] });
-}
-
-function initMap() {
-  if (mapL || typeof L === 'undefined') {
-    if (mapL) { mapL.invalidateSize(); renderMapMarkers(); }
-    return;
-  }
-  const loc = LOCS.length > 0 ? LOCS[activeIdx] : { lat:-33.85, lng:151.25 };
-  mapL = L.map('leaflet-map', { center:[loc.lat,loc.lng], zoom:11, zoomControl:true });
-  osmTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    { subdomains:'abcd', maxZoom:19, attribution:'© CARTO © OSM' });
-  osmTileLayer.addTo(mapL);
+// ═══════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════
+function makeIcon(color){const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill="${color}" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="5" fill="white" opacity=".9"/></svg>`;return L.icon({iconUrl:'data:image/svg+xml;base64,'+btoa(svg),iconSize:[24,32],iconAnchor:[12,32],popupAnchor:[0,-34]});}
+function initMap(){
+  if(typeof L==='undefined'){setTimeout(initMap,300);return;}
+  if(mapL){mapL.invalidateSize();renderMapMarkers();return;}
+  const loc=LOCS.length>0?LOCS[activeIdx]:{lat:-33.85,lng:151.25};
+  mapL=L.map('leaflet-map',{center:[loc.lat,loc.lng],zoom:11,zoomControl:true});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© CARTO © OSM'}).addTo(mapL);
   renderMapMarkers();
-
-  // Long press to add
-  let lp = null;
-  const el = document.getElementById('leaflet-map');
-  el.addEventListener('touchstart', e => {
-    const t = e.touches[0];
-    lp = setTimeout(() => {
-      const r = el.getBoundingClientRect();
-      const ll = mapL.containerPointToLatLng(L.point(t.clientX-r.left, t.clientY-r.top));
-      prefillFromMap(ll.lat, ll.lng);
-    }, 700);
-  }, {passive:true});
-  el.addEventListener('touchend', () => clearTimeout(lp), {passive:true});
-  el.addEventListener('touchmove', () => clearTimeout(lp), {passive:true});
+  let lp=null;const el=document.getElementById('leaflet-map');
+  el.addEventListener('touchstart',e=>{const t=e.touches[0];lp=setTimeout(()=>{const r=el.getBoundingClientRect();const ll=mapL.containerPointToLatLng(L.point(t.clientX-r.left,t.clientY-r.top));document.getElementById('m-lat').value=ll.lat.toFixed(5);document.getElementById('m-lng').value=ll.lng.toFixed(5);showSel(ll.lat.toFixed(4)+'°S, '+ll.lng.toFixed(4)+'°E','지도 롱프레스');openModal();},700);},{passive:true});
+  el.addEventListener('touchend',()=>clearTimeout(lp),{passive:true});
+  el.addEventListener('touchmove',()=>clearTimeout(lp),{passive:true});
 }
+function renderMapMarkers(){if(!mapL)return;mapMarkers.forEach(m=>m.remove());mapMarkers=[];LOCS.forEach((loc,i)=>{const m=L.marker([loc.lat,loc.lng],{icon:makeIcon(loc.color)}).addTo(mapL).bindPopup(`<b>${loc.name}</b><br><small style="color:#888">${loc.note}</small>`).on('click',()=>selectLoc(i));if(i===activeIdx)m.openPopup();mapMarkers.push(m);});}
+function setLayer(key,btn){document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');currentLayer=key;if(LOCS.length>0){const l=LOCS[activeIdx];const wl=document.getElementById('windy-link');if(wl)wl.href='https://www.windy.com/'+key+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+key+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}}
+function setTile(mode,btn){document.querySelectorAll('.tile-btn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');if(!mapL||typeof L==='undefined')return;mapL.eachLayer(l=>{if(l instanceof L.TileLayer)mapL.removeLayer(l);});if(mode==='sat'){L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{maxZoom:19,attribution:'© Esri'}).addTo(mapL);}else{L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19,attribution:'© CARTO © OSM'}).addTo(mapL);}}
+let pickerMapL2=null,pickedLatLng2=null;
+function openPicker(){document.getElementById('picker-overlay').classList.add('on');setTimeout(()=>{if(pickerMapL2){pickerMapL2.invalidateSize();return;}if(typeof L==='undefined')return;const loc=LOCS.length>0?LOCS[activeIdx]:{lat:-33.85,lng:151.25};pickerMapL2=L.map('picker-map',{center:[loc.lat,loc.lng],zoom:11,zoomControl:true});L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{subdomains:'abcd',maxZoom:19}).addTo(pickerMapL2);pickerMapL2.on('click',e=>{pickedLatLng2=e.latlng;if(pickerMarker)pickerMarker.remove();pickerMarker=L.marker([e.latlng.lat,e.latlng.lng]).addTo(pickerMapL2);document.getElementById('picker-coords-txt').textContent=e.latlng.lat.toFixed(4)+'°S · '+e.latlng.lng.toFixed(4)+'°E';document.getElementById('picker-confirm').style.display='block';});},100);}
+function closePicker(){document.getElementById('picker-overlay').classList.remove('on');}
+function confirmPick(){if(!pickedLatLng2)return;document.getElementById('m-lat').value=pickedLatLng2.lat.toFixed(5);document.getElementById('m-lng').value=pickedLatLng2.lng.toFixed(5);showSel(pickedLatLng2.lat.toFixed(4)+'°S, '+pickedLatLng2.lng.toFixed(4)+'°E','지도에서 선택됨');closePicker();}
 
-function renderMapMarkers() {
-  if (!mapL) return;
-  mapMarkers.forEach(m => m.remove()); mapMarkers = [];
-  LOCS.forEach((loc,i) => {
-    const m = L.marker([loc.lat,loc.lng], {icon:makeIcon(loc.color)})
-      .addTo(mapL)
-      .bindPopup(`<b>${loc.name}</b><br><small style="color:#888">${loc.note}</small>`)
-      .on('click', () => selectLoc(i));
-    if (i===activeIdx) m.openPopup();
-    mapMarkers.push(m);
-  });
+// ═══════════════════════════════════════════
+// LOCATIONS
+// ═══════════════════════════════════════════
+function renderFavs(){
+  const row=document.getElementById('fav-row');if(!row)return;
+  row.innerHTML=LOCS.map((l,i)=>`<div class="fc ${i===activeIdx?'on':''}" onclick="selectLoc(${i})"><div class="fc-dot" style="background:${l.color}"></div><div><div class="fc-name">${l.name}</div><div class="fc-dist">${distStr(l.lat,l.lng)}</div></div></div>`).join('')+`<div class="fc fc-add" onclick="openModal()">＋ Add</div>`;
 }
-
-function setLayer(key, btn) {
-  document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  currentLayer = key;
-  if (LOCS.length>0) {
-    const l=LOCS[activeIdx];
-    const wl=document.getElementById('windy-link');
-    if(wl) wl.href=`https://www.windy.com/${key}/${l.lat.toFixed(3)}/${l.lng.toFixed(3)}?${key},${l.lat.toFixed(3)},${l.lng.toFixed(3)},10`;
-  }
+function renderSavedList(){
+  const el=document.getElementById('saved-list');if(!el)return;
+  if(!LOCS.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">저장된 포인트 없음</div>';return;}
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">저장된 포인트 (${LOCS.length}곳)</div>`+LOCS.map((l,i)=>`<div class="saved-item ${i===activeIdx?'active':''}" onclick="selectLoc(${i});closeModal()"><div style="width:9px;height:9px;border-radius:50%;background:${l.color};flex-shrink:0"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">${l.name}</div><div style="font-size:10px;color:var(--muted)">${l.note} · ${distStr(l.lat,l.lng)}</div></div>${i===activeIdx?'<span style="font-size:9px;color:var(--accent)">active</span>':''}<span onclick="event.stopPropagation();deleteLoc(${i})" style="font-size:12px;color:var(--warn);padding:2px 6px;cursor:pointer">✕</span></div>`).join('');
 }
-
-function setTile(mode, btn) {
-  document.querySelectorAll('.tile-btn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  if (!mapL || typeof L==='undefined') return;
-  mapL.eachLayer(l => { if (l instanceof L.TileLayer) mapL.removeLayer(l); });
-  if (mode==='sat') {
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      {maxZoom:19,attribution:'© Esri'}).addTo(mapL);
-    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
-      {maxZoom:19,attribution:'',opacity:0.8}).addTo(mapL);
-  } else {
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      {subdomains:'abcd',maxZoom:19,attribution:'© CARTO © OSM'}).addTo(mapL);
-  }
-}
-
-// Map picker
-let pickerMapL2 = null;
-function openPicker() {
-  document.getElementById('picker-overlay').classList.add('on');
-  setTimeout(() => {
-    if (pickerMapL2) { pickerMapL2.invalidateSize(); return; }
-    if (typeof L==='undefined') return;
-    const loc = LOCS.length>0?LOCS[activeIdx]:{lat:-33.85,lng:151.25};
-    pickerMapL2 = L.map('picker-map',{center:[loc.lat,loc.lng],zoom:11,zoomControl:true});
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-      {subdomains:'abcd',maxZoom:19}).addTo(pickerMapL2);
-    pickerMapL2.on('click', e => {
-      pickedLatLng = e.latlng;
-      if (pickerMarker) pickerMarker.remove();
-      pickerMarker = L.marker([e.latlng.lat,e.latlng.lng]).addTo(pickerMapL2);
-      document.getElementById('picker-coords').textContent = e.latlng.lat.toFixed(4)+'°S · '+e.latlng.lng.toFixed(4)+'°E';
-      document.getElementById('picker-confirm').style.display='block';
-    });
-  }, 100);
-}
-function closePicker() { document.getElementById('picker-overlay').classList.remove('on'); }
-function confirmPick() {
-  if (!pickedLatLng) return;
-  document.getElementById('m-lat').value = pickedLatLng.lat.toFixed(5);
-  document.getElementById('m-lng').value = pickedLatLng.lng.toFixed(5);
-  showSel(pickedLatLng.lat.toFixed(4)+'°S, '+pickedLatLng.lng.toFixed(4)+'°E', '지도에서 선택됨');
-  closePicker();
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 13: LOCATIONS
-// ═══════════════════════════════════════════════════
-function renderFavs() {
-  const row = document.getElementById('fav-row');
-  if (!row) return;
-  row.innerHTML = LOCS.map((l,i) => `
-    <div class="fc ${i===activeIdx?'on':''}" onclick="selectLoc(${i})">
-      <div class="fc-dot" style="background:${l.color}"></div>
-      <div>
-        <div class="fc-name">${l.name}</div>
-        <div class="fc-dist">${distStr(l.lat,l.lng)}</div>
-      </div>
-    </div>`).join('') + `<div class="fc fc-add" onclick="openModal()">＋ Add</div>`;
-}
-
-function renderSavedList() {
-  const el = document.getElementById('saved-list');
-  if (!el) return;
-  if (!LOCS.length) { el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px;">저장된 포인트 없음</div>'; return; }
-  el.innerHTML = `<div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;">저장된 포인트 (${LOCS.length}곳)</div>`
-    + LOCS.map((l,i) => `
-      <div class="saved-item ${i===activeIdx?'active':''}" onclick="selectLoc(${i});closeModal();">
-        <div style="width:9px;height:9px;border-radius:50%;background:${l.color};flex-shrink:0;"></div>
-        <div style="flex:1;">
-          <div style="font-size:12px;font-weight:600;">${l.name}</div>
-          <div style="font-size:10px;color:var(--muted);">${l.note} · ${distStr(l.lat,l.lng)}</div>
-        </div>
-        ${i===activeIdx?'<span style="font-size:9px;color:var(--accent);">active</span>':''}
-        <span onclick="event.stopPropagation();deleteLoc(${i})" style="font-size:12px;color:var(--warn);padding:2px 6px;cursor:pointer;">✕</span>
-      </div>`).join('');
-}
-
-function selectLoc(idx) {
-  activeIdx = idx;
-  const l = LOCS[idx];
-  document.getElementById('tb-name').textContent = l.name;
-  document.getElementById('tb-coords').textContent = `${l.lat.toFixed(3)}, ${l.lng.toFixed(3)} · NSW`;
+function selectLoc(idx){
+  activeIdx=idx;const l=LOCS[idx];
+  document.getElementById('tb-name').textContent=l.name;
+  document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
   renderFavs();
-  if (mapL) { mapL.setView([l.lat,l.lng],11); renderMapMarkers(); }
-  const wl=document.getElementById('windy-link');
-  if(wl) wl.href=`https://www.windy.com/${currentLayer}/${l.lat.toFixed(3)}/${l.lng.toFixed(3)}?${currentLayer},${l.lat.toFixed(3)},${l.lng.toFixed(3)},10`;
-  // Re-fetch weather for new location
-  loadWeatherData(l.lat, l.lng);
+  if(mapL){mapL.setView([l.lat,l.lng],11);renderMapMarkers();}
+  loadWeather(l.lat,l.lng);
 }
+function deleteLoc(idx){LOCS.splice(idx,1);saveLocs();if(activeIdx>=LOCS.length)activeIdx=Math.max(0,LOCS.length-1);if(LOCS.length>0)selectLoc(activeIdx);else{document.getElementById('tb-name').textContent='포인트 없음';document.getElementById('tb-sub').textContent='+ 버튼으로 포인트 추가';renderFavs();}renderSavedList();}
 
-function deleteLoc(idx) {
-  if (LOCS.length<=1&&idx===0) { LOCS.splice(0,1); saveLocs(); renderFavs(); renderSavedList(); resetTopbar(); return; }
-  LOCS.splice(idx,1);
-  saveLocs();
-  if (activeIdx>=LOCS.length) activeIdx=LOCS.length-1;
-  if (LOCS.length>0) selectLoc(activeIdx);
-  else resetTopbar();
-  renderSavedList();
-}
-
-function resetTopbar() {
-  document.getElementById('tb-name').textContent='포인트 없음';
-  document.getElementById('tb-coords').textContent='+ 버튼으로 포인트 추가';
-}
-
-function prefillFromMap(lat, lng) {
-  document.getElementById('m-lat').value = lat.toFixed(5);
-  document.getElementById('m-lng').value = lng.toFixed(5);
-  showSel(lat.toFixed(4)+'°S, '+lng.toFixed(4)+'°E','지도 롱프레스로 선택됨');
-  openModal();
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 14: MODAL
-// ═══════════════════════════════════════════════════
-function openModal() { renderSavedList(); document.getElementById('modal').classList.add('on'); }
-function closeModal() {
-  document.getElementById('modal').classList.remove('on');
-  document.getElementById('sdrop').style.display='none';
-  document.getElementById('sel-prev').style.display='none';
-  document.getElementById('direct-input').style.display='none';
-  ['m-search','m-name','m-note','m-lat','m-lng','m-lat-d','m-lng-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-}
-function showSel(name, coords) {
-  document.getElementById('prev-name').textContent=name;
-  document.getElementById('prev-coords').textContent=coords;
-  document.getElementById('sel-prev').style.display='block';
-}
-function clearSel() {
-  document.getElementById('sel-prev').style.display='none';
-  ['m-lat','m-lng','m-search'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
-}
-function pickColor(el) {
-  document.querySelectorAll('.cp').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on'); selColor=el.dataset.c;
-}
-function toggleDirect() {
-  const d=document.getElementById('direct-input');
-  d.style.display=d.style.display==='none'?'block':'none';
-}
-function syncDirect() {
-  const lat=document.getElementById('m-lat-d').value;
-  const lng=document.getElementById('m-lng-d').value;
-  if(lat) document.getElementById('m-lat').value=lat;
-  if(lng) document.getElementById('m-lng').value=lng;
-  if(lat&&lng) showSel(parseFloat(lat).toFixed(4)+'°S, '+parseFloat(lng).toFixed(4)+'°E','직접 입력');
-}
-function saveLoc() {
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function openModal(){renderSavedList();document.getElementById('modal').classList.add('on');}
+function closeModal(){document.getElementById('modal').classList.remove('on');document.getElementById('sdrop').style.display='none';document.getElementById('sel-prev').style.display='none';document.getElementById('direct-input').style.display='none';['m-search','m-name','m-note','m-lat','m-lng','m-lat-d','m-lng-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function showSel(name,coords){document.getElementById('prev-name').textContent=name;document.getElementById('prev-coords').textContent=coords;document.getElementById('sel-prev').style.display='block';}
+function clearSel(){document.getElementById('sel-prev').style.display='none';['m-lat','m-lng','m-search'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function pickColor(el){document.querySelectorAll('.cp').forEach(c=>c.classList.remove('on'));el.classList.add('on');selColor=el.dataset.c;}
+function toggleDirect(){const d=document.getElementById('direct-input');d.style.display=d.style.display==='none'?'block':'none';}
+function syncDirect(){const lat=document.getElementById('m-lat-d').value,lng=document.getElementById('m-lng-d').value;if(lat)document.getElementById('m-lat').value=lat;if(lng)document.getElementById('m-lng').value=lng;if(lat&&lng)showSel(parseFloat(lat).toFixed(4)+'°S, '+parseFloat(lng).toFixed(4)+'°E','직접 입력');}
+function saveLoc(){
   syncDirect();
   const name=document.getElementById('m-name').value.trim();
   const lat=parseFloat(document.getElementById('m-lat').value);
   const lng=parseFloat(document.getElementById('m-lng').value);
   const note=document.getElementById('m-note').value.trim()||'Custom spot';
   if(!name){alert('포인트 이름을 입력해줘!');return;}
-  if(isNaN(lat)||isNaN(lng)){alert('장소를 검색하거나 GPS / 지도 / 좌표 입력으로 위치를 선택해줘!');return;}
-  LOCS.push({name,lat,lng,color:selColor,note});
-  saveLocs();
-  closeModal();
-  selectLoc(LOCS.length-1);
-  renderFavs();
+  if(isNaN(lat)||isNaN(lng)){alert('위치를 선택해줘! (검색, GPS, 지도, 또는 좌표 직접 입력)');return;}
+  LOCS.push({name,lat,lng,color:selColor,note});saveLocs();closeModal();selectLoc(LOCS.length-1);renderFavs();
 }
 
-// ═══════════════════════════════════════════════════
-// MODULE 15: SEARCH
-// ═══════════════════════════════════════════════════
-function onSearch(q) {
+// ═══════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════
+function onSearch(q){
   clearTimeout(searchTimer);
   const drop=document.getElementById('sdrop'),spin=document.getElementById('spin');
   if(!q||q.length<2){drop.style.display='none';spin.style.display='none';return;}
-  spin.style.display='block'; drop.style.display='none';
+  spin.style.display='block';drop.style.display='none';
   searchTimer=setTimeout(async()=>{
     try{
-      const r=await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=6&countrycodes=au`);
-      const data=await r.json();
-      spin.style.display='none';
-      drop.style.display='block';
-      if(!data||!data.length){drop.innerHTML='<div style="padding:12px 13px;font-size:12px;color:var(--muted);">결과 없음</div>';return;}
-      drop.innerHTML=data.map(d=>{
-        const parts=d.display_name.split(',');
-        const main=parts[0].trim();
-        const sub=parts.slice(1,3).join(',').trim();
-        const eName=main.replace(/'/g,"\\'");
-        return`<div class="sdrop-row" onclick="pickResult(${d.lat},${d.lon},'${eName}')">
-          <div style="font-size:13px;font-weight:600;color:var(--text);">${main}</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:2px;">${sub}</div>
-          <div style="font-size:10px;color:var(--accent);margin-top:1px;">${parseFloat(d.lat).toFixed(4)}°S · ${parseFloat(d.lon).toFixed(4)}°E</div>
-        </div>`;
-      }).join('');
-    }catch(e){
-      spin.style.display='none';
-      drop.style.display='block';
-      drop.innerHTML='<div style="padding:12px 13px;font-size:12px;color:var(--warn);">검색 실패 — 인터넷 연결 확인</div>';
-    }
+      const r=await fetch('https://nominatim.openstreetmap.org/search?q='+encodeURIComponent(q)+'&format=json&limit=6&countrycodes=au');
+      const data=await r.json();spin.style.display='none';drop.style.display='block';
+      if(!data||!data.length){drop.innerHTML='<div style="padding:12px 13px;font-size:12px;color:var(--muted)">결과 없음</div>';return;}
+      drop.innerHTML=data.map(d=>{const parts=d.display_name.split(',');const main=parts[0].trim();const sub=parts.slice(1,3).join(',').trim();const eName=main.replace(/'/g,"\\'");return`<div class="sdrop-row" onclick="pickResult(${d.lat},${d.lon},'${eName}')"><div style="font-size:13px;font-weight:600;color:var(--text)">${main}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${sub}</div><div style="font-size:10px;color:var(--accent);margin-top:1px">${parseFloat(d.lat).toFixed(4)}°S · ${parseFloat(d.lon).toFixed(4)}°E</div></div>`;}).join('');
+    }catch(e){spin.style.display='none';drop.style.display='block';drop.innerHTML='<div style="padding:12px 13px;font-size:12px;color:var(--warn)">검색 실패 — 인터넷 연결 확인</div>';}
   },500);
 }
+function pickResult(lat,lng,name){document.getElementById('sdrop').style.display='none';const s=document.getElementById('m-search');if(s)s.value=name;document.getElementById('m-lat').value=lat;document.getElementById('m-lng').value=lng;document.getElementById('m-name').value=name;showSel(name,parseFloat(lat).toFixed(4)+'°S · '+parseFloat(lng).toFixed(4)+'°E');if(mapL)mapL.setView([parseFloat(lat),parseFloat(lng)],12);}
 
-function pickResult(lat,lng,name){
-  document.getElementById('sdrop').style.display='none';
-  const s=document.getElementById('m-search');if(s)s.value=name;
-  document.getElementById('m-lat').value=lat;
-  document.getElementById('m-lng').value=lng;
-  document.getElementById('m-name').value=name;
-  showSel(name,parseFloat(lat).toFixed(4)+'°S · '+parseFloat(lng).toFixed(4)+'°E');
-  if(mapL) mapL.setView([parseFloat(lat),parseFloat(lng)],12);
-}
-
-// ═══════════════════════════════════════════════════
-// MODULE 16: INIT
-// ═══════════════════════════════════════════════════
-async function loadWeatherData(lat, lng) {
-  try {
-    document.getElementById('marine-content').innerHTML='<div class="loading-msg">⏳ 날씨 데이터 불러오는 중...</div>';
-    marineDays = await fetchWeather(lat, lng);
+// ═══════════════════════════════════════════
+// WEATHER LOADER
+// ═══════════════════════════════════════════
+async function loadWeather(lat,lng){
+  console.log('[loadWeather] START lat='+lat+' lng='+lng);
+  const mc=document.getElementById('marine-content');
+  if(mc)mc.innerHTML='<div class="loading-msg">⏳ 날씨 데이터 불러오는 중...</div>';
+  try{
+    marineDays=await fetchWeather(lat,lng);
+    console.log('[loadWeather] Got '+marineDays.length+' days, rendering...');
     renderMarineDateRow();
-    renderMarineContent(0);
+    renderMarineDay(0);
+    activeMarineDay=0;
     renderSpScroll();
     renderSpResult(activeSpecies);
-  } catch(e) {
-    console.error('Weather fetch failed:', e);
-    document.getElementById('marine-content').innerHTML=`<div class="loading-msg" style="color:var(--warn);">⚠ 날씨 데이터 로드 실패<br><small>인터넷 연결을 확인해줘</small></div>`;
+    console.log('[loadWeather] DONE');
+  }catch(e){
+    console.error('[loadWeather] ERROR:',e.message,e.stack);
+    if(mc)mc.innerHTML='<div class="err-msg">⚠ 날씨 로드 실패: '+e.message+'<br><small>인터넷 연결 확인 후 포인트를 다시 선택해봐</small></div>';
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-  // 1. Solunar — 달 위치 수식 계산, 즉시 렌더
-  buildSolDays();
-  renderSolDateRow();
-  renderSolContent(0);
-
-  // 2. 물때 — 음력 수식 계산, 즉시 렌더
-  const todayMt = multtae(new Date());
-  renderMulttae(todayMt);
-
-  // 3. 어종 탭 기본 세팅
-  renderSpScroll();
-  renderSpResult(activeSpecies);
-
-  // 4. 포인트 있으면 날씨 자동 로드
-  if (LOCS.length > 0) {
-    const l = LOCS[activeIdx];
-    document.getElementById('tb-name').textContent = l.name;
-    document.getElementById('tb-coords').textContent = l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('DOMContentLoaded',()=>{
+  console.log('[INIT] App starting...');
+  // 1. Solunar — instant calculation
+  try{buildSolDays();renderSolDateRow();renderSolContent(0);console.log('[INIT] Solunar OK');}
+  catch(e){console.error('[INIT] Solunar error:',e.message);document.getElementById('sol-content').innerHTML='<div class="err-msg">Solunar 오류: '+e.message+'</div>';}
+  // 2. Multtae — instant calculation
+  try{renderMulttae(multtae(new Date()));console.log('[INIT] Multtae OK');}
+  catch(e){console.error('[INIT] Multtae error:',e.message);document.getElementById('mt-content').innerHTML='<div class="err-msg">물때 오류: '+e.message+'</div>';}
+  // 3. Species scroll
+  try{renderSpScroll();console.log('[INIT] Species scroll OK');}
+  catch(e){console.error('[INIT] Species error:',e.message);}
+  // 4. Locations
+  try{
     renderFavs();
-    renderMapMarkers();
-    updateExtButtons(l.lat, l.lng, l.name);
-    loadWeatherData(l.lat, l.lng);
-  } else {
-    renderFavs();
-    document.getElementById('marine-content').innerHTML =
-      '<div class="loading-msg">📍 포인트를 추가하면 실시간 날씨 데이터가 표시돼</div>';
-  }
+    if(LOCS.length>0){
+      const l=LOCS[activeIdx];
+      document.getElementById('tb-name').textContent=l.name;
+      document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
+      loadWeather(l.lat,l.lng);
+    }else{
+      document.getElementById('marine-content').innerHTML='<div class="loading-msg">📍 포인트를 추가하면 실시간 날씨가 표시돼</div>';
+      document.getElementById('sp-result').innerHTML='<div class="loading-msg">위에서 어종을 선택해줘</div>';
+    }
+    console.log('[INIT] Locations OK, LOCS='+LOCS.length);
+  }catch(e){console.error('[INIT] Locations error:',e.message);}
+  console.log('[INIT] Complete');
 });
 </script>
 </body>
