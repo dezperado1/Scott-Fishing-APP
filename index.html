@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Scotty Rock Fishing</title>
+<title>NSW Rock Fishing</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -262,9 +262,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 
     <!-- MARINE -->
     <div class="tab" id="tab-marine">
-      <div class="willy-badge">
-        <span style="font-size:15px">✅</span>
-        <span style="font-size:12px;color:#b8ffda;line-height:1.45">이 데이터는 <strong style="color:var(--green)">WillyWeather 공식 API (BOM)</strong>를 기반으로 제공됩니다.</span>
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:10px;margin-bottom:10px">
+        <span style="font-size:15px;flex-shrink:0">✅</span>
+        <span style="font-size:11px;color:#9fffcc;line-height:1.6">WillyWeather 공식 유료 데이터를 <strong style="color:var(--green)">Scott이 단독 제공</strong>합니다.<br><span style="font-size:10px;color:rgba(0,230,118,.45);letter-spacing:.3px">무단 도용 금지</span></span>
       </div>
       <div class="stitle">날짜 선택 <span class="pill pill-f" id="src-pill">WillyWeather BOM</span></div>
       <div class="date-scroll"><div class="date-row" id="marine-date-row"></div></div>
@@ -321,6 +321,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       </div>
       <div class="stitle">어종 선택 <span class="pill pill-a">실제 조건 분석</span></div>
       <div class="sp-scroll" id="sp-scroll"></div>
+      <div style="margin-bottom:8px;padding:11px 14px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:12px;display:flex;align-items:flex-start;gap:10px">
+        <span style="font-size:19px;flex-shrink:0">🐟</span>
+        <div><div style="font-size:12px;font-weight:600;color:var(--accent)">원하는 어종이 있으면 추가해드립니다</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px;line-height:1.55">락피싱 어종 추가 요청은 Scott에게 피드백 주세요 💬</div></div>
+      </div>
       <div id="sp-result"><div class="loading-msg">위에서 어종을 선택해줘</div></div>
     </div>
 
@@ -640,7 +645,7 @@ const SPECIES=[
   {id:'snapper',emoji:'🐡',name:'Snapper',col:'#ff6b9d',rig:{ml:'20–30lb Braid',ld:'30–40lb Fluoro',hk:'3/0–5/0 Circle',wt:'Paternoster 2–4oz',dp:'Bottom to 5m up',tc:'Paternoster / Slow jig'},baits:[{r:1,n:'Fresh squid (whole)',e:5,w:'직접 잡은 것'},{r:2,n:'Pilchard (rigged)',e:5,w:'검증 미끼'},{r:3,n:'Prawns (large)',e:4,w:'파터노스터'},{r:4,n:'Slow jig 40–80g',e:4,w:'슬로우지그'}],colors:[{n:'Pink / Red',h:'#ff4488',top:true,w:'흐린날·깊은수심'},{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린조건 2위'},{n:'White / Pearl',h:'#ddeeff',top:false,w:'맑은물 얕은 곳'},{n:'Blue / Purple',h:'#5544ff',top:false,w:'20m+ 깊은 수심'}],tide:{bestTime:'만조 전후 2–3시간',bestTimeNote:'일몰+만조 조합 최강',tidalState:'만조+날물 초반',tidalNote:'수심 깊어지고 조류 흘러야',highTide:5,risingTide:3,lowTide:2,fallingTide:4,tip:'스내퍼는 만조 전후 깊은 암초에서 최활발.'}},
   {id:'jewfish',emoji:'🦈',name:'Jewfish',col:'#b06aff',rig:{ml:'PE 3–5 Braid',ld:'60–80lb Fluoro',hk:'5/0–8/0 Circle',wt:'60–120g',dp:'Bottom structure',tc:'Live bait / SP / Bottom jig'},baits:[{r:1,n:'Live Tailor / Mullet',e:5,w:'라이브베이트 최강'},{r:2,n:'Fresh squid (large)',e:5,w:'오늘 잡은 통째'},{r:3,n:'Large SP 5–7"',e:4,w:'Zman / Gulp'},{r:4,n:'Pilchard gang rig',e:4,w:'표준 갱훅'}],colors:[{n:'White / Pearl SP',h:'#ddeeff',top:true,w:'야간 No.1'},{n:'Black / Purple',h:'#330055',top:true,w:'야간 실루엣'},{n:'Motor oil',h:'#553311',top:false,w:'탁한물 낮'},{n:'Chartreuse',h:'#aadd00',top:false,w:'조명 있는 부두'}],tide:{bestTime:'날물 하반기 + 야간',bestTimeNote:'만조 후 2–3시간+야간',tidalState:'날물+야간',tidalNote:'베이트피시가 조류 타고 흘러내려옴',highTide:3,risingTide:3,lowTide:2,fallingTide:5,tip:'쥬피시는 날물+야간 채널 포인트가 최고.'}},
   {id:'kingfish',emoji:'🐠',name:'Kingfish',col:'#f5a623',rig:{ml:'PE 3–4 Braid',ld:'80–100lb Fluoro',hk:'4/0–6/0 Assist',wt:'60–120g slow jig',dp:'20–40m',tc:'Slow pitch / Speed jigging'},baits:[{r:1,n:'Live Yakka / Slimy',e:5,w:'라이브베이트 최강'},{r:2,n:'Slow pitch jig 80–120g',e:5,w:'조류 적합'},{r:3,n:'Stickbait 140mm',e:4,w:'표층 보일 때'},{r:4,n:'Pilchard (rigged)',e:3,w:'바닥 브레이크'}],colors:[{n:'Pink / White',h:'#ff9ecd',top:true,w:'흐린날+파도'},{n:'Chartreuse',h:'#c6ff00',top:false,w:'맑은물 고압'},{n:'Blue / Silver',h:'#60b8ff',top:false,w:'맑은물 베이트'},{n:'Red / Orange',h:'#ff5533',top:false,w:'탁한물 새벽'}],tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'조류 강하게 흐를 때',tidalState:'들물 중반',tidalNote:'강한 조류 타고 베이트 쫓음',highTide:4,risingTide:5,lowTide:1,fallingTide:3,tip:'킹피시는 조류 강하게 흐를 때 활성 최고.'}},
-  {id:'tuna',emoji:'🐟',name:'Tuna',col:'#ff6b35',rig:{ml:'PE 4–6 Braid',ld:'100–150lb Fluoro',hk:'6/0–8/0 Ganged',wt:'Poppers 160mm+',dp:'Surface to 50m',tc:'Popper / Stickbait offshore'},baits:[{r:1,n:'Poppers 160mm+',e:5,w:'오프쇼어 보일링'},{r:2,n:'Trolling bibless 200mm',e:5,w:'오프쇼어 트롤링'},{r:3,n:'Knife jig 150–200g',e:4,w:'빠른 리트리브'},{r:4,n:'Live bait rigged',e:5,w:'라이브베이트'}],colors:[{n:'Pink / White Popper',h:'#ff9ecd',top:true,w:'흐린날 시인성'},{n:'Blue / Chrome',h:'#4499ff',top:false,w:'맑은 파란물'},{n:'Flying Fish',h:'#88ccff',top:false,w:'오프쇼어 트롤링'},{n:'Red / Black',h:'#cc2200',top:false,w:'새벽'}],tide:{bestTime:'조류 전환기 전후',bestTimeNote:'만조·간조 전환 직전 30분',tidalState:'조류 전환기',tidalNote:'오프쇼어 — 조경선 위치 중요',highTide:3,risingTide:4,lowTide:3,fallingTide:4,tip:'오프쇼어 참치는 EAC 조경선이 더 중요해.'}},
+  {id:'tuna',emoji:'🐠',name:'Blackfish',col:'#607d8b',rig:{ml:'4–6lb Mono',ld:'6lb Fluoro',hk:'#8–#6 Long shank',wt:'No sinker / Float',dp:'Surface to 2m',tc:'Float / Weed bait'},baits:[{r:1,n:'Cabbage weed (green)',e:5,w:'NSW 갯바위 No.1'},{r:2,n:'Cunjevoi (gut)',e:4,w:'파도 강할 때'},{r:3,n:'Bread dough',e:4,w:'맑은물 조용한 날'},{r:4,n:'Nori seaweed',e:3,w:'겨울 소강 상태'}],colors:null,tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'파도가 바위 덮을 때 최고',tidalState:'만조',tidalNote:'파도가 락 웨드 먹이 씻어내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'Blackfish는 파도가 바위를 덮으면서 Cabbage weed를 씻어내릴 때 최고야. 만조 전후 집중.'}},
   {id:'squid',emoji:'🦑',name:'Squid',col:'#b06aff',rig:{ml:'PE 0.6–0.8 Braid',ld:'2–3号 Fluoro 1m',hk:'Egi 3.0–3.5호',wt:'Egi 15–20g',dp:'Mid to bottom',tc:'Slow fall · Bottom drag'},baits:[],colors:[{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린날+조류 No.1!'},{n:'Pink / UV',h:'#ff44cc',top:true,w:'흐린날 탁한물 2위'},{n:'Brown / Natural',h:'#885533',top:false,w:'맑은물 낮'},{n:'Chartreuse / Green',h:'#aadd00',top:false,w:'맑은물 밝을 때'},{n:'Blue / Night',h:'#3366ff',top:false,w:'야간+조명'}],tide:{bestTime:'일몰 후 2시간 + 들물',bestTimeNote:'야간 들물 = 에깅 황금 타임',tidalState:'들물+야간',tidalNote:'조류 있어야 에기가 자연스럽게 흘러',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'에깅은 들물 때 조류 약간 흐를 때 최고야.'}},
 ];
 
@@ -717,13 +722,13 @@ function renderMarineDay(i){
       <div class="card"><div class="sc-icon">🌊</div>
         <div style="display:flex;align-items:baseline;gap:4px">
           <span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted)">${d.swellPer||'—'}s</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${(d.swellPer||0)>=10?'#ff6b6b':'var(--muted)'};font-weight:700">${d.swellPer||'—'}s${(d.swellPer||0)>=10?'⚠':''}</span>
         </div>
         <div class="sc-label">Swell Height / Period</div>
         <div class="sc-sub" style="display:flex;align-items:center;gap:5px">
           <span style="font-size:13px">🧭</span> ${d.swellD}
         </div>
-        <div style="font-size:11px;font-weight:600;color:var(--accent);margin-top:3px">${d.swellH}m / ${d.swellPer||'—'}s / ${d.swellD}</div>
+        <div style="font-size:11px;font-weight:600;margin-top:3px"><span style="color:var(--accent)">${d.swellH}m</span> <span style="color:${(d.swellPer||0)>=10?'#ff6b6b':'var(--muted)'}">/ ${d.swellPer||'—'}s</span> <span style="color:var(--muted)">/ ${d.swellD}</span></div>
         <div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div>
       </div>
       <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Wind Speed</div><div class="sc-sub">${d.windD} · Gust ${d.windGust}</div><div class="badge ${d.windKmh>40?'b-warn':'b-ok'}">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div></div>
@@ -777,7 +782,7 @@ function genAnalysis(id){
     snapper:()=>`스내퍼 조건: <strong>스웰 ${sw}m · SST ${sst}°C · ${mt}물</strong>\n\n${sol.s>=75?'⭐ 솔루나 '+sol.s+'점 — 피딩 좋은 날.':'솔루나 '+sol.s+'점.'} 기압 ${pres}hPa ${pu?'↑ 상승.':'→ 안정.'}\n\n${ts} — 만조 전후 수중 암초 집중.\n\n미끼: ${sw<2?'파터노스터 + 생오징어.':'슬로우지그 80-100g.'}`,
     jewfish:()=>`쥬피시 조건: <strong>${mt}물 · 스웰 ${sw}m</strong>\n\n${new Date().getHours()>=18||new Date().getHours()<6?'🌙 지금 야간 — 쥬피시 피딩 타임!':'야간이 진짜야. 일몰 후 집중.'}\n\n${mt>=6&&mt<=10?'✅ 6~10물 — 황금 물때.':mt>=11?'조금 — 딥홀 집중.':'사리 — 채널 입구.'}\n\n미끼: 생 오징어 통째.`,
     kingfish:()=>`킹피시 조건: <strong>스웰 ${sw}m · ${mt}물</strong>\n\n${sw>2.5?'⚠ 딥레지 위주.':good?'✅ 좋은 조건.':'🔵 가능.'}\n\n${mD.strength.includes('강')?'조류 강함 — 슬로우지그 80-120g.':'조류 약 — 스틱베이트+라이브베이트.'}\n\n솔루나 ${sol.s}점. ${moon.n} ${moon.pct}%.`,
-    tuna:()=>`참치 조건: <strong>스웰 ${sw}m · SST ${sst}°C</strong>\n\n${sw>2.5?'⚠ 오프쇼어만.':'갯바위 가능.'}\n\nSST ${sst}°C — ${sst>=20?'✅ 수온 양호.':'수온 낮음.'} ${new Date().getMonth()>=11||new Date().getMonth()<=3?'피크 시즌!':'시즌 아웃.'}\n\n조류 전환기 전후 보일링 확률 높아.`,
+    tuna:()=>`Blackfish 조건: <strong>스웰 ${sw}m · 바람 ${wi}km/h</strong>\n\n${sw<2.5&&wi<30?'✅ 좋은 조건. 바위 위 Cabbage weed 타겟.':sw>3?'⚠ 파도 너무 강함. 안전 주의.':'🔵 가능한 조건.'} 기압 ${pres}hPa ${pu?'↑ 상승.':'→ 안정.'}\n\n${mt}물 (${mD.name}) — 만조 전후 2시간이 황금 타임. 파도가 바위 덮을 때 Cabbage weed 씻겨내려와.\n\n미끼: ${sst>20?'Cabbage weed 최우선. 수온 높아 활성 좋음.':'Cabbage weed + Cunjevoi gut 병행.'}`,
     squid:()=>`에깅 조건: <strong>스웰 ${sw}m · 바람 ${wi}km/h · ${mt}물</strong>\n\n${good&&mt>=6&&mt<=10?'⭐ 에깅 최적! 트리플 콤보.':ok?'🔵 에깅 가능.':'⚠ 만 안쪽.'}\n\n${mt}물 — ${mD.strength.includes('강')?'조류 강함. 에기 20g+.':mD.strength.includes('약')?'조류 약. 변환기 노려.':'에깅 황금 물때!'}\n\n컬러: ${sw>2||rain>30?'Orange/Gold 1순위.':sst>21?'Brown/Natural 또는 Pink UV.':'Orange/Gold 기본.'} 수온 ${sst}°C.`,
   };
   return (A[id]&&A[id]())||'분석 불가.';
