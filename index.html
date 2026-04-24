@@ -7,7 +7,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Fishing">
+<meta name="apple-mobile-web-app-title" content="Scott's Marine">
 <meta name="theme-color" content="#00d4ff">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <style>
@@ -70,10 +70,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .hrow{display:flex;gap:7px;min-width:max-content}
 .hc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px 10px;min-width:72px;text-align:center}
 .hc.now{border-color:var(--accent);background:rgba(0,212,255,.06)}
-.tl-scroll{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px}
+.tl-scroll{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch}
 .tl-scroll::-webkit-scrollbar{display:none}
 .tl-row{display:flex;min-width:max-content}
-.tl-col{width:44px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.tl-col{width:44px;display:flex;flex-direction:column;align-items:center;gap:3px;scroll-snap-align:start}
 .tl-t{font-size:9px;color:var(--muted)}
 .tl-bw{width:26px;height:52px;display:flex;align-items:flex-end;position:relative}
 .tl-b{width:100%;border-radius:3px 3px 0 0}
@@ -211,6 +211,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .leaflet-control-zoom a{background:var(--card)!important;color:var(--accent)!important;border-color:var(--border)!important}
 .leaflet-control-attribution{background:rgba(7,13,24,.7)!important;color:var(--muted)!important;font-size:8px!important}
 .loading-msg{text-align:center;padding:40px 20px;font-size:13px;color:var(--muted)}
+.pin-note{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:9px;border:1px solid rgba(0,230,118,.2);background:rgba(0,230,118,.04);margin-bottom:6px}
+.pin-note:last-child{margin-bottom:0}
+.pin-note-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.pin-note-body{flex:1;min-width:0}
+.pin-note-name{font-size:11px;font-weight:600;color:var(--green)}
+.pin-note-coords{font-size:9px;color:var(--muted);margin-top:1px}
+.pin-note-del{font-size:11px;color:var(--warn);cursor:pointer;padding:2px 6px;flex-shrink:0}
 .err-msg{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:10px;padding:14px;font-size:12px;color:var(--warn);margin-bottom:10px;line-height:1.6}
 
 /* King Waves Danger Banner Animation */
@@ -266,9 +273,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 
     <!-- MARINE -->
     <div class="tab" id="tab-marine">
-      <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:10px;margin-bottom:10px">
-        <span style="font-size:15px;flex-shrink:0">✅</span>
-        <span style="font-size:11px;color:#9fffcc;line-height:1.6">WillyWeather 공식 유료 데이터를 <strong style="color:var(--green)">Scott이 단독 제공</strong>합니다.<br><span style="font-size:10px;color:rgba(0,230,118,.45);letter-spacing:.3px">무단 도용 금지</span></span>
+      <div style="padding:8px 12px;background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.18);border-radius:8px;margin-bottom:10px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:6px">
+          <span style="font-size:11px;color:#9fffcc;line-height:1.6">✅ WillyWeather 공식 유료 데이터를 Scott이<br><strong style="color:var(--green);font-size:11px">단독 제공합니다.</strong></span>
+          <span style="font-size:9px;color:rgba(0,230,118,.45);white-space:nowrap;flex-shrink:0;padding-bottom:2px">무단 도용 금지</span>
+        </div>
       </div>
       <div class="stitle">Select Date <span class="pill pill-f" id="src-pill">WillyWeather BOM</span></div>
       <div class="date-scroll"><div class="date-row" id="marine-date-row"></div></div>
@@ -280,10 +289,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div class="stitle">저장된 포인트</div>
       <div class="fav-scroll"><div class="fav-row" id="fav-row"></div></div>
       
-      <div class="stitle">명당 추천 <span class="pill pill-w">랜덤 150km 이내</span></div>
-      <div class="fav-scroll" style="margin-bottom:12px"><div class="fav-row" id="rec-row">
-        <div class="loading-msg" style="padding:10px 0;text-align:left;">GPS를 켜면 150km 이내 추천 명당이 표시돼</div>
-      </div></div>
+
 
       <div class="live-bar">
         <div class="lb-item"><div class="lb-val" id="lb-swell">—</div><div class="lb-lbl">Swell</div></div>
@@ -306,6 +312,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <a id="windy-link" class="windy-btn" href="https://www.windy.com" target="_blank" rel="noopener">
         🌐 Windy.com에서 라이브 날씨 레이어 보기 ↗
       </a>
+      <button id="gmaps-btn" onclick="openGoogleMaps()" style="display:none;width:100%;padding:10px;border-radius:11px;border:1px solid rgba(66,133,244,.4);background:rgba(66,133,244,.1);color:#4285f4;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px">
+        📍 Google Maps 앱으로 길찾기
+      </button>
+      <div style="margin-bottom:8px">
+        <div class="stitle">📍 낚시자리 핀 <span style="font-size:9px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none">지도 길게 누르면 저장</span></div>
+        <div id="fish-pins-list"><div style="font-size:11px;color:var(--muted);padding:8px 0">저장된 낚시자리 없음. 지도를 길게 눌러 추가해줘.</div></div>
+      </div>
     </div>
 
     <!-- 어종 -->
@@ -535,14 +548,14 @@ function renderRecSpots(){
 const LUNAR_REF=new Date('2025-01-29T12:36:00Z'),LUNAR_CYCLE=29.53058867;
 function lunarAge(d){return(((d-LUNAR_REF)/86400000%LUNAR_CYCLE)+LUNAR_CYCLE)%LUNAR_CYCLE;}
 function moonPhase(a){
-  if(a<1.85)return{n:'New Moon',e:'🌑',pct:2};
-  if(a<7.38)return{n:'Waxing Crescent',e:'🌒',pct:Math.round(a/7.38*48)+2};
-  if(a<9.22)return{n:'First Quarter',e:'🌓',pct:50};
-  if(a<14.76)return{n:'Waxing Gibbous',e:'🌔',pct:Math.round(50+(a-9.22)/5.54*48)};
-  if(a<16.61)return{n:'Full Moon',e:'🌕',pct:98};
-  if(a<22.15)return{n:'Waning Gibbous',e:'🌖',pct:Math.round(98-(a-14.76)/7.38*48)};
-  if(a<23.99)return{n:'Last Quarter',e:'🌗',pct:50};
-  return{n:'Waning Crescent',e:'🌘',pct:Math.round((29.53-a)/5.54*48)};
+  if(a<1.85)return{n:'그믐달 (신월)',e:'🌑',pct:2};
+  if(a<7.38)return{n:'초승달',e:'🌒',pct:Math.round(a/7.38*48)+2};
+  if(a<9.22)return{n:'상현달',e:'🌓',pct:50};
+  if(a<14.76)return{n:'상현 보름달',e:'🌔',pct:Math.round(50+(a-9.22)/5.54*48)};
+  if(a<16.61)return{n:'보름달',e:'🌕',pct:98};
+  if(a<22.15)return{n:'하현 보름달',e:'🌖',pct:Math.round(98-(a-14.76)/7.38*48)};
+  if(a<23.99)return{n:'하현달',e:'🌗',pct:50};
+  return{n:'그믐달',e:'🌘',pct:Math.round((29.53-a)/5.54*48)};
 }
 
 function getSolScore(age){
@@ -592,10 +605,11 @@ function buildSolDays(){
     const d=new Date(now);d.setDate(d.getDate()+i);d.setHours(12,0,0,0);
     const age=lunarAge(d),moon=moonPhase(age);
     let s = getSolScore(age);
-    let solG='Poor',solC='#3a5570';
-    if(s>=80){solG='Excellent';solC='#00e676';}
-    else if(s>=50){solG='Good';solC='#00d4ff';}
-    else if(s>=25){solG='Fair';solC='#6b8aaa';}
+    let solG='조과 불량',solC='#ff4d4d';
+    if(s>=90){solG='⭐ PRIME';solC='#f5a623';}
+    else if(s>=70){solG='✅ 좋음';solC='#00e676';}
+    else if(s>=50){solG='🔵 양호';solC='#00d4ff';}
+    else if(s>=30){solG='🟡 보통';solC='#ffa500';}
     const sol={s,g:solG,c:solC};
     const peaks=solunarPeaks(d),act=activityH(peaks,sol.s);
     solDays.push({date:d,dayName:DNs[d.getDay()],dayNum:d.getDate(),isToday:i===0,age,moon,sol,peaks,act});
@@ -640,20 +654,76 @@ function renderSolContent(i){
   }
 
   document.getElementById('sol-content').innerHTML=`
-    <div class="ring-w"><svg width="152" height="152" viewBox="0 0 152 152"><circle cx="76" cy="76" r="62" fill="none" stroke="#1e3450" stroke-width="9"/><circle cx="76" cy="76" r="62" fill="none" stroke="url(#sg)" stroke-width="9" stroke-dasharray="389.56" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/><defs><linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#00d4ff"/><stop offset="100%" stop-color="#f5a623"/></linearGradient></defs></svg>
-    <div class="ring-c"><div style="font-family:'Bebas Neue',sans-serif;font-size:46px;color:var(--accent);line-height:1">${d.sol.s}</div><div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">Day Rating</div><div style="font-size:11px;font-weight:600;color:${d.sol.c};margin-top:2px">${d.sol.g}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${d.moon.n}</div>${dl}</div></div>
+    <div class="ring-w"><svg width="152" height="152" viewBox="0 0 152 152"><circle cx="76" cy="76" r="62" fill="none" stroke="#1e3450" stroke-width="9"/><circle cx="76" cy="76" r="62" fill="none" stroke="${d.sol.c}" stroke-width="9" stroke-dasharray="389.56" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg>
+    <div class="ring-c"><div style="font-family:'Bebas Neue',sans-serif;font-size:46px;color:${d.sol.c};line-height:1;text-shadow:0 0 20px ${d.sol.c}44">${d.sol.s}</div><div style="font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase">오늘의 조과 지수</div><div style="font-size:11px;font-weight:600;color:${d.sol.c};margin-top:2px">${d.sol.g}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${d.moon.n}</div>${dl}</div></div>
     ${warningsHtml}
-    <div class="stitle">Peak Times <span style="font-size:10px;color:var(--muted);font-weight:400">Zenith & Underfoot</span></div>
+    <div class="stitle">피딩 피크 타임 <span style="font-size:10px;color:var(--muted);font-weight:400">달의 남중 기준</span></div>
     <div class="peak-g">
-      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m1}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m1} – ${d.peaks.m1e}</div><div class="pk-dur">2 Hours · Zenith / Underfoot</div><div class="pk-bar"><div class="pk-fill" style="width:90%;background:var(--gold)"></div></div></div>
-      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m2}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m2} – ${d.peaks.m2e}</div><div class="pk-dur">2 Hours · Zenith / Underfoot</div><div class="pk-bar"><div class="pk-fill" style="width:85%;background:var(--gold)"></div></div></div>
-      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n1}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n1} – ${d.peaks.n1e}</div><div class="pk-dur">1 Hour · Moonrise / Moonset</div><div class="pk-bar"><div class="pk-fill" style="width:55%;background:var(--accent)"></div></div></div>
-      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n2}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n2} – ${d.peaks.n2e}</div><div class="pk-dur">1 Hour · Moonrise / Moonset</div><div class="pk-bar"><div class="pk-fill" style="width:40%;background:var(--accent)"></div></div></div>
+      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m1}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m1} – ${d.peaks.m1e}</div><div class="pk-dur">2시간 · 달 남중/지중</div><div class="pk-bar"><div class="pk-fill" style="width:90%;background:var(--gold)"></div></div></div>
+      <div class="pk maj"><div class="pk-type maj">★ Major</div><div class="pk-time">${d.peaks.m2}</div><div class="pk-range" style="color:var(--gold)">${d.peaks.m2} – ${d.peaks.m2e}</div><div class="pk-dur">2시간 · 달 남중/지중</div><div class="pk-bar"><div class="pk-fill" style="width:85%;background:var(--gold)"></div></div></div>
+      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n1}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n1} – ${d.peaks.n1e}</div><div class="pk-dur">1시간 · 월출/월몰</div><div class="pk-bar"><div class="pk-fill" style="width:55%;background:var(--accent)"></div></div></div>
+      <div class="pk"><div class="pk-type min">◆ Minor</div><div class="pk-time">${d.peaks.n2}</div><div class="pk-range" style="color:var(--accent)">${d.peaks.n2} – ${d.peaks.n2e}</div><div class="pk-dur">1시간 · 월출/월몰</div><div class="pk-bar"><div class="pk-fill" style="width:40%;background:var(--accent)"></div></div></div>
     </div>
     <div class="stitle">Moon Phase</div>
     <div class="moon-row"><div style="font-size:32px">${d.moon.e}</div><div style="flex:1"><div style="font-size:13px;font-weight:600">${d.moon.n}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">Illumination: ${d.moon.pct}%</div><div class="moon-prog"><div class="moon-fill" style="width:${d.moon.pct}%"></div></div></div></div>
-    <div class="stitle">Hourly Activity Index</div>
+    <div class="stitle">시간대별 활성도 리포트</div>
     <div class="tl-scroll"><div class="tl-row">${tl}</div></div>`;
+}
+
+// ─── COMPASS ROSE HELPER ─────────────────────────
+function dirToDeg(dir){
+  const map={N:0,NNE:22.5,NE:45,ENE:67.5,E:90,ESE:112.5,SE:135,SSE:157.5,
+             S:180,SSW:202.5,SW:225,WSW:247.5,W:270,WNW:292.5,NW:315,NNW:337.5};
+  return map[dir]||0;
+}
+function compassRoseSVG(dir, mode){
+  const deg = dirToDeg(dir);
+  // swell: FROM 방향 — 화살표가 갯바위로 밀려오는 방향 (180도 반전)
+  // wind:  TO 방향   — 바람이 부는 방향 그대로
+  const arrowDeg = (mode === 'swell') ? (deg + 180) % 360 : deg;
+  const ac = (mode === 'swell') ? '#f5a623' : '#00d4ff';
+  const r = 26, cx = 28, cy = 28;
+  return `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#1e3450" stroke-width="1.5"/>
+    <line x1="${cx}" y1="2"  x2="${cx}" y2="7"  stroke="#1e3450" stroke-width="1.2"/>
+    <line x1="${cx}" y1="49" x2="${cx}" y2="54" stroke="#1e3450" stroke-width="1.2"/>
+    <line x1="2"  y1="${cy}" x2="7"  y2="${cy}" stroke="#1e3450" stroke-width="1.2"/>
+    <line x1="49" y1="${cy}" x2="54" y2="${cy}" stroke="#1e3450" stroke-width="1.2"/>
+    <text x="${cx}" y="12"   text-anchor="middle" fill="#6b8aaa" font-size="5" font-family="monospace">N</text>
+    <text x="${cx}" y="52"   text-anchor="middle" fill="#6b8aaa" font-size="5" font-family="monospace">S</text>
+    <text x="8"    y="${cy+2}" text-anchor="middle" fill="#6b8aaa" font-size="5" font-family="monospace">W</text>
+    <text x="48"   y="${cy+2}" text-anchor="middle" fill="#6b8aaa" font-size="5" font-family="monospace">E</text>
+    <circle cx="${cx}" cy="${cy}" r="5" fill="${ac}22"/>
+    <g transform="rotate(${arrowDeg} ${cx} ${cy})">
+      <polygon points="${cx},8 ${cx-3},20 ${cx},17 ${cx+3},20" fill="${ac}"/>
+      <polygon points="${cx},48 ${cx-3},36 ${cx},39 ${cx+3},36" fill="#1e3450"/>
+      <line x1="${cx}" y1="17" x2="${cx}" y2="39" stroke="${ac}" stroke-width="1.2" opacity=".5"/>
+    </g>
+    <circle cx="${cx}" cy="${cy}" r="2.5" fill="${ac}"/>
+  </svg>`;
+}
+
+// ─── PRESSURE HELPERS ────────────────────────────
+function pressTrend(days, i){
+  // 전일 대비 추세
+  if(days.length > 1 && days[0] && days[1]){
+    const diff = days[0].pressure - days[1].pressure;
+    if(diff >  1.5) return {icon:'↑', col:'var(--green)', label:'상승'};
+    if(diff < -1.5) return {icon:'↓', col:'var(--warn)',  label:'하강'};
+  }
+  // 절대값 기준: 1013hPa 표준
+  const hpa = (days[i] || days[0] || {}).pressure || 1013;
+  if(hpa > 1013) return {icon:'↑', col:'var(--green)', label:'고기압'};
+  if(hpa < 1013) return {icon:'↓', col:'var(--warn)',  label:'저기압'};
+  return {icon:'—', col:'var(--muted)', label:'표준기압'};
+}
+
+function pressColor(hpa){
+  if(hpa >= 1020) return {text:'var(--green)',  border:'rgba(0,230,118,.45)', bg:'rgba(0,230,118,.08)'};
+  if(hpa >= 1015) return {text:'#66ffcc',       border:'rgba(0,230,118,.25)', bg:'rgba(0,230,118,.04)'};
+  if(hpa >= 1010) return {text:'var(--text)',   border:'var(--border)',       bg:'var(--card)'};
+  if(hpa >=  995) return {text:'var(--gold)',   border:'rgba(245,166,35,.45)',bg:'rgba(245,166,35,.08)'};
+  return               {text:'var(--warn)',   border:'rgba(255,107,53,.45)', bg:'rgba(255,107,53,.08)'};
 }
 
 // ─── WILLYWEATHER API ─────────────────────────────
@@ -852,21 +922,40 @@ function renderMarineDay(i){
     ${dangerBanner}
     <div class="alert-bar" style="background:${wBg};border:1px solid ${wBd};color:${wc}">${d.warn==='good'?'✅ Good conditions · Safe to fish':d.warn==='rough'?'⛔ Rough · Caution advised':'⚠ Moderate · Check exposed spots'} · ${d.dayName} ${d.dayNum}</div>
     <div class="g2">
-      <div class="card"><div class="sc-icon">🌊</div>
-        <div style="display:flex;align-items:baseline;gap:4px">
-          <span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span>
-          <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${(d.swellPer||0)>=10?'#ff6b6b':'var(--muted)'};font-weight:700">${d.swellPer||'—'}s${(d.swellPer||0)>=10?'⚠':''}</span>
+      <div class="card" style="display:flex;flex-direction:row;align-items:center;gap:10px">
+        <div style="flex-shrink:0">${compassRoseSVG(d.swellD,'swell')}</div>
+        <div>
+          <div style="display:flex;align-items:baseline;gap:4px">
+            <span class="sc-big">${d.swellH}</span><span class="sc-unit">m</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${(d.swellPer||0)>=10?'#ff6b6b':'var(--muted)'};font-weight:700">${d.swellPer||'—'}s${(d.swellPer||0)>=10?' ⚠':''}</span>
+          </div>
+          <div class="sc-label">Swell / Period</div>
+          <div style="font-size:11px;font-weight:600;color:var(--gold);margin-top:2px">${d.swellD}</div>
+          <div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}" style="margin-top:4px">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div>
         </div>
-        <div class="sc-label">Swell Height / Period</div>
-        <div class="sc-sub" style="display:flex;align-items:center;gap:5px">
-          <span style="font-size:13px">🧭</span> ${d.swellD}
-        </div>
-        <div style="font-size:11px;font-weight:600;margin-top:3px"><span style="color:var(--accent)">${d.swellH}m</span> <span style="color:${(d.swellPer||0)>=10?'#ff6b6b':'var(--muted)'}">/ ${d.swellPer||'—'}s</span> <span style="color:var(--muted)">/ ${d.swellD}</span></div>
-        <div class="badge ${d.swellH>2.5?'b-warn':'b-ok'}">${d.swellH>3?'Rough':d.swellH>2?'Moderate':'Good'}</div>
       </div>
-      <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Wind Speed</div><div class="sc-sub">${d.windD} · Gust ${d.windGust}</div><div class="badge ${d.windKmh>40?'b-warn':'b-ok'}">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div></div>
+      <div class="card" style="display:flex;flex-direction:row;align-items:center;gap:10px">
+        <div style="flex-shrink:0">${compassRoseSVG(d.windD,'wind')}</div>
+        <div>
+          <div><span class="sc-big">${d.windKmh}</span><span class="sc-unit">km/h</span></div>
+          <div class="sc-label">Wind Speed</div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent);margin-top:2px">${d.windD}</div>
+          <div style="font-size:10px;color:var(--muted)">Gust ${d.windGust} km/h</div>
+          <div class="badge ${d.windKmh>40?'b-warn':'b-ok'}" style="margin-top:4px">${d.windKmh>50?'Strong':d.windKmh>30?'Fresh':'Light'}</div>
+        </div>
+      </div>
       <div class="card"><div class="sc-icon">🌡</div><div><span class="sc-big">${d.sst}</span><span class="sc-unit">°C</span></div><div class="sc-label">Sea Temp</div><div class="sc-sub">NSW Coastal</div><div class="badge b-ok">BOM</div></div>
-      <div class="card"><div class="sc-icon">📊</div><div><span class="sc-big">${d.pressure}</span><span class="sc-unit">hPa</span></div><div class="sc-label">Pressure</div><div class="sc-sub">${d.pressure>1015?'↑ Rising':'↓ Falling'}</div><div class="badge ${d.pressure>1010?'b-ok':'b-warn'}">${d.pressure>1015?'Stable':'Watch'}</div></div>
+      <div class="card" style="background:${pressColor(d.pressure).bg};border-color:${pressColor(d.pressure).border}">
+        <div class="sc-icon">📊</div>
+        <div style="display:flex;align-items:baseline;gap:3px">
+          <span class="sc-big" style="color:${pressColor(d.pressure).text}">${d.pressure}</span>
+          <span class="sc-unit">hPa</span>
+          <span style="font-size:14px;font-weight:800;color:${pressTrend(marineDays,i).col};margin-left:2px">${pressTrend(marineDays,i).icon}</span>
+        </div>
+        <div class="sc-label">Pressure</div>
+        <div style="font-size:10px;font-weight:600;color:${pressTrend(marineDays,i).col};margin-top:2px">${pressTrend(marineDays,i).label}</div>
+        <div class="badge" style="background:${pressColor(d.pressure).bg};color:${pressColor(d.pressure).text};border:1px solid ${pressColor(d.pressure).border};margin-top:3px">${d.pressure>=1020?'High':d.pressure>=1010?'Normal':'Low'}</div>
+      </div>
       <div class="card"><div class="sc-icon">🌧</div><div><span class="sc-big">${d.rain}</span><span class="sc-unit">%</span></div><div class="sc-label">Rain Chance</div><div class="sc-sub">${d.rain>30?'Showers likely':'Mostly clear'}</div><div class="badge ${d.rain>40?'b-warn':'b-ok'}">${d.rain>50?'High':d.rain>20?'Moderate':'Low'}</div></div>
       <div class="card"><div class="sc-icon">💨</div><div><span class="sc-big">${d.windGust}</span><span class="sc-unit">km/h</span></div><div class="sc-label">Wind Gust</div><div class="sc-sub">Max today</div><div class="badge ${d.windGust>50?'b-warn':'b-ok'}">${d.windGust>60?'Dangerous':d.windGust>40?'Strong':'OK'}</div></div>
     </div>
@@ -971,6 +1060,21 @@ function initMap(){
   mapL=L.map('leaflet-map',{center:[loc.lat,loc.lng],zoom:11,zoomControl:true});
   L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{maxZoom:20,attribution:'© Google'}).addTo(mapL);
   renderMapMarkers();
+  renderFishPinMarkers();
+  // Long press → save fishing spot
+  let _lp=null;
+  const _el=document.getElementById('leaflet-map');
+  _el.addEventListener('touchstart',e=>{
+    const t=e.touches[0];
+    _lp=setTimeout(()=>{
+      if(!mapL)return;
+      const r=_el.getBoundingClientRect();
+      const ll=mapL.containerPointToLatLng(L.point(t.clientX-r.left,t.clientY-r.top));
+      addFishPin(ll.lat,ll.lng);
+    },700);
+  },{passive:true});
+  _el.addEventListener('touchend',()=>clearTimeout(_lp),{passive:true});
+  _el.addEventListener('touchmove',()=>clearTimeout(_lp),{passive:true});
 }
 function renderMapMarkers(){if(!mapL)return;mapMarkers.forEach(m=>m.remove());mapMarkers=[];LOCS.forEach((loc,i)=>{const m=L.marker([loc.lat,loc.lng],{icon:makeIcon(loc.color)}).addTo(mapL).bindPopup(`<b>${loc.name}</b><br><small style="color:#888">${loc.note}</small>`).on('click',()=>selectLoc(i));if(i===activeIdx)m.openPopup();mapMarkers.push(m);});}
 function setLayer(key,btn){document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');currentLayer=key;if(LOCS.length>0){const l=LOCS[activeIdx];const wl=document.getElementById('windy-link');if(wl)wl.href='https://www.windy.com/'+key+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+key+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}}
@@ -1031,6 +1135,66 @@ function onSearch(q){
 function pickResult(lat,lng,name){document.getElementById('sdrop').style.display='none';const s=document.getElementById('m-search');if(s)s.value=name;document.getElementById('m-lat').value=lat;document.getElementById('m-lng').value=lng;document.getElementById('m-name').value=name;showSel(name,parseFloat(lat).toFixed(4)+'°S · '+parseFloat(lng).toFixed(4)+'°E');if(mapL)mapL.setView([parseFloat(lat),parseFloat(lng)],12);}
 
 // ─── INIT ─────────────────────────────────────────
+// ═══════════════════════════════════════════
+// FISHING PIN NOTES (localStorage)
+// ═══════════════════════════════════════════
+let FISH_PINS = [];
+try { FISH_PINS = JSON.parse(localStorage.getItem('nsw_fish_pins') || '[]'); } catch(e){ FISH_PINS=[]; }
+
+function saveFishPins(){ try{ localStorage.setItem('nsw_fish_pins', JSON.stringify(FISH_PINS)); }catch(e){} }
+
+function addFishPin(lat, lng){
+  const name = prompt('📍 이 낚시자리 이름을 입력해줘:', '낚시자리 ' + (FISH_PINS.length+1));
+  if(!name) return;
+  FISH_PINS.push({ name, lat, lng, ts: Date.now() });
+  saveFishPins();
+  renderFishPins();
+  // Add marker on map
+  if(mapL && typeof L !== 'undefined'){
+    const icon = makeIcon('#00e676');
+    L.marker([lat, lng], {icon})
+      .addTo(mapL)
+      .bindPopup('<b>📍 '+name+'</b><br><small>'+lat.toFixed(4)+'°S, '+lng.toFixed(4)+'°E</small>');
+  }
+}
+
+function deleteFishPin(idx){
+  FISH_PINS.splice(idx, 1);
+  saveFishPins();
+  renderFishPins();
+  renderFishPinMarkers();
+}
+
+function renderFishPins(){
+  const el = document.getElementById('fish-pins-list');
+  if(!el) return;
+  if(!FISH_PINS.length){
+    el.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:8px 0">저장된 낚시자리 없음. 지도를 길게 눌러 추가해줘.</div>';
+    return;
+  }
+  el.innerHTML = FISH_PINS.map((p,i) => `
+    <div class="pin-note">
+      <div class="pin-note-icon">📍</div>
+      <div class="pin-note-body">
+        <div class="pin-note-name">${p.name}</div>
+        <div class="pin-note-coords">${p.lat.toFixed(4)}°S · ${p.lng.toFixed(4)}°E</div>
+      </div>
+      <button onclick="showSpotOnMap(${p.lat},${p.lng},'${p.name.replace(/'/g,'')}')" style="background:none;border:none;color:var(--accent);font-size:10px;cursor:pointer;padding:2px 5px">🗺</button>
+      <span class="pin-note-del" onclick="deleteFishPin(${i})">✕</span>
+    </div>`).join('');
+}
+
+function renderFishPinMarkers(){
+  if(!mapL || typeof L === 'undefined') return;
+  // Re-add all pin markers
+  FISH_PINS.forEach(p => {
+    const icon = makeIcon('#00e676');
+    L.marker([p.lat, p.lng], {icon})
+      .addTo(mapL)
+      .bindPopup('<b>📍 '+p.name+'</b><br><small>'+p.lat.toFixed(4)+'°S, '+p.lng.toFixed(4)+'°E</small>');
+  });
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   console.log('[INIT] NSW Fishing App starting...');
   try{buildSolDays();renderSolDateRow();renderSolContent(0);console.log('[INIT] Solunar ✓');}
@@ -1052,6 +1216,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     }
     console.log('[INIT] Locations ✓ count='+LOCS.length);
   }catch(e){console.error('[INIT] Locations error:',e);}
+  // Fish pins
+  try{ renderFishPins(); renderFishPinMarkers(); }catch(e){ console.warn('[INIT] Fish pins:',e); }
   console.log('[INIT] Complete');
 });
 </script>
