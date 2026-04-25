@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Scott's Marine Insight V3.1</title>
+<title>Scott's Marine Insight V3.2</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -123,7 +123,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .cb-lbl{font-size:9px;color:var(--muted);text-transform:uppercase}
 .sp-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:12px;padding:2px 0}
 .sp-scroll::-webkit-scrollbar{display:none}
-.sp-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 7px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:58px;position:relative;flex-shrink:0}
+.sp-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:9px 7px 14px;border-radius:12px;border:1px solid var(--border);background:var(--card);cursor:pointer;min-width:58px;position:relative;flex-shrink:0}
 .sp-btn.on{border-color:var(--gold);background:rgba(245,166,35,.08)}
 .sp-emoji{font-size:21px}
 .sp-name{font-size:9px;font-weight:600;color:var(--muted);text-transform:uppercase;white-space:nowrap}
@@ -220,6 +220,37 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .pin-note-del{font-size:11px;color:var(--warn);cursor:pointer;padding:2px 6px;flex-shrink:0}
 .err-msg{background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:10px;padding:14px;font-size:12px;color:var(--warn);margin-bottom:10px;line-height:1.6}
 
+/* ─── V3.2 NEW STYLES ─────────────────────────────── */
+.rec-badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:12px;background:linear-gradient(135deg,#f5a623,#ff6b35);color:#000;font-size:9px;font-weight:800;letter-spacing:.5px;animation:recPulse 2s infinite}
+@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 rgba(245,166,35,.5)}60%{box-shadow:0 0 0 5px rgba(245,166,35,0)}}
+.rec-msg{background:linear-gradient(135deg,rgba(245,166,35,.12),rgba(255,107,53,.08));border:1px solid rgba(245,166,35,.35);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:11px;font-weight:600;color:var(--gold);line-height:1.55}
+.genre-filter{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin-bottom:10px;padding:2px 0}
+.genre-filter::-webkit-scrollbar{display:none}
+.gf-btn{padding:6px 12px;border-radius:18px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;transition:all .2s}
+.gf-btn.on{border-color:var(--accent);background:rgba(0,212,255,.15);color:var(--accent)}
+.danger-level{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);margin-bottom:8px}
+.dl-bar{flex:1;height:6px;border-radius:3px;background:var(--bg)}
+.dl-fill-high{height:100%;border-radius:3px;background:linear-gradient(90deg,#ff4444,#ff6b35);width:90%}
+.dl-fill-mid{height:100%;border-radius:3px;background:linear-gradient(90deg,#f5a623,#ffd700);width:55%}
+.dl-fill-low{height:100%;border-radius:3px;background:linear-gradient(90deg,#00e676,#00d4ff);width:25%}
+.dl-label{font-size:10px;font-weight:700;letter-spacing:.5px}
+.rig-infographic{background:var(--bg3);border:1px solid rgba(0,212,255,.2);border-radius:10px;padding:12px 14px;margin-top:10px}
+.rig-ig-title{font-size:10px;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;font-weight:700}
+.rig-ig-row{display:flex;align-items:flex-start;gap:0}
+.rig-ig-node{display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;width:52px}
+.rig-ig-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--border)}
+.rig-ig-lbl{font-size:8px;color:var(--muted);text-align:center;letter-spacing:.3px;text-transform:uppercase}
+.rig-ig-val{font-size:8px;font-weight:700;color:var(--text);text-align:center;line-height:1.3;margin-top:1px}
+.rig-ig-connector{flex:1;height:2px;background:linear-gradient(90deg,rgba(0,212,255,.3),rgba(0,212,255,.6),rgba(0,212,255,.3));margin-top:13px;min-width:6px}
+.sst-meter{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:10px}
+.sst-meter-title{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:7px}
+.sst-track{width:100%;height:8px;border-radius:4px;background:var(--bg);position:relative;margin-bottom:5px}
+.sst-fill{height:100%;border-radius:4px;transition:width .6s ease}
+.sst-thumb{position:absolute;top:-4px;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;transform:translateX(-50%);box-shadow:0 0 8px rgba(0,0,0,.5)}
+.sst-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-top:2px}
+.sst-result{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.sp-btn.recommended{border-color:var(--gold);background:rgba(245,166,35,.1)}
+/* ─── END V3.2 ─────────────────────────────────────── */
 /* King Waves Danger Banner Animation */
 @keyframes flashDanger {
   0%, 100% { background-color: rgba(255, 0, 0, 0.2); border-color: rgba(255, 0, 0, 0.4); }
@@ -266,7 +297,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 
     <!-- SOLUNAR -->
     <div class="tab active" id="tab-solunar">
-      <div class="stitle">Select Date <span class="pill pill-f">Zenith & Underfoot</span></div>
+      <div class="stitle">날짜 선택 <span class="pill pill-f">피딩 타임 최적화</span></div>
       <div class="sol-scroll"><div class="sol-row" id="sol-date-row"></div></div>
       <div id="sol-content"></div>
     </div>
@@ -279,7 +310,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
           <span style="font-size:9px;color:rgba(0,230,118,.45);white-space:nowrap;flex-shrink:0;padding-bottom:2px">무단 도용 금지</span>
         </div>
       </div>
-      <div class="stitle">Select Date <span class="pill pill-f" id="src-pill">WillyWeather BOM</span></div>
+      <div class="stitle">날짜 선택 <span class="pill pill-f" id="src-pill">WillyWeather BOM</span></div>
       <div class="date-scroll"><div class="date-row" id="marine-date-row"></div></div>
       <div id="marine-content"><div class="loading-msg">📍 포인트를 추가하면 WillyWeather 실시간 날씨가 표시돼</div></div>
     </div>
@@ -333,6 +364,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="cb-item"><div class="cb-val" id="cb-sst">—°C</div><div class="cb-lbl">SST</div></div>
       </div>
       <div class="stitle">어종 선택 <span class="pill pill-a">실제 조건 분석</span></div>
+      <div class="genre-filter" id="genre-filter">
+        <button class="gf-btn on" onclick="setGenre('all',this)">🎣 전체</button>
+        <button class="gf-btn" onclick="setGenre('float',this)">🎯 찌낚시</button>
+        <button class="gf-btn" onclick="setGenre('lbg',this)">⚡ LBG·지깅</button>
+        <button class="gf-btn" onclick="setGenre('eging',this)">🦑 에깅</button>
+      </div>
+      <div id="rec-msg-box"></div>
       <div class="sp-scroll" id="sp-scroll"></div>
       <div style="margin-bottom:8px;padding:11px 14px;background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-radius:12px;display:flex;align-items:flex-start;gap:10px">
         <span style="font-size:19px;flex-shrink:0">🐟</span>
@@ -971,13 +1009,13 @@ function renderMarineDay(i){
 
 // ─── SPECIES DATA ─────────────────────────────────
 const SPECIES=[
-  {id:'drummer',emoji:'🐟',name:'Drummer',col:'#00e676',rig:{ml:'20lb Mono/Braid',ld:'30lb Fluoro',hk:'#4–#2 Suicide',wt:'Ball 1–2oz',dp:'Bottom to 3m',tc:'Float / Running sinker'},baits:[{r:1,n:'Green Cunjevoi',e:5,w:'드러머 No.1'},{r:2,n:'Bread dough',e:4,w:'고압 안정기'},{r:3,n:'Abalone gut',e:4,w:'현지 검증'},{r:4,n:'Cabbage weed',e:3,w:'자연 서식'}],colors:null,tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'만조 직전~후 2시간',tidalState:'만조',tidalNote:'파도가 바위 덮으며 먹이 씻겨내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'드러머는 만조 전후가 압도적으로 좋아.'}},
-  {id:'bream',emoji:'🐠',name:'Bream',col:'#00d4ff',rig:{ml:'6–8lb Mono',ld:'8lb Fluoro',hk:'#6–#4 Circle',wt:'Split shot 0–1/8oz',dp:'Bottom hugging',tc:'Finesse / Bream SP'},baits:[{r:1,n:'Nippers (Yabbies)',e:5,w:'Incoming tide 최강'},{r:2,n:'Prawns (fresh)',e:5,w:'올라운드'},{r:3,n:'Peeled prawn tail',e:4,w:'작은 바늘'},{r:4,n:'Bread crust',e:3,w:'표층 피딩'}],colors:null,tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'간조 후 1시간부터 만조까지',tidalState:'들물',tidalNote:'신선한 물·먹이 유입으로 활성',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'브림은 들물 때가 최고야.'}},
-  {id:'snapper',emoji:'🐡',name:'Snapper',col:'#ff6b9d',rig:{ml:'20–30lb Braid',ld:'30–40lb Fluoro',hk:'3/0–5/0 Circle',wt:'Paternoster 2–4oz',dp:'Bottom to 5m up',tc:'Paternoster / Slow jig'},baits:[{r:1,n:'Fresh squid (whole)',e:5,w:'직접 잡은 것'},{r:2,n:'Pilchard (rigged)',e:5,w:'검증 미끼'},{r:3,n:'Prawns (large)',e:4,w:'파터노스터'},{r:4,n:'Slow jig 40–80g',e:4,w:'슬로우지그'}],colors:[{n:'Pink / Red',h:'#ff4488',top:true,w:'흐린날·깊은수심'},{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린조건 2위'},{n:'White / Pearl',h:'#ddeeff',top:false,w:'맑은물 얕은 곳'},{n:'Blue / Purple',h:'#5544ff',top:false,w:'20m+ 깊은 수심'}],tide:{bestTime:'만조 전후 2–3시간',bestTimeNote:'일몰+만조 조합 최강',tidalState:'만조+날물 초반',tidalNote:'수심 깊어지고 조류 흘러야',highTide:5,risingTide:3,lowTide:2,fallingTide:4,tip:'스내퍼는 만조 전후 깊은 암초에서 최활발.'}},
-  {id:'jewfish',emoji:'🦈',name:'Jewfish',col:'#b06aff',rig:{ml:'PE 3–5 Braid',ld:'60–80lb Fluoro',hk:'5/0–8/0 Circle',wt:'60–120g',dp:'Bottom structure',tc:'Live bait / SP / Bottom jig'},baits:[{r:1,n:'Live Tailor / Mullet',e:5,w:'라이브베이트 최강'},{r:2,n:'Fresh squid (large)',e:5,w:'오늘 잡은 통째'},{r:3,n:'Large SP 5–7"',e:4,w:'Zman / Gulp'},{r:4,n:'Pilchard gang rig',e:4,w:'표준 갱훅'}],colors:[{n:'White / Pearl SP',h:'#ddeeff',top:true,w:'야간 No.1'},{n:'Black / Purple',h:'#330055',top:true,w:'야간 실루엣'},{n:'Motor oil',h:'#553311',top:false,w:'탁한물 낮'},{n:'Chartreuse',h:'#aadd00',top:false,w:'조명 있는 부두'}],tide:{bestTime:'날물 하반기 + 야간',bestTimeNote:'만조 후 2–3시간+야간',tidalState:'날물+야간',tidalNote:'베이트피시가 조류 타고 흘러내려옴',highTide:3,risingTide:3,lowTide:2,fallingTide:5,tip:'쥬피시는 날물+야간 채널 포인트가 최고.'}},
-  {id:'kingfish',emoji:'🐠',name:'Kingfish',col:'#f5a623',rig:{ml:'PE 3–4 Braid',ld:'80–100lb Fluoro',hk:'4/0–6/0 Assist',wt:'60–120g slow jig',dp:'20–40m',tc:'Slow pitch / Speed jigging'},baits:[{r:1,n:'Live Yakka / Slimy',e:5,w:'라이브베이트 최강'},{r:2,n:'Slow pitch jig 80–120g',e:5,w:'조류 적합'},{r:3,n:'Stickbait 140mm',e:4,w:'표층 보일 때'},{r:4,n:'Pilchard (rigged)',e:3,w:'바닥 브레이크'}],colors:[{n:'Pink / White',h:'#ff9ecd',top:true,w:'흐린날+파도'},{n:'Chartreuse',h:'#c6ff00',top:false,w:'맑은물 고압'},{n:'Blue / Silver',h:'#60b8ff',top:false,w:'맑은물 베이트'},{n:'Red / Orange',h:'#ff5533',top:false,w:'탁한물 새벽'}],tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'조류 강하게 흐를 때',tidalState:'들물 중반',tidalNote:'강한 조류 타고 베이트 쫓음',highTide:4,risingTide:5,lowTide:1,fallingTide:3,tip:'킹피시는 조류 강하게 흐를 때 활성 최고.'}},
-  {id:'tuna',emoji:'🐠',name:'Blackfish',col:'#607d8b',rig:{ml:'4–6lb Mono',ld:'6lb Fluoro',hk:'#8–#6 Long shank',wt:'No sinker / Float',dp:'Surface to 2m',tc:'Float / Weed bait'},baits:[{r:1,n:'Cabbage weed (green)',e:5,w:'NSW 갯바위 No.1'},{r:2,n:'Cunjevoi (gut)',e:4,w:'파도 강할 때'},{r:3,n:'Bread dough',e:4,w:'맑은물 조용한 날'},{r:4,n:'Nori seaweed',e:3,w:'겨울 소강 상태'}],colors:null,tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'파도가 바위 덮을 때 최고',tidalState:'만조',tidalNote:'파도가 락 웨드 먹이 씻어내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'Blackfish는 파도가 바위를 덮으면서 Cabbage weed를 씻어내릴 때 최고야. 만조 전후 집중.'}},
-  {id:'squid',emoji:'🦑',name:'Squid',col:'#b06aff',rig:{ml:'PE 0.6–0.8 Braid',ld:'2–3호 Fluoro 1m',hk:'Egi 3.0–3.5호',wt:'Egi 15–20g',dp:'Mid to bottom',tc:'Slow fall · Bottom drag'},baits:[],colors:[{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린날+조류 No.1!'},{n:'Pink / UV',h:'#ff44cc',top:true,w:'흐린날 탁한물 2위'},{n:'Brown / Natural',h:'#885533',top:false,w:'맑은물 낮'},{n:'Chartreuse / Green',h:'#aadd00',top:false,w:'맑은물 밝을 때'},{n:'Blue / Night',h:'#3366ff',top:false,w:'야간+조명'}],tide:{bestTime:'일몰 후 2시간 + 들물',bestTimeNote:'야간 들물 = 에깅 황금 타임',tidalState:'들물+야간',tidalNote:'조류 있어야 에기가 자연스럽게 흘러',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'에깅은 들물 때 조류 약간 흐를 때 최고야.'}},
+  {id:'drummer',emoji:'🐟',name:'Drummer',col:'#00e676',genre:'float',dangerLevel:'high',sstOptMin:16,sstOptMax:22,rig:{ml:'20lb Mono/Braid',ld:'30lb Fluoro',hk:'#4–#2 Suicide',wt:'Ball 1–2oz',dp:'Bottom to 3m',tc:'Float / Running sinker'},baits:[{r:1,n:'Green Cunjevoi',e:5,w:'드러머 No.1'},{r:2,n:'Bread dough',e:4,w:'고압 안정기'},{r:3,n:'Abalone gut',e:4,w:'현지 검증'},{r:4,n:'Cabbage weed',e:3,w:'자연 서식'}],colors:null,tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'만조 직전~후 2시간',tidalState:'만조',tidalNote:'파도가 바위 덮으며 먹이 씻겨내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'드러머는 만조 전후가 압도적으로 좋아.'}},
+  {id:'bream',emoji:'🐠',name:'Bream',col:'#00d4ff',genre:'float',dangerLevel:'low',sstOptMin:18,sstOptMax:25,rig:{ml:'6–8lb Mono',ld:'8lb Fluoro',hk:'#6–#4 Circle',wt:'Split shot 0–1/8oz',dp:'Bottom hugging',tc:'Finesse / Bream SP'},baits:[{r:1,n:'Nippers (Yabbies)',e:5,w:'Incoming tide 최강'},{r:2,n:'Prawns (fresh)',e:5,w:'올라운드'},{r:3,n:'Peeled prawn tail',e:4,w:'작은 바늘'},{r:4,n:'Bread crust',e:3,w:'표층 피딩'}],colors:null,tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'간조 후 1시간부터 만조까지',tidalState:'들물',tidalNote:'신선한 물·먹이 유입으로 활성',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'브림은 들물 때가 최고야.'}},
+  {id:'snapper',emoji:'🐡',name:'Snapper',col:'#ff6b9d',genre:'float',dangerLevel:'mid',sstOptMin:17,sstOptMax:24,rig:{ml:'20–30lb Braid',ld:'30–40lb Fluoro',hk:'3/0–5/0 Circle',wt:'Paternoster 2–4oz',dp:'Bottom to 5m up',tc:'Paternoster / Slow jig'},baits:[{r:1,n:'Fresh squid (whole)',e:5,w:'직접 잡은 것'},{r:2,n:'Pilchard (rigged)',e:5,w:'검증 미끼'},{r:3,n:'Prawns (large)',e:4,w:'파터노스터'},{r:4,n:'Slow jig 40–80g',e:4,w:'슬로우지그'}],colors:[{n:'Pink / Red',h:'#ff4488',top:true,w:'흐린날·깊은수심'},{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린조건 2위'},{n:'White / Pearl',h:'#ddeeff',top:false,w:'맑은물 얕은 곳'},{n:'Blue / Purple',h:'#5544ff',top:false,w:'20m+ 깊은 수심'}],tide:{bestTime:'만조 전후 2–3시간',bestTimeNote:'일몰+만조 조합 최강',tidalState:'만조+날물 초반',tidalNote:'수심 깊어지고 조류 흘러야',highTide:5,risingTide:3,lowTide:2,fallingTide:4,tip:'스내퍼는 만조 전후 깊은 암초에서 최활발.'}},
+  {id:'jewfish',emoji:'🦈',name:'Jewfish',col:'#b06aff',genre:'lbg',dangerLevel:'mid',sstOptMin:18,sstOptMax:26,rig:{ml:'PE 3–5 Braid',ld:'60–80lb Fluoro',hk:'5/0–8/0 Circle',wt:'60–120g',dp:'Bottom structure',tc:'Live bait / SP / Bottom jig'},baits:[{r:1,n:'Live Tailor / Mullet',e:5,w:'라이브베이트 최강'},{r:2,n:'Fresh squid (large)',e:5,w:'오늘 잡은 통째'},{r:3,n:'Large SP 5–7"',e:4,w:'Zman / Gulp'},{r:4,n:'Pilchard gang rig',e:4,w:'표준 갱훅'}],colors:[{n:'White / Pearl SP',h:'#ddeeff',top:true,w:'야간 No.1'},{n:'Black / Purple',h:'#330055',top:true,w:'야간 실루엣'},{n:'Motor oil',h:'#553311',top:false,w:'탁한물 낮'},{n:'Chartreuse',h:'#aadd00',top:false,w:'조명 있는 부두'}],tide:{bestTime:'날물 하반기 + 야간',bestTimeNote:'만조 후 2–3시간+야간',tidalState:'날물+야간',tidalNote:'베이트피시가 조류 타고 흘러내려옴',highTide:3,risingTide:3,lowTide:2,fallingTide:5,tip:'쥬피시는 날물+야간 채널 포인트가 최고.'}},
+  {id:'kingfish',emoji:'🐠',name:'Kingfish',col:'#f5a623',genre:'lbg',dangerLevel:'mid',sstOptMin:19,sstOptMax:26,rig:{ml:'PE 3–4 Braid',ld:'80–100lb Fluoro',hk:'4/0–6/0 Assist',wt:'60–120g slow jig',dp:'20–40m',tc:'Slow pitch / Speed jigging'},baits:[{r:1,n:'Live Yakka / Slimy',e:5,w:'라이브베이트 최강'},{r:2,n:'Slow pitch jig 80–120g',e:5,w:'조류 적합'},{r:3,n:'Stickbait 140mm',e:4,w:'표층 보일 때'},{r:4,n:'Pilchard (rigged)',e:3,w:'바닥 브레이크'}],colors:[{n:'Pink / White',h:'#ff9ecd',top:true,w:'흐린날+파도'},{n:'Chartreuse',h:'#c6ff00',top:false,w:'맑은물 고압'},{n:'Blue / Silver',h:'#60b8ff',top:false,w:'맑은물 베이트'},{n:'Red / Orange',h:'#ff5533',top:false,w:'탁한물 새벽'}],tide:{bestTime:'들물 중반 ~ 만조',bestTimeNote:'조류 강하게 흐를 때',tidalState:'들물 중반',tidalNote:'강한 조류 타고 베이트 쫓음',highTide:4,risingTide:5,lowTide:1,fallingTide:3,tip:'킹피시는 조류 강하게 흐를 때 활성 최고.'}},
+  {id:'tuna',emoji:'🐠',name:'Blackfish',col:'#607d8b',genre:'float',dangerLevel:'high',sstOptMin:15,sstOptMax:22,rig:{ml:'4–6lb Mono',ld:'6lb Fluoro',hk:'#8–#6 Long shank',wt:'No sinker / Float',dp:'Surface to 2m',tc:'Float / Weed bait'},baits:[{r:1,n:'Cabbage weed (green)',e:5,w:'NSW 갯바위 No.1'},{r:2,n:'Cunjevoi (gut)',e:4,w:'파도 강할 때'},{r:3,n:'Bread dough',e:4,w:'맑은물 조용한 날'},{r:4,n:'Nori seaweed',e:3,w:'겨울 소강 상태'}],colors:null,tide:{bestTime:'만조 전후 1–2시간',bestTimeNote:'파도가 바위 덮을 때 최고',tidalState:'만조',tidalNote:'파도가 락 웨드 먹이 씻어내려옴',highTide:5,risingTide:4,lowTide:2,fallingTide:3,tip:'Blackfish는 파도가 바위를 덮으면서 Cabbage weed를 씻어내릴 때 최고야. 만조 전후 집중.'}},
+  {id:'squid',emoji:'🦑',name:'Squid',col:'#b06aff',genre:'eging',dangerLevel:'low',sstOptMin:16,sstOptMax:23,rig:{ml:'PE 0.6–0.8 Braid',ld:'2–3호 Fluoro 1m',hk:'Egi 3.0–3.5호',wt:'Egi 15–20g',dp:'Mid to bottom',tc:'Slow fall · Bottom drag'},baits:[],colors:[{n:'Orange / Gold',h:'#ff8800',top:true,w:'흐린날+조류 No.1!'},{n:'Pink / UV',h:'#ff44cc',top:true,w:'흐린날 탁한물 2위'},{n:'Brown / Natural',h:'#885533',top:false,w:'맑은물 낮'},{n:'Chartreuse / Green',h:'#aadd00',top:false,w:'맑은물 밝을 때'},{n:'Blue / Night',h:'#3366ff',top:false,w:'야간+조명'}],tide:{bestTime:'일몰 후 2시간 + 들물',bestTimeNote:'야간 들물 = 에깅 황금 타임',tidalState:'들물+야간',tidalNote:'조류 있어야 에기가 자연스럽게 흘러',highTide:4,risingTide:5,lowTide:2,fallingTide:3,tip:'에깅은 들물 때 조류 약간 흐를 때 최고야.'}},
 ];
 
 function spScore(id){
@@ -998,7 +1036,73 @@ function spScore(id){
   };
   return M[id]||70;
 }
-function renderSpScroll(){document.getElementById('sp-scroll').innerHTML=SPECIES.map(s=>{const sc=spScore(s.id);return`<div class="sp-btn ${s.id===activeSpecies?'on':''}" onclick="selectSp('${s.id}')"><div class="sp-score-badge" style="background:${s.col};color:#000">${sc}</div><div class="sp-emoji">${s.emoji}</div><div class="sp-name">${s.name}</div></div>`;}).join('');}
+// ─── V3.2: GENRE FILTER ──────────────────────────
+let activeGenre = 'all';
+function setGenre(g, btn){
+  activeGenre = g;
+  document.querySelectorAll('.gf-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderSpScroll();
+}
+
+// ─── V3.2: RECOMMENDATION ENGINE ─────────────────
+function getRecommendedId(){
+  const t = marineDays[0];
+  if(!t) return null;
+  const sw = t.swellH, sst = t.sst;
+  // 스웰 1.5~2.0m & 수온 탁함(스웰>1.5) → 드러머
+  if(sw >= 1.5 && sw <= 2.2) return 'drummer';
+  // 잔잔 + 수온 높음 → 킹피시
+  if(sw < 1.5 && sst >= 21) return 'kingfish';
+  // 조류 강 + 야간 → jewfish
+  const h = new Date().getHours();
+  if((h >= 18 || h < 6)) return 'jewfish';
+  // 잔잔 → 에깅
+  if(sw < 1.5) return 'squid';
+  return 'drummer';
+}
+function getRecMessage(id){
+  const t = marineDays[0];
+  if(!t) return null;
+  const sw = t.swellH, sst = t.sst;
+  const msgs = {
+    drummer: `스웰 ${sw}m · 탁한 물색 → 드러머 공략 최적기! 갯바위 포말 지점에 Cunjevoi 투입.`,
+    kingfish: `잔잔한 바다 + 수온 ${sst}°C → 킹피시 슬로우지깅 타임! 조류 타는 암초 레지 집중.`,
+    jewfish: `야간 + 날물 조합 → 쥬피시 피딩 황금 타임! 채널 입구 라이브베이트 투입.`,
+    squid: `잔잔한 바다 + 들물 → 에깅 최적 조건! Orange/Gold 에기 슬로우 폴.`,
+    snapper: `만조 전후 + 솔루나 좋음 → 스내퍼 암초 파터노스터!`,
+    bream: `들물 중반 조건 → 브림 핀피싱! 니퍼스 / 새우 에스추어리 집중.`,
+    tuna: `파도 양호 → Blackfish 갯바위 Cabbage weed 찌낚시!`,
+  };
+  return msgs[id] || null;
+}
+
+function renderSpScroll(){
+  const recId = getRecommendedId();
+  const filtered = activeGenre === 'all' ? SPECIES : SPECIES.filter(s => s.genre === activeGenre);
+  
+  // 추천 메시지 박스
+  const msgBox = document.getElementById('rec-msg-box');
+  if(msgBox){
+    const recMsg = getRecMessage(recId);
+    if(recMsg && marineDays[0]){
+      msgBox.innerHTML = `<div class="rec-msg">🏆 <strong>오늘의 추천:</strong> ${recMsg}</div>`;
+    } else {
+      msgBox.innerHTML = '';
+    }
+  }
+
+  document.getElementById('sp-scroll').innerHTML = filtered.map(s=>{
+    const sc = spScore(s.id);
+    const isRec = s.id === recId && marineDays[0];
+    return `<div class="sp-btn ${s.id===activeSpecies?'on':''} ${isRec?'recommended':''}" onclick="selectSp('${s.id}')">
+      <div class="sp-score-badge" style="background:${s.col};color:#000">${sc}</div>
+      <div class="sp-emoji">${s.emoji}</div>
+      <div class="sp-name">${s.name}</div>
+      ${isRec ? '<div style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);font-size:8px;white-space:nowrap"><span class="rec-badge">추천</span></div>' : ''}
+    </div>`;
+  }).join('');
+}
 function selectSp(id){activeSpecies=id;renderSpScroll();renderSpResult(id);}
 function genAnalysis(id){
   const t=marineDays[0];if(!t)return'포인트를 추가하면 WillyWeather 실제 조건 분석이 시작돼.';
@@ -1029,7 +1133,72 @@ function renderSpResult(id){
   else{const t=marineDays[0];pHtml=LOCS.map((loc,i)=>{const sw=t?t.swellH:2,wi=t?t.windKmh:25,safe=sw<2.5&&wi<35;return`<div class="sl-item ${safe?'best':'caution'}"><div class="sl-dot" style="background:${safe?'var(--green)':'var(--warn)'}"></div><div style="flex:1"><div style="display:flex;align-items:center;justify-content:space-between;gap:4px"><div class="sl-name">${loc.name}${i===activeIdx?' ★':''}</div><button onclick="showOnMap(${loc.lat},${loc.lng},'${loc.name.replace(/'/g,'')}')" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:3px 8px;font-size:10px;color:var(--accent);cursor:pointer;flex-shrink:0">🗺 지도</button></div><div class="sl-dir">📍 ${Math.abs(loc.lat).toFixed(3)}°S · ${loc.lng.toFixed(3)}°E · ${distStr(loc.lat,loc.lng)}</div><div class="sl-desc">${safe?'스웰 '+sw+'m · 바람 '+wi+'km/h — 낚시 가능':'스웰 '+sw+'m · 바람 '+wi+'km/h — 오늘 주의'}</div><div class="sl-tags">${safe?'<span class="sl-tag t-safe">조건 양호</span><span class="sl-tag t-info">'+(loc.note||'Custom')+'</span>':'<span class="sl-tag t-caut">파도 주의</span><span class="sl-tag t-caut">안전 확인</span>'}</div></div></div>`;}).join('');}
   const td=s.tide;const star=(r,col)=>'<span style="font-size:13px;color:'+col+';">'+'★'.repeat(r)+'</span><span style="font-size:13px;color:var(--dim);">'+'★'.repeat(5-r)+'</span>';
   const tidalHtml=`<div class="rb-sec"><div class="rb-stitle">🌊 최적 조수 조건</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px"><div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">최적 시간대</div><div style="font-size:13px;font-weight:600;color:var(--accent)">${td.bestTime}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${td.bestTimeNote}</div></div><div style="background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 11px"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">조수 상태</div><div style="font-size:13px;font-weight:600;color:var(--gold)">${td.tidalState}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">${td.tidalNote}</div></div></div><div class="tide-cond-g">${[['만조',td.highTide],['들물',td.risingTide],['간조',td.lowTide],['날물',td.fallingTide]].map(([l,r])=>{const col=r>=5?'#f5a623':r>=4?'#00e676':r>=3?'#00d4ff':'#6b8aaa';return`<div class="tc-item"><div style="font-size:10px;color:var(--muted);margin-bottom:5px">${l}</div><div>${star(r,col)}</div></div>`;}).join('')}</div><div style="background:var(--bg3);border:1px solid rgba(0,212,255,.2);border-radius:9px;padding:10px 12px"><div style="font-size:10px;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px">💡 조수 팁</div><div style="font-size:11px;color:var(--muted);line-height:1.65">${td.tip}</div></div></div>`;
-  const rigHtml=`<div class="rig-g"><div class="rig-card"><div class="rig-lbl">Main Line</div><div class="rig-val">${s.rig.ml}</div></div><div class="rig-card"><div class="rig-lbl">Leader</div><div class="rig-val">${s.rig.ld}</div></div><div class="rig-card"><div class="rig-lbl">Hook</div><div class="rig-val">${s.rig.hk}</div></div><div class="rig-card"><div class="rig-lbl">Weight/Lure</div><div class="rig-val">${s.rig.wt}</div></div><div class="rig-card"><div class="rig-lbl">Depth</div><div class="rig-val">${s.rig.dp}</div></div><div class="rig-card"><div class="rig-lbl">Technique</div><div class="rig-val">${s.rig.tc}</div></div></div>`;
+
+  // ─── V3.2: 위험도 섹션 ───────────────────────────
+  const dlMap = {
+    high: {label:'위험도 상 ⚠️', cls:'dl-fill-high', col:'#ff6b35', desc:'갯바위 낙상·파도 위험. 구명조끼+스파이크화 필수.'},
+    mid:  {label:'위험도 중 ⚡', cls:'dl-fill-mid',  col:'#f5a623', desc:'파도·조류 주의. 포인트 사전 확인 권장.'},
+    low:  {label:'위험도 하 ✅', cls:'dl-fill-low',  col:'#00e676', desc:'상대적으로 안전한 포인트. 기본 안전수칙 준수.'},
+  };
+  const dl = dlMap[s.dangerLevel] || dlMap['low'];
+  const dangerHtml = `<div class="rb-sec"><div class="rb-stitle">⚠️ 공략 위험도</div>
+    <div class="danger-level">
+      <div style="flex-shrink:0;font-size:11px;font-weight:700;color:${dl.col};min-width:70px">${dl.label}</div>
+      <div class="dl-bar"><div class="${dl.cls}"></div></div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.6;padding:0 2px">${dl.desc}</div>
+  </div>`;
+
+  // ─── V3.2: SST 수온 적합도 미터 ──────────────────
+  const curSst = (marineDays[0]||{}).sst || 20;
+  const optMin = s.sstOptMin, optMax = s.sstOptMax;
+  const sstRange = [optMin - 4, optMax + 4];
+  const clampedSst = Math.max(sstRange[0], Math.min(sstRange[1], curSst));
+  const sstPct = Math.round(((clampedSst - sstRange[0]) / (sstRange[1] - sstRange[0])) * 100);
+  const inOptimal = curSst >= optMin && curSst <= optMax;
+  const sstColor = inOptimal ? '#00e676' : (curSst < optMin ? '#60b8ff' : '#ff6b35');
+  const sstLabel = inOptimal ? '✅ 최적 수온' : (curSst < optMin ? '🔵 수온 낮음' : '🔴 수온 높음');
+  const sstFitPct = inOptimal ? 95 : Math.max(20, 100 - Math.abs(curSst - (optMin+optMax)/2) * 8);
+  const sstHtml = `<div class="rb-sec"><div class="rb-stitle">🌡 수온 적합도 미터</div>
+    <div class="sst-meter">
+      <div class="sst-meter-title">현재 수온 vs 최적 수온 (${optMin}–${optMax}°C)</div>
+      <div class="sst-track">
+        <div class="sst-fill" style="width:${sstPct}%;background:linear-gradient(90deg,#1a4a8a,${sstColor})"></div>
+        <div class="sst-thumb" style="left:${sstPct}%;background:${sstColor}"></div>
+      </div>
+      <div class="sst-labels"><span>${sstRange[0]}°C</span><span style="color:${sstColor};font-weight:700">${curSst}°C 현재</span><span>${sstRange[1]}°C</span></div>
+      <div class="sst-result">
+        <div style="font-size:11px;font-weight:700;color:${sstColor}">${sstLabel}</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="width:60px;height:6px;border-radius:3px;background:var(--bg);overflow:hidden"><div style="height:100%;width:${sstFitPct}%;background:${sstColor};border-radius:3px"></div></div>
+          <span style="font-size:11px;font-weight:700;color:${sstColor}">${Math.round(sstFitPct)}%</span>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  // ─── V3.2: 채비 인포그래픽 ───────────────────────
+  const rigNodes = [
+    {icon:'🧵', label:'원줄', val:s.rig.ml},
+    {icon:'🎣', label:'목줄', val:s.rig.ld},
+    {icon:'🪝', label:'바늘', val:s.rig.hk},
+    {icon:'⚓', label:'봉돌/루어', val:s.rig.wt},
+  ];
+  const rigIgHtml = `<div class="rig-infographic">
+    <div class="rig-ig-title">🔧 채비 비주얼 가이드</div>
+    <div class="rig-ig-row">
+      ${rigNodes.map((n,i)=>`
+        <div class="rig-ig-node">
+          <div class="rig-ig-dot" style="background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.3)">${n.icon}</div>
+          <div class="rig-ig-lbl">${n.label}</div>
+          <div class="rig-ig-val">${n.val}</div>
+        </div>
+        ${i < rigNodes.length-1 ? '<div class="rig-ig-connector"></div>' : ''}
+      `).join('')}
+    </div>
+  </div>`;
+
+  const rigHtml=`<div class="rig-g"><div class="rig-card"><div class="rig-lbl">Main Line</div><div class="rig-val">${s.rig.ml}</div></div><div class="rig-card"><div class="rig-lbl">Leader</div><div class="rig-val">${s.rig.ld}</div></div><div class="rig-card"><div class="rig-lbl">Hook</div><div class="rig-val">${s.rig.hk}</div></div><div class="rig-card"><div class="rig-lbl">Weight/Lure</div><div class="rig-val">${s.rig.wt}</div></div><div class="rig-card"><div class="rig-lbl">Depth</div><div class="rig-val">${s.rig.dp}</div></div><div class="rig-card"><div class="rig-lbl">Technique</div><div class="rig-val">${s.rig.tc}</div></div></div>${rigIgHtml}`;
   const colorHtml=s.colors?`<div class="rb-sec"><div class="rb-stitle">🎨 오늘 추천 컬러</div><div class="color-strip">${s.colors.map(cc=>`<div class="color-chip ${cc.top?'top':''}"><div class="cswatch" style="background:${cc.h}"></div><div><div style="font-size:11px;font-weight:600">${cc.top?'⭐ ':''}${cc.n}</div><div style="font-size:10px;color:var(--muted);margin-top:1px">${cc.w}</div></div></div>`).join('')}</div></div>`:'';
   const baitHtml=s.baits.length?`<div class="rb-sec"><div class="rb-stitle">🪱 미끼 추천</div><table class="bait-tbl"><tr><th>#</th><th>미끼</th><th>효과</th><th>이유</th></tr>${s.baits.map((b,i)=>{const rc=i===0?'var(--gold)':i===1?'var(--accent)':'var(--muted)';const dots='<div class="eff-row">'+[1,2,3,4,5].map(j=>`<div class="${j<=b.e?'ef':'ee'}"></div>`).join('')+'</div>';return`<tr><td><span class="b-rank" style="color:${rc}">${b.r}</span></td><td style="font-weight:500">${b.n}</td><td>${dots}</td><td style="color:var(--muted);font-size:10px">${b.w}</td></tr>`;}).join('')}</table></div>`:'';
   const analysis=genAnalysis(id);
@@ -1037,6 +1206,8 @@ function renderSpResult(id){
     <div class="rc"><div class="rc-head"><div style="font-size:28px">${s.emoji}</div><div style="flex:1"><div style="font-size:16px;font-weight:600">${s.name}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">WillyWeather 오늘 조건 기반</div></div><div class="rc-ring"><svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="17" fill="none" stroke="var(--border)" stroke-width="4"/><circle cx="22" cy="22" r="17" fill="none" stroke="${c}" stroke-width="4" stroke-dasharray="${cf.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round"/></svg><div class="rc-rnum" style="color:${c}">${sc}</div></div></div>
     <div class="rc-body">
       <div class="rb-sec"><div class="rb-stitle">📍 포인트 추천 (저장 포인트 기준)</div>${pHtml}</div>
+      ${dangerHtml}
+      ${sstHtml}
       ${tidalHtml}
       <div class="rb-sec"><div class="rb-stitle">🎣 채비 세팅</div>${rigHtml}</div>
       ${colorHtml}${baitHtml}
