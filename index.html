@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Scott's Marine Insight V3.9</title>
+<title>Scott's Marine Insight V3.9.1</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -390,11 +390,13 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .mar-cell{border-radius:10px;border:1px solid var(--border);background:var(--card);padding:5px 2px 6px;text-align:center;cursor:pointer;transition:all .18s}
 .mar-cell.on{border-color:var(--accent);background:rgba(0,212,255,.1)}
 .mar-cell.today{border-color:rgba(176,106,255,.5)}
-.mar-cell.rough{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.04)}
+.mar-cell.rough{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.06)}
+.mar-cell.good{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.04)}
 .mc-day{font-size:7.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
 .mc-num{font-family:'Bebas Neue',sans-serif;font-size:15px;line-height:1;margin:1px 0}
-.mc-icon{font-size:11px;margin:1px 0}
-.mc-sw{font-size:7px;font-weight:700;margin-top:1px}
+.mc-icon{font-size:14px;margin:2px 0}
+.mc-sw{font-size:8px;font-weight:800;margin-top:1px}
+.mc-wi{font-size:7px;color:var(--muted);margin-top:1px}
 /* 에깅 세션 타이머 */
 .egi-timer{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px}
 .egi-timer.hot{border-color:rgba(245,166,35,.5);background:rgba(245,166,35,.04)}
@@ -484,6 +486,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <!-- SOLUNAR -->
     <div class="tab active" id="tab-solunar">
       <div class="stitle">날짜 선택 <span class="pill pill-f">피딩 타임 최적화</span></div>
+      <!-- 이번 주 최고 출조일 TOP 3 -->
+      <div id="sol-top3" style="margin-bottom:10px"></div>
       <!-- 7일 캘린더 그리드 -->
       <div class="cal-grid" id="sol-cal-grid"></div>
       <!-- 킹피시 시즌 알리미 -->
@@ -512,8 +516,43 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <div class="tab" id="tab-map">
       <div class="stitle">저장된 포인트</div>
       <div class="fav-scroll"><div class="fav-row" id="fav-row"></div></div>
-      
 
+      <!-- 현재 포인트 조건 카드 -->
+      <div id="map-point-card" style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin-bottom:10px;display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--accent)" id="map-card-name">—</div>
+          <div style="font-size:10px;color:var(--muted)" id="map-card-coords">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px">
+          <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted)">Swell</div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent)" id="mc-swell">—</div>
+          </div>
+          <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted)">Wind</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)" id="mc-wind">—</div>
+          </div>
+          <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted)">SST</div>
+            <div style="font-size:13px;font-weight:700;color:var(--gold)" id="mc-sst">—</div>
+          </div>
+          <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted)">hPa</div>
+            <div style="font-size:13px;font-weight:700;color:var(--text)" id="mc-pres">—</div>
+          </div>
+          <div style="text-align:center;background:var(--bg3);border-radius:8px;padding:7px 4px">
+            <div style="font-size:9px;color:var(--muted)">Tide</div>
+            <div style="font-size:13px;font-weight:700;color:var(--purple)" id="mc-tide">—</div>
+          </div>
+        </div>
+        <div id="map-card-note" style="font-size:10px;color:var(--muted);margin-top:7px;padding-top:7px;border-top:1px solid var(--border);display:none"></div>
+        <!-- 조황 예보 요약 -->
+        <div id="map-forecast-summary" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border);display:none"></div>
+        <!-- 골든타임 -->
+        <div id="map-golden-time" style="margin-top:6px;display:none"></div>
+        <!-- 어종 태그 -->
+        <div id="map-species-tags" style="margin-top:6px;display:none"></div>
+      </div>
 
       <div class="live-bar">
         <div class="lb-item"><div class="lb-val" id="lb-swell">—</div><div class="lb-lbl">Swell</div></div>
@@ -522,7 +561,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="lb-item"><div class="lb-val" id="lb-pres">—</div><div class="lb-lbl">hPa</div></div>
         <div class="lb-item"><div class="lb-val" id="lb-tide">—</div><div class="lb-lbl">Tide</div></div>
       </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+      <div style="display:none">
         <div class="map-layer-btns" style="margin-bottom:0">
           <button class="lbtn on" onclick="setLayer('wind',this)">💨 Wind</button>
           <button class="lbtn" onclick="setLayer('waves',this)">🌊 Swell</button>
@@ -539,15 +578,18 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <button id="gmaps-btn" onclick="openGoogleMaps()" style="display:none;width:100%;padding:10px;border-radius:11px;border:1px solid rgba(66,133,244,.4);background:rgba(66,133,244,.1);color:#4285f4;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px">
         📍 Google Maps 앱으로 길찾기
       </button>
-      <div style="margin-bottom:8px">
-        <div class="stitle">📍 낚시자리 핀 <span style="font-size:9px;color:var(--muted);font-weight:400;letter-spacing:0;text-transform:none">지도 길게 누르면 저장</span></div>
-        <div id="fish-pins-list"><div style="font-size:11px;color:var(--muted);padding:8px 0">저장된 낚시자리 없음. 지도를 길게 눌러 추가해줘.</div></div>
-      </div>
+
+      <!-- 추천 명당 (GPS 기반) -->
+      <div class="stitle" style="margin-top:4px">📍 주변 추천 명당 <span style="font-size:9px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">GPS 150km 이내</span></div>
+      <div id="rec-spots"></div>
     </div>
 
     <!-- 어종 -->
     <div class="tab" id="tab-species">
-      <div class="stitle">Today's Conditions</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="stitle" style="margin-bottom:0">Today's Conditions</div>
+        <div id="species-date-badge" style="font-size:10px;color:var(--gold);font-weight:600;padding:3px 8px;background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.3);border-radius:6px;display:none">📅 <span id="species-date-label"></span></div>
+      </div>
       <div class="cond-bar">
         <div class="cb-item"><div class="cb-val" id="cb-swell">—</div><div class="cb-lbl">Swell</div></div>
         <div class="cb-item"><div class="cb-val" id="cb-dir">—</div><div class="cb-lbl">Dir</div></div>
@@ -583,7 +625,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="egi-tab-icon">🦑</div>
         <div>
           <div class="egi-tab-title">에깅 어시스턴트</div>
-          <div class="egi-tab-sub">오늘 조건 기반 실시간 에깅 전략 · WillyWeather + Open-Meteo</div>
+          <div class="egi-tab-sub" id="egi-date-sub">오늘 조건 기반 실시간 에깅 전략 · WillyWeather + Open-Meteo</div>
         </div>
       </div>
       <div id="egi-conditions-bar"></div>
@@ -663,13 +705,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <button onclick="closeModal()" style="background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1">✕</button>
     </div>
     <div class="modal-body">
+
+      <!-- 저장된 포인트 목록 (상단) -->
       <div id="saved-list" style="margin-bottom:14px"></div>
       <div style="border-top:1px solid var(--border);margin-bottom:14px"></div>
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px">➕ 새 포인트 추가</div>
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">① 이름 & 메모</div>
-      <input class="mi" id="m-name" placeholder="포인트 이름 (예: Kiama Downs)"/>
-      <input class="mi" id="m-note" placeholder="메모 (LBG · 에깅 · 드러머)"/>
-      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px">② 위치 선택</div>
+
+      <!-- 새 포인트 추가 / 수정 -->
+      <div id="modal-form-title" style="font-size:13px;font-weight:600;margin-bottom:10px">➕ 새 포인트 추가</div>
+
+      <!-- ① 위치 선택 -->
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">① 위치 선택</div>
       <div style="position:relative;margin-bottom:4px">
         <input class="mi" id="m-search" placeholder="🔍 장소 검색 (예: Kiama Downs)" oninput="onSearch(this.value)" autocomplete="off" style="margin-bottom:0;padding-right:36px"/>
         <span id="spin" style="display:none;position:absolute;right:12px;top:13px;font-size:14px;color:var(--accent)">⟳</span>
@@ -697,6 +742,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         </div>
       </div>
       <input type="hidden" id="m-lat"/><input type="hidden" id="m-lng"/>
+
+      <!-- ② 이름 & 메모 -->
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">② 이름 & 메모</div>
+      <input class="mi" id="m-name" placeholder="포인트 이름 (예: Kiama Downs)"/>
+      <input class="mi" id="m-note" placeholder="메모"/>
+
+      <!-- 어종 태그 -->
+      <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px">🎣 어종 태그 <span style="font-size:9px;color:var(--accent);text-transform:none;letter-spacing:0">(복수 선택 가능)</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px" id="species-tag-picker"></div>
+
+      <!-- ③ 마커 색상 -->
       <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:4px 0 8px">③ 마커 색상</div>
       <div style="display:flex;gap:8px;margin-bottom:16px">
         <div class="cp on" style="background:#00d4ff" data-c="#00d4ff" onclick="pickColor(this)"></div>
@@ -706,7 +762,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
         <div class="cp" style="background:#b06aff" data-c="#b06aff" onclick="pickColor(this)"></div>
         <div class="cp" style="background:#ff4444" data-c="#ff4444" onclick="pickColor(this)"></div>
       </div>
-      <button class="mbtn p" onclick="saveLoc()">저장하기</button>
+      <input type="hidden" id="m-edit-idx" value="-1"/>
+      <button class="mbtn p" id="modal-save-btn" onclick="saveLoc()">저장하기</button>
+      <button id="modal-cancel-edit-btn" onclick="cancelEdit()" style="display:none;width:100%;padding:11px;border-radius:11px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-top:6px">취소</button>
     </div>
   </div>
 
@@ -737,6 +795,33 @@ let userLat=null, userLng=null;
 let marineDays=[], activeSolDay=0, activeMarineDay=0, activeSpecies='drummer';
 let mapL=null, pickerMapL2=null, mapMarkers=[], pickerMarker=null, pickedLL=null;
 let currentLayer='wind';
+// ─── 어종 태그 ──────────────────────────────────
+let selTags = [];
+function toggleSpTag(el){
+  const id = el.dataset.id;
+  if(selTags.includes(id)){
+    selTags = selTags.filter(t=>t!==id);
+    el.style.background = 'var(--bg3)';
+    el.style.color = 'var(--muted)';
+    el.style.borderColor = 'var(--border)';
+  } else {
+    selTags.push(id);
+    el.style.background = 'rgba(0,212,255,.15)';
+    el.style.color = 'var(--accent)';
+    el.style.borderColor = 'var(--accent)';
+  }
+}
+function setTagPicker(tags){
+  selTags = tags ? [...tags] : [];
+  document.querySelectorAll('.sp-tag-chip').forEach(el=>{
+    const on = selTags.includes(el.dataset.id);
+    el.style.background = on ? 'rgba(0,212,255,.15)' : 'var(--bg3)';
+    el.style.color = on ? 'var(--accent)' : 'var(--muted)';
+    el.style.borderColor = on ? 'var(--accent)' : 'var(--border)';
+  });
+}
+const TAG_LABELS = {kingfish:'🐠 Kingfish',snapper:'🔴 Snapper',bream:'⚪ Bream',flathead:'🟤 Flathead',drummer:'⚫ Drummer',luderick:'🎣 Luderick',trevally:'💛 Trevally',mulloway:'🌙 Mulloway',squid:'🦑 에깅',longtail_tuna:'🐟 Longtail',aus_salmon:'🐟 Salmon',tailor:'⚡ Tailor'};
+
 function saveLocs(){try{localStorage.setItem('nsw_locs',JSON.stringify(LOCS));}catch(e){}}
 
 // ─── NSW SHORE SPOTS DB (150km Random) ───────────
@@ -949,6 +1034,60 @@ function renderSolCalGrid(){
       <div class="cal-swell">${swText}</div>
     </div>`;
   }).join('');
+  renderSolTop3();
+}
+
+function renderSolTop3(){
+  const el = document.getElementById('sol-top3');
+  if(!el || !solDays.length) return;
+  const ranked = solDays.slice(0,7).map((d,i)=>{
+    const b = getBlendedForDay(i);
+    const md = marineDays[i]||{};
+    const swH = md.swellH||0, swP = md.swellPer||0;
+    const di = swH*swP;
+    const safetyPenalty = di>=18?-30: di>=12?-15: swH>=2.0?-10: 0;
+    const finalScore = Math.max(0, b.score + safetyPenalty);
+    return {i, d, score:finalScore, swH, swP, di, safetyPenalty};
+  }).sort((a,b)=>b.score-a.score).slice(0,3);
+
+  const medals=['🥇','🥈','🥉'], cols=['#f5a623','#aab8c2','#cd7f32'];
+  let rows = '';
+  ranked.forEach((r,rank)=>{
+    const col = r.score>=80?'var(--green)':r.score>=60?'var(--gold)':r.score>=40?'var(--accent)':'var(--muted)';
+    const swCol = r.swH>=2.0?'var(--warn)':r.swH>=1.2?'var(--gold)':'var(--green)';
+    const safetyTag = r.di>=18
+      ? '<span style="font-size:9px;background:rgba(255,107,53,.2);color:var(--warn);border-radius:6px;padding:1px 6px">⚠ 파도위험</span>'
+      : r.di>=12
+      ? '<span style="font-size:9px;background:rgba(245,166,35,.2);color:var(--gold);border-radius:6px;padding:1px 6px">⚡ 주의</span>'
+      : '';
+    const todayTag = r.d.isToday ? '<span style="font-size:9px;background:rgba(176,106,255,.2);color:var(--purple);border-radius:6px;padding:1px 6px">TODAY</span>' : '';
+    const dayLabel = r.d.isToday ? '오늘 (TODAY)' : (r.d.dayName + ' ' + r.d.dayNum);
+    const swellLine = r.d.moon.e + ' ' + r.d.moon.n + ' · 스웰 <span style="color:' + swCol + ';font-weight:600">' + r.swH + 'm</span>'
+      + (r.swP ? ' × ' + r.swP + 's' : '')
+      + (r.safetyPenalty < 0 ? ' <span style="color:var(--warn)">· 파도 -' + Math.abs(r.safetyPenalty) + '점</span>' : '');
+    const bgStyle = rank===0 ? 'rgba(245,166,35,.06)' : 'var(--bg3)';
+    const bdStyle = rank===0 ? 'rgba(245,166,35,.25)' : 'var(--border)';
+
+    rows += '<div onclick="selectSolDay(' + r.i + ')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;background:' + bgStyle + ';border:1px solid ' + bdStyle + ';border-radius:9px;cursor:pointer">'
+      + '<div style="font-size:18px;flex-shrink:0">' + medals[rank] + '</div>'
+      + '<div style="flex:1;min-width:0">'
+      + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
+      + '<span style="font-size:12px;font-weight:700;color:' + cols[rank] + '">' + dayLabel + '</span>'
+      + todayTag + safetyTag
+      + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-top:2px">' + swellLine + '</div>'
+      + '</div>'
+      + '<div style="text-align:right;flex-shrink:0">'
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:' + col + ';line-height:1">' + r.score + '</div>'
+      + '<div style="font-size:8px;color:var(--muted)">점</div>'
+      + '</div>'
+      + '</div>';
+  });
+
+  el.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px">'
+    + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏆 이번 주 최고 출조일 TOP 3</div>'
+    + '<div style="display:flex;flex-direction:column;gap:6px">' + rows + '</div>'
+    + '</div>';
 }
 function selectSolDay(i){activeSolDay=i;renderSolCalGrid();renderSolContent(i);renderSafetyTimer(i);}
 function renderSolContent(i){
@@ -974,8 +1113,11 @@ function renderSolContent(i){
     : '';
 
   let warningsHtml = '';
-  if (md.swellH >= 2.5 || md.swellPer >= 10) {
-      warningsHtml += `<div style="background:rgba(255,107,53,0.1); border:1px solid rgba(255,107,53,0.5); color:var(--warn); padding:8px 12px; border-radius:8px; margin-bottom:10px; font-size:12px; font-weight:bold; text-align:center;">⚠️ 파도 위험: 안전을 위해 갯바위 낚시 금지!</div>`;
+  const _swH = md.swellH||0, _swP = md.swellPer||0, _di = _swH*_swP;
+  if(_di >= 18 || _swH >= 2.5){
+    warningsHtml += `<div style="background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.5);color:var(--warn);padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:12px;font-weight:700;text-align:center">⚠️ 파도 위험 (위험지수 ${_di.toFixed(0)}) — 갯바위 낚시 금지!</div>`;
+  } else if(_di >= 12 || _swP >= 10){
+    warningsHtml += `<div style="background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.4);color:var(--gold);padding:8px 12px;border-radius:8px;margin-bottom:10px;font-size:12px;font-weight:700;text-align:center">⚡ 파도 주의 (위험지수 ${_di.toFixed(0)}) — 안전 확인 필요</div>`;
   }
   let presDrop = false;
   if (i > 0 && marineDays[i-1] && md.pressure) presDrop = Math.abs(md.pressure - marineDays[i-1].pressure) >= 3;
@@ -1316,18 +1458,59 @@ function renderMarineCalGrid(){
   marineDays.forEach((d,i) => {
     const on = i === activeMarineDay;
     const wc = d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';
-    const isRough = d.warn === 'rough';
-    html += `<div class="mar-cell ${d.isToday?'today':''} ${on?'on':''} ${isRough?'rough':''}" onclick="selectMarineDay(${i})">
+    const isRough = d.warn==='rough', isGood = d.warn==='good';
+    // 날씨 아이콘 — 조건 기반
+    let wIcon = d.condIcon || '🌤';
+    if(d.swellH >= 2.5) wIcon = '⛔';
+    else if(d.swellH >= 1.8) wIcon = '🌊';
+    else if(d.rain > 50) wIcon = '🌧';
+    else if(d.rain > 20) wIcon = '🌦';
+    else if(d.windKmh > 30) wIcon = '💨';
+    else if(isGood) wIcon = '⭐';
+    // 스웰 색상
+    const swCol = d.swellH >= 2.0?'var(--warn)': d.swellH >= 1.2?'var(--gold)':'var(--green)';
+    html += `<div class="mar-cell ${d.isToday?'today':''} ${on?'on':''} ${isRough?'rough':''} ${isGood&&!on?'good':''}" onclick="selectMarineDay(${i})">
       <div class="mc-day">${d.isToday?'TODAY':d.dayName.toUpperCase()}</div>
       <div class="mc-num" style="color:${on?'var(--accent)':wc}">${d.dayNum}</div>
-      <div class="mc-icon">${d.condIcon}</div>
-      <div class="mc-sw" style="color:${wc}">${d.swellH}m</div>
+      <div class="mc-icon">${wIcon}</div>
+      <div class="mc-sw" style="color:${swCol}">${d.swellH}m</div>
+      <div class="mc-wi">${d.windKmh}k</div>
     </div>`;
     if(i === 6) html += `<div style="grid-column:1/-1;height:1px;background:var(--border);margin:1px 0;opacity:.5"></div>`;
   });
   grid.innerHTML = html;
 }
-function selectMarineDay(i){activeMarineDay=i;renderMarineCalGrid();renderMarineDay(i);}
+function selectMarineDay(i){
+  activeMarineDay=i;
+  renderMarineCalGrid();
+  renderMarineDay(i);
+  // 에깅/어종탭 날짜 동기화
+  const d = marineDays[i];
+  if(d){
+    const isToday = i === 0;
+    const dayLabel = isToday ? '오늘' : (d.dayName || `${i}일 후`);
+    const dateStr = d.dateStr || '';
+    // 어종탭 뱃지
+    const badge = document.getElementById('species-date-badge');
+    const badgeLabel = document.getElementById('species-date-label');
+    if(badge && badgeLabel){
+      if(isToday){ badge.style.display='none'; }
+      else { badge.style.display='block'; badgeLabel.textContent=`${dayLabel} (${dateStr})`; }
+    }
+    // 어종탭 conditions bar도 선택된 날짜로 업데이트
+    const eid=id=>document.getElementById(id);
+    if(eid('cb-swell'))eid('cb-swell').textContent=d.swellH+'m';
+    if(eid('cb-dir'))eid('cb-dir').textContent=d.swellD||'—';
+    if(eid('cb-wind'))eid('cb-wind').textContent=d.windKmh+'km/h';
+    if(eid('cb-wdir'))eid('cb-wdir').textContent=d.windD||'—';
+    if(eid('cb-moon')){const md=solDays[i]?solDays[i].moon.pct+'%':'50%';eid('cb-moon').textContent=md;}
+    if(eid('cb-sst'))eid('cb-sst').textContent=d.sst!=null?d.sst+'°C':'—';
+    // 에깅탭 리렌더
+    try{ renderEgingTab(); }catch(e){}
+    // 어종 분석 리렌더
+    try{ renderSpScroll(); if(activeSpecies) renderSpResult(activeSpecies); }catch(e){}
+  }
+}
 function renderMarineDay(i){
   if(!marineDays[i]){document.getElementById('marine-content').innerHTML='<div class="err-msg">데이터 없음</div>';return;}
   const d=marineDays[i];
@@ -1356,9 +1539,28 @@ function renderMarineDay(i){
   }
   if(LOCS.length>0){const l=LOCS[activeIdx];const wl=eid('windy-link');if(wl)wl.href='https://www.windy.com/'+currentLayer+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+currentLayer+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}
   
+  // ─── 복합 위험도 계산 (스웰 높이 × 주기) ────────
+  // 위험 지수 = swellH × swellPer (높을수록 위험)
+  // 예: 1.5m × 14s = 21 (위험), 2.0m × 8s = 16 (보통), 1.0m × 12s = 12 (주의)
+  const swH = d.swellH || 0;
+  const swP = d.swellPer || 0;
+  const dangerIndex = swH * swP;
   let dangerBanner = '';
-  if((d.swellPer || 0) >= 10) {
-    dangerBanner = `<div class="danger-banner">⚠️ DANGER: KING WAVES (Swell Period ${d.swellPer}s) - 갯바위 접근 절대 주의!</div>`;
+  if(dangerIndex >= 25 || swH >= 3.0){
+    dangerBanner = `<div class="danger-banner" style="background:rgba(255,0,0,.15);border-color:rgba(255,0,0,.6)">
+      🚨 EXTREME DANGER — 갯바위 접근 절대 금지!
+      <div style="font-size:10px;font-weight:400;margin-top:3px;opacity:.85">스웰 ${swH}m × 주기 ${swP}s = 위험지수 ${dangerIndex.toFixed(0)} (기준 25+)</div>
+    </div>`;
+  } else if(dangerIndex >= 18 || swH >= 2.5){
+    dangerBanner = `<div class="danger-banner">
+      ⚠️ KING WAVES RISK — 갯바위 접근 위험!
+      <div style="font-size:10px;font-weight:400;margin-top:3px;opacity:.85">스웰 ${swH}m × 주기 ${swP}s = 위험지수 ${dangerIndex.toFixed(0)} (기준 18+) · 외해 노출 지점 자제</div>
+    </div>`;
+  } else if(dangerIndex >= 12 || swP >= 10){
+    dangerBanner = `<div class="danger-banner" style="background:rgba(245,166,35,.12);border-color:rgba(245,166,35,.5);color:var(--gold)">
+      ⚡ 파도 주의 — 갯바위 안전 확인 필요
+      <div style="font-size:10px;font-weight:400;margin-top:3px;opacity:.85">스웰 ${swH}m × 주기 ${swP}s = 위험지수 ${dangerIndex.toFixed(0)} · 주기 ${swP}s 장주기 파도</div>
+    </div>`;
   }
 
   document.getElementById('marine-content').innerHTML=`
@@ -1600,7 +1802,7 @@ function renderSafetyTimer(dayIdx) {
 
 // ─── V3.4: 에기 로테이션 가이드 ──────────────────
 function genEgiRotation() {
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const sst = t ? t.sst : null;
   const sw = t ? t.swellH : 1.0;
   const rain = t ? t.rain : 0;
@@ -1665,7 +1867,7 @@ function genEgiRotation() {
 function renderSeasonAlert(){
   const box = document.getElementById('season-alert-box');
   if(!box) return;
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const sst = t ? t.sst : null;
   const blended = getBlendedForDay(0);
   const solScore = blended.score;
@@ -1704,7 +1906,7 @@ function renderSeasonAlert(){
 
 // ─── V3.5: 조황 공유 텍스트 생성기 ──────────────
 function genShareText(){
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const loc = LOCS.length > 0 ? LOCS[activeIdx] : null;
   const locName = loc ? loc.name : '—';
   const d = solDays[0];
@@ -1770,7 +1972,7 @@ async function copyShareText(){
 
 // ─── V3.6: 에깅 전용 탭 렌더 ────────────────────
 function renderEgingTab(){
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const sst = t ? t.sst : null;
   const sw = t ? t.swellH : 0;
   const wi = t ? t.windKmh : 0;
@@ -1783,6 +1985,21 @@ function renderEgingTab(){
   const isNight = h >= 18 || h < 6;
   const isDusk = (h >= 16 && h < 18) || (h >= 6 && h < 8);
   const isRough = sw > 1.8 || rain > 40;
+
+  // ─── 날짜 헤더 업데이트 ──────────────────────────
+  const dateSub = document.getElementById('egi-date-sub');
+  if(dateSub && t){
+    const isToday = activeMarineDay === 0;
+    const dayLabel = isToday ? '오늘' : t.dayName || `${activeMarineDay}일 후`;
+    const dateStr = t.dateStr || '';
+    if(isToday){
+      dateSub.innerHTML = `오늘 조건 기반 실시간 에깅 전략 · WillyWeather + Open-Meteo`;
+      dateSub.style.color = '';
+    } else {
+      dateSub.innerHTML = `📅 <strong style="color:var(--gold)">${dayLabel} (${dateStr})</strong> 조건 기반 · 마린탭에서 날짜 변경 가능`;
+      dateSub.style.color = 'var(--gold)';
+    }
+  }
 
   // 세션 타이머
   renderEgiSessionTimer();
@@ -1959,7 +2176,7 @@ function renderPointCompare(){
     el.innerHTML = `<div class="egi-section"><div class="egi-sec-title">📍 포인트 비교</div><div style="font-size:11px;color:var(--muted)">포인트를 2개 이상 저장하면 조건 비교가 가능해.</div></div>`;
     return;
   }
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const sw = t ? t.swellH : 1.5;
   const wi = t ? t.windKmh : 20;
   const wd = t ? t.windD : 'NE';
@@ -2004,7 +2221,7 @@ function renderPointCompare(){
 function renderWindPointRec(){
   const el = document.getElementById('wind-point-rec');
   if(!el) return;
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t){ el.innerHTML=''; return; }
   const wd = t.windD, wi = t.windKmh;
   const wdDeg = dirToDeg(wd);
@@ -2049,7 +2266,7 @@ let _egiTimerInterval = null;
 function renderEgiSessionTimer(){
   const el = document.getElementById('egi-session-timer');
   if(!el) return;
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t){ el.innerHTML=''; return; }
 
   // 들물 시작 = 가장 가까운 간조 이후 시간
@@ -2161,7 +2378,7 @@ function renderEgiSessionTimer(){
 function renderEgiCastGuide(){
   const el = document.getElementById('egi-cast-guide');
   if(!el) return;
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t){ el.innerHTML=''; return; }
 
   const wd = t.windD || 'NE';
@@ -2283,7 +2500,7 @@ const EGI_POINT_TYPES = [
 function renderEgiPointTypes(){
   const el = document.getElementById('egi-point-types');
   if(!el) return;
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   const sst = t ? t.sst : null;
   const sw = t ? t.swellH : 1.0;
   const h = new Date().getHours();
@@ -2327,7 +2544,7 @@ function togglePtItem(el){
 
 // ─── 에기 계산기 자동입력 ────────────────────────
 function autoFillEgiCalc(){
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t){ alert('포인트를 먼저 선택해줘'); return; }
   const nh = t.tides.find(x=>x.type==='high');
   const nl = t.tides.find(x=>x.type==='low');
@@ -2475,7 +2692,7 @@ function getBlendedForDay(i) {
 function clearBlendedCache() { blendedCache = {}; }
 
 function spScore(id){
-  const t=marineDays[0];if(!t)return 70;
+  const t=marineDays[activeMarineDay]||marineDays[0];if(!t)return 70;
   const sw=t.swellH;
   const nh=t.tides.find(x=>x.type==='high');
   const nl=t.tides.find(x=>x.type==='low');
@@ -2506,7 +2723,7 @@ function setGenre(g, btn){
 
 // ─── V3.2: RECOMMENDATION ENGINE ─────────────────
 function getRecommendedId(){
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t) return null;
   const sw = t.swellH, sst = t.sst;
   // 스웰 1.5~2.0m & 수온 탁함(스웰>1.5) → 드러머
@@ -2521,7 +2738,7 @@ function getRecommendedId(){
   return 'drummer';
 }
 function getRecMessage(id){
-  const t = marineDays[0];
+  const t = marineDays[activeMarineDay] || marineDays[0];
   if(!t) return null;
   const sw = t.swellH, sst = t.sst;
   const msgs = {
@@ -2543,7 +2760,7 @@ function renderSpScroll(){
   const msgBox = document.getElementById('rec-msg-box');
   if(msgBox){
     const recMsg = getRecMessage(recId);
-    if(recMsg && marineDays[0]){
+    if(recMsg && (marineDays[activeMarineDay]||marineDays[0])){
       msgBox.innerHTML = `<div class="rec-msg">🏆 <strong>오늘의 추천:</strong> ${recMsg}</div>`;
     } else {
       msgBox.innerHTML = '';
@@ -2552,7 +2769,7 @@ function renderSpScroll(){
 
   document.getElementById('sp-scroll').innerHTML = filtered.map(s=>{
     const sc = spScore(s.id);
-    const isRec = s.id === recId && marineDays[0];
+    const isRec = s.id === recId && (marineDays[activeMarineDay]||marineDays[0]);
     return `<div class="sp-btn ${s.id===activeSpecies?'on':''} ${isRec?'recommended':''}" onclick="selectSp('${s.id}')">
       <div class="sp-score-badge" style="background:${s.col};color:#000">${sc}</div>
       <div class="sp-emoji">${s.emoji}</div>
@@ -2563,7 +2780,7 @@ function renderSpScroll(){
 }
 function selectSp(id){activeSpecies=id;renderSpScroll();renderSpResult(id);}
 function genAnalysis(id){
-  const t=marineDays[0];if(!t)return'포인트를 추가하면 WillyWeather 실제 조건 분석이 시작돼.';
+  const t=marineDays[activeMarineDay]||marineDays[0];if(!t)return'포인트를 추가하면 WillyWeather 실제 조건 분석이 시작돼.';
   const sw=t.swellH,wi=t.windKmh,sst=t.sst,rain=t.rain,pres=t.pressure,sd=t.swellD,wd=t.windD;
   const sol=solDays[0] ? solDays[0].sol : {s:40};
   const moon=solDays[0] ? solDays[0].moon : {n:'', pct:50};
@@ -2601,7 +2818,7 @@ function renderSpResult(id){
   const dangerHtml=`<div class="rb-sec"><div class="rb-stitle">⚠️ 공략 위험도</div><div class="danger-level"><div style="flex-shrink:0;font-size:11px;font-weight:700;color:${dl.col};min-width:70px">${dl.label}</div><div class="dl-bar"><div class="${dl.cls}"></div></div></div><div style="font-size:11px;color:var(--muted);line-height:1.6;padding:0 2px">${dl.desc}</div></div>`;
 
   // ─── SST 수온 적합도 미터 (null 대응) ────────────
-  const curSst=(marineDays[0]||{}).sst;
+  const curSst=(marineDays[activeMarineDay]||marineDays[0]||{}).sst;
   const optMin=s.sstOptMin,optMax=s.sstOptMax;
   let sstHtml='';
   if(curSst!=null){
@@ -2682,7 +2899,42 @@ function initMap(){
   _el.addEventListener('touchend',()=>clearTimeout(_lp),{passive:true});
   _el.addEventListener('touchmove',()=>clearTimeout(_lp),{passive:true});
 }
-function renderMapMarkers(){if(!mapL)return;mapMarkers.forEach(m=>m.remove());mapMarkers=[];LOCS.forEach((loc,i)=>{const m=L.marker([loc.lat,loc.lng],{icon:makeIcon(loc.color)}).addTo(mapL).bindPopup(`<b>${loc.name}</b><br><small style="color:#888">${loc.note}</small>`).on('click',()=>selectLoc(i));if(i===activeIdx)m.openPopup();mapMarkers.push(m);});}
+function renderMapMarkers(){
+  if(!mapL) return;
+  mapMarkers.forEach(m=>m.remove()); mapMarkers=[];
+
+  // 조류 방향 오버레이 (현재 포인트 기준)
+  const d = marineDays[0];
+  if(d && d.windD && LOCS[activeIdx]){
+    const l = LOCS[activeIdx];
+    const dirMap={'N':0,'NNE':22.5,'NE':45,'ENE':67.5,'E':90,'ESE':112.5,'SE':135,'SSE':157.5,'S':180,'SSW':202.5,'SW':225,'WSW':247.5,'W':270,'WNW':292.5,'NW':315,'NNW':337.5};
+    const wAngle = dirMap[d.windD] || 0;
+    const swAngle = dirMap[d.swellD||d.windD] || 0;
+    // 바람 화살표
+    const windSvg=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="-18 -18 36 36"><polygon points="0,-14 4,6 0,2 -4,6" fill="rgba(0,212,255,.85)" stroke="white" stroke-width=".8" transform="rotate(${wAngle})"/><circle r="3" fill="rgba(0,212,255,.9)"/></svg>`;
+    const windIcon=L.divIcon({html:windSvg,iconSize:[36,36],iconAnchor:[18,18],className:''});
+    const wm=L.marker([l.lat+0.008,l.lng-0.008],{icon:windIcon,interactive:false}).addTo(mapL);
+    wm.bindTooltip(`💨 바람 ${d.windKmh}km/h ${d.windD}`,{permanent:false,className:'leaf-tip'});
+    mapMarkers.push(wm);
+    // 스웰 화살표
+    const swellSvg=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="-18 -18 36 36"><polygon points="0,-14 4,6 0,2 -4,6" fill="rgba(0,230,118,.85)" stroke="white" stroke-width=".8" transform="rotate(${swAngle})"/><circle r="3" fill="rgba(0,230,118,.9)"/></svg>`;
+    const swellIcon=L.divIcon({html:swellSvg,iconSize:[36,36],iconAnchor:[18,18],className:''});
+    const sm=L.marker([l.lat+0.008,l.lng+0.008],{icon:swellIcon,interactive:false}).addTo(mapL);
+    sm.bindTooltip(`🌊 스웰 ${d.swellH}m ${d.swellD||''}`,{permanent:false,className:'leaf-tip'});
+    mapMarkers.push(sm);
+  }
+
+  // 포인트 마커 (태그 팝업 포함)
+  LOCS.forEach((loc,i)=>{
+    const tagHtml = (loc.tags&&loc.tags.length) ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px">${loc.tags.map(t=>`<span style="font-size:10px;background:#e8f4ff;color:#0077cc;border-radius:8px;padding:1px 6px">${TAG_LABELS[t]||t}</span>`).join('')}</div>` : '';
+    const m=L.marker([loc.lat,loc.lng],{icon:makeIcon(loc.color)})
+      .addTo(mapL)
+      .bindPopup(`<b style="font-size:13px">${loc.name}</b>${loc.note?`<br><small style="color:#888">${loc.note}</small>`:''}${tagHtml}`)
+      .on('click',()=>selectLoc(i));
+    if(i===activeIdx) m.openPopup();
+    mapMarkers.push(m);
+  });
+}
 function setLayer(key,btn){document.querySelectorAll('.lbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');currentLayer=key;if(LOCS.length>0){const l=LOCS[activeIdx];const wl=document.getElementById('windy-link');if(wl)wl.href='https://www.windy.com/'+key+'/'+l.lat.toFixed(3)+'/'+l.lng.toFixed(3)+'?'+key+','+l.lat.toFixed(3)+','+l.lng.toFixed(3)+',10';}}
 function openPicker(){
   document.getElementById('picker-overlay').classList.add('on');
@@ -2706,13 +2958,192 @@ function confirmPick(){if(!pickedLL)return;document.getElementById('m-lat').valu
 
 // ─── LOCATIONS ────────────────────────────────────
 function renderFavs(){const row=document.getElementById('fav-row');if(!row)return;row.innerHTML=LOCS.map((l,i)=>`<div class="fc ${i===activeIdx?'on':''}" onclick="selectLoc(${i})"><div class="fc-dot" style="background:${l.color}"></div><div><div class="fc-name">${l.name}</div><div class="fc-dist">${distStr(l.lat,l.lng)}</div></div></div>`).join('')+`<div class="fc fc-add" onclick="openModal()">＋ Add</div>`;}
-function renderSavedList(){const el=document.getElementById('saved-list');if(!el)return;if(!LOCS.length){el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">저장된 포인트 없음</div>';return;}el.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">저장된 포인트 (${LOCS.length}곳)</div>`+LOCS.map((l,i)=>`<div class="saved-item ${i===activeIdx?'active':''}" onclick="selectLoc(${i});closeModal()"><div style="width:9px;height:9px;border-radius:50%;background:${l.color};flex-shrink:0"></div><div style="flex:1"><div style="font-size:12px;font-weight:600">${l.name}</div><div style="font-size:10px;color:var(--muted)">${l.note} · ${distStr(l.lat,l.lng)}</div></div>${i===activeIdx?'<span style="font-size:9px;color:var(--accent)">active</span>':''}<span onclick="event.stopPropagation();deleteLoc(${i})" style="font-size:12px;color:var(--warn);padding:2px 6px;cursor:pointer">✕</span></div>`).join('');}
-function selectLoc(idx){activeIdx=idx;const l=LOCS[idx];document.getElementById('tb-name').textContent=l.name;document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';renderFavs();if(mapL){mapL.setView([l.lat,l.lng],11);renderMapMarkers();}loadWeather(l.name);}
+function renderSavedList(){
+  const el=document.getElementById('saved-list');
+  if(!el)return;
+  if(!LOCS.length){
+    el.innerHTML='<div style="font-size:12px;color:var(--muted);text-align:center;padding:10px">저장된 포인트 없음</div>';
+    return;
+  }
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);margin-bottom:6px;letter-spacing:1px;text-transform:uppercase">저장된 포인트 (${LOCS.length}곳)</div>`+
+  LOCS.map((l,i)=>{
+    const tagHtml = (l.tags&&l.tags.length) ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${l.tags.map(t=>`<span style="font-size:9px;background:rgba(0,212,255,.1);color:var(--accent);border:1px solid rgba(0,212,255,.25);border-radius:10px;padding:2px 7px">${TAG_LABELS[t]||t}</span>`).join('')}</div>` : '';
+    return `<div class="saved-item ${i===activeIdx?'active':''}" onclick="selectLoc(${i});closeModal()">
+      <div style="width:9px;height:9px;border-radius:50%;background:${l.color};flex-shrink:0;margin-top:2px"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.name}</div>
+        <div style="font-size:10px;color:var(--muted)">${l.note?l.note+' · ':''}${distStr(l.lat,l.lng)}</div>
+        ${tagHtml}
+      </div>
+      ${i===activeIdx?'<span style="font-size:9px;color:var(--accent);flex-shrink:0">active</span>':''}
+      <span onclick="event.stopPropagation();editLoc(${i})" style="font-size:13px;color:var(--accent);padding:3px 7px;cursor:pointer;flex-shrink:0" title="수정">✏️</span>
+      <span onclick="event.stopPropagation();deleteLoc(${i})" style="font-size:12px;color:var(--warn);padding:3px 6px;cursor:pointer;flex-shrink:0" title="삭제">✕</span>
+    </div>`;
+  }).join('');
+}
+
+function editLoc(i){
+  const l = LOCS[i];
+  if(!l) return;
+  document.getElementById('m-name').value = l.name;
+  document.getElementById('m-note').value = l.note || '';
+  document.getElementById('m-lat').value = l.lat;
+  document.getElementById('m-lng').value = l.lng;
+  document.getElementById('m-edit-idx').value = i;
+  showSel(l.name, l.lat.toFixed(4)+'°S · '+l.lng.toFixed(4)+'°E');
+  document.querySelectorAll('.cp').forEach(el=>{
+    el.classList.toggle('on', el.dataset.c===l.color);
+  });
+  selColor = l.color;
+  setTagPicker(l.tags || []);
+  document.getElementById('modal-form-title').textContent = '✏️ 포인트 수정';
+  document.getElementById('modal-save-btn').textContent = '수정 저장';
+  document.getElementById('modal-cancel-edit-btn').style.display = 'block';
+  document.querySelector('.modal-body').scrollTo({top:0,behavior:'smooth'});
+}
+
+function cancelEdit(){
+  document.getElementById('m-edit-idx').value = '-1';
+  document.getElementById('modal-form-title').textContent = '➕ 새 포인트 추가';
+  document.getElementById('modal-save-btn').textContent = '저장하기';
+  document.getElementById('modal-cancel-edit-btn').style.display = 'none';
+  closeModal();
+  openModal();
+}
+function selectLoc(idx){
+  activeIdx=idx;
+  const l=LOCS[idx];
+  document.getElementById('tb-name').textContent=l.name;
+  document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
+  renderFavs();
+  if(mapL){mapL.setView([l.lat,l.lng],11);renderMapMarkers();}
+  loadWeather(l.name);
+  // 맵 포인트 카드 업데이트
+  updateMapCard(l);
+}
+
+function updateMapCard(l){
+  const card = document.getElementById('map-point-card');
+  if(!card) return;
+  card.style.display = 'block';
+  document.getElementById('map-card-name').textContent = l.name;
+  document.getElementById('map-card-coords').textContent = l.lat.toFixed(4)+'°S · '+l.lng.toFixed(4)+'°E';
+
+  const d = marineDays[0];
+  if(d){
+    const sc = d.warn==='good'?'var(--green)':d.warn==='rough'?'var(--warn)':'var(--gold)';
+    document.getElementById('mc-swell').textContent = d.swellH+'m';
+    document.getElementById('mc-swell').style.color = sc;
+    document.getElementById('mc-wind').textContent = d.windKmh+'km/h';
+    document.getElementById('mc-sst').textContent = d.sst!=null?d.sst+'°C':'—';
+    document.getElementById('mc-pres').textContent = d.pressure?d.pressure+'hPa':'—';
+    const nt = d.tides&&d.tides[0]?`${d.tides[0].type==='high'?'↑':'↓'} ${d.tides[0].height}m`:'—';
+    document.getElementById('mc-tide').textContent = nt;
+
+    // ─── 조황 예보 요약 카드 ──────────────────────
+    const sw = d.swellH, wi = d.windKmh, rain = d.rain||0;
+    let fcIcon, fcColor, fcTitle, fcMsg;
+    if(sw <= 1.0 && wi <= 15 && rain < 20){
+      fcIcon='🟢'; fcColor='var(--green)'; fcTitle='출조 강추';
+      fcMsg=`스웰 ${sw}m · 바람 ${wi}km/h — 최상의 조건. 지금 나가!`;
+    } else if(sw <= 1.5 && wi <= 25 && rain < 40){
+      fcIcon='🟡'; fcColor='var(--gold)'; fcTitle='출조 가능';
+      fcMsg=`스웰 ${sw}m · 바람 ${wi}km/h — 무난한 조건. ${sw>1.2?'파도 주의.':''}`;
+    } else if(sw <= 2.5){
+      fcIcon='🟠'; fcColor='#ff8c00'; fcTitle='조건 보통';
+      fcMsg=`스웰 ${sw}m — 만 안쪽 포인트 추천. 외해는 자제.`;
+    } else {
+      fcIcon='🔴'; fcColor='var(--warn)'; fcTitle='출조 비추천';
+      fcMsg=`스웰 ${sw}m · 파도 강함 — 안전 최우선. 다음 기회 노려.`;
+    }
+    const fsEl = document.getElementById('map-forecast-summary');
+    fsEl.style.display='block';
+    fsEl.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${fcColor}12;border:1px solid ${fcColor}44;border-radius:9px">
+      <div style="font-size:20px;flex-shrink:0">${fcIcon}</div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:${fcColor}">${fcTitle}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${fcMsg}</div>
+      </div>
+    </div>`;
+
+    // ─── 골든타임 (일출/일몰) ─────────────────────
+    const sr = d.sunrise, ss = d.sunset;
+    if(sr && ss){
+      const gtEl = document.getElementById('map-golden-time');
+      gtEl.style.display='block';
+      // 일출 ±45분, 일몰 ±45분 골든타임
+      const srParts = sr.split(':'), ssParts = ss.split(':');
+      const srMin = parseInt(srParts[0])*60+parseInt(srParts[1]);
+      const ssMin = parseInt(ssParts[0])*60+parseInt(ssParts[1]);
+      const fmt = m => `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+      const now = new Date(); const nowMin = now.getHours()*60+now.getMinutes();
+      const inSrGold = nowMin >= srMin-45 && nowMin <= srMin+45;
+      const inSsGold = nowMin >= ssMin-45 && nowMin <= ssMin+45;
+      const activeGold = inSrGold || inSsGold;
+      gtEl.innerHTML=`<div style="display:flex;gap:6px">
+        <div style="flex:1;text-align:center;padding:7px 6px;background:${inSrGold?'rgba(245,166,35,.2)':'var(--bg3)'};border:1px solid ${inSrGold?'rgba(245,166,35,.5)':'var(--border)'};border-radius:9px">
+          <div style="font-size:16px">🌅</div>
+          <div style="font-size:9px;color:var(--muted);margin:2px 0">일출 골든타임</div>
+          <div style="font-size:11px;font-weight:700;color:${inSrGold?'var(--gold)':'var(--text)'}">${fmt(srMin-45)} ~ ${fmt(srMin+45)}</div>
+          ${inSrGold?'<div style="font-size:9px;color:var(--gold);font-weight:700">⭐ 지금 황금 시간!</div>':''}
+        </div>
+        <div style="flex:1;text-align:center;padding:7px 6px;background:${inSsGold?'rgba(245,166,35,.2)':'var(--bg3)'};border:1px solid ${inSsGold?'rgba(245,166,35,.5)':'var(--border)'};border-radius:9px">
+          <div style="font-size:16px">🌇</div>
+          <div style="font-size:9px;color:var(--muted);margin:2px 0">일몰 골든타임</div>
+          <div style="font-size:11px;font-weight:700;color:${inSsGold?'var(--gold)':'var(--text)'}">${fmt(ssMin-45)} ~ ${fmt(ssMin+45)}</div>
+          ${inSsGold?'<div style="font-size:9px;color:var(--gold);font-weight:700">⭐ 지금 황금 시간!</div>':''}
+        </div>
+      </div>`;
+    }
+
+    // lb 값 동기화
+    const eid=id=>document.getElementById(id);
+    if(eid('lb-swell'))eid('lb-swell').textContent=d.swellH+'m';
+    if(eid('lb-wind'))eid('lb-wind').textContent=d.windKmh+'km/h';
+    if(eid('lb-sst'))eid('lb-sst').textContent=d.sst!=null?d.sst+'°C':'—';
+    if(eid('lb-pres'))eid('lb-pres').textContent=d.pressure+'hPa';
+    if(d.tides[0]&&eid('lb-tide'))eid('lb-tide').textContent=`${String(d.tides[0].h).padStart(2,'0')}:${String(d.tides[0].m||0).padStart(2,'0')}`;
+  }
+
+  // ─── 메모 표시 ────────────────────────────────
+  const noteEl = document.getElementById('map-card-note');
+  if(l.note){ noteEl.textContent='📝 '+l.note; noteEl.style.display='block'; }
+  else { noteEl.style.display='none'; }
+
+  // ─── 어종 태그 표시 ───────────────────────────
+  const tagEl = document.getElementById('map-species-tags');
+  if(l.tags && l.tags.length){
+    tagEl.style.display='flex';
+    tagEl.style.flexWrap='wrap';
+    tagEl.style.gap='5px';
+    tagEl.innerHTML = l.tags.map(t=>`<span onclick="showTab('species',document.querySelector('[onclick*=tab-species]'));setTimeout(()=>selectSp('${t}'),200)" style="font-size:10px;background:rgba(176,106,255,.15);color:var(--purple);border:1px solid rgba(176,106,255,.3);border-radius:10px;padding:3px 9px;cursor:pointer;font-weight:600">${TAG_LABELS[t]||t}</span>`).join('');
+  } else { tagEl.style.display='none'; }
+}
 function deleteLoc(idx){LOCS.splice(idx,1);saveLocs();if(activeIdx>=LOCS.length)activeIdx=Math.max(0,LOCS.length-1);if(LOCS.length>0)selectLoc(activeIdx);else{document.getElementById('tb-name').textContent='포인트 없음';document.getElementById('tb-sub').textContent='+ 버튼으로 포인트 추가';renderFavs();}renderSavedList();}
 
 // ─── MODAL ────────────────────────────────────────
-function openModal(){renderSavedList();document.getElementById('modal').classList.add('on');}
-function closeModal(){document.getElementById('modal').classList.remove('on');document.getElementById('sdrop').style.display='none';document.getElementById('sel-prev').style.display='none';document.getElementById('direct-input').style.display='none';['m-search','m-name','m-note','m-lat','m-lng','m-lat-d','m-lng-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function openModal(){
+  renderSavedList();
+  // 어종 태그 칩 JS 렌더링
+  const picker = document.getElementById('species-tag-picker');
+  if(picker && !picker.children.length){
+    const tagList = [['kingfish','🐠 Kingfish'],['snapper','🔴 Snapper'],['bream','⚪ Bream'],['flathead','🟤 Flathead'],['drummer','⚫ Drummer'],['luderick','🎣 Luderick'],['trevally','💛 Trevally'],['mulloway','🌙 Mulloway'],['squid','🦑 에깅'],['longtail_tuna','🐟 Longtail'],['aus_salmon','🐟 Salmon'],['tailor','⚡ Tailor']];
+    picker.innerHTML = tagList.map(([id,label])=>`<div class="sp-tag-chip" data-id="${id}" onclick="toggleSpTag(this)" style="padding:5px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg3);color:var(--muted);transition:.15s">${label}</div>`).join('');
+  }
+  setTagPicker([]);
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){
+  document.getElementById('modal').classList.remove('on');
+  document.getElementById('sdrop').style.display='none';
+  document.getElementById('sel-prev').style.display='none';
+  document.getElementById('direct-input').style.display='none';
+  ['m-search','m-name','m-note','m-lat','m-lng','m-lat-d','m-lng-d'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('m-edit-idx').value='-1';
+  document.getElementById('modal-form-title').textContent='➕ 새 포인트 추가';
+  document.getElementById('modal-save-btn').textContent='저장하기';
+  document.getElementById('modal-cancel-edit-btn').style.display='none'; setTagPicker([]);
+}
 function showSel(name,coords){document.getElementById('prev-name').textContent=name;document.getElementById('prev-coords').textContent=coords;document.getElementById('sel-prev').style.display='block';}
 function clearSel(){document.getElementById('sel-prev').style.display='none';['m-lat','m-lng','m-search'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 function pickColor(el){document.querySelectorAll('.cp').forEach(c=>c.classList.remove('on'));el.classList.add('on');selColor=el.dataset.c;}
@@ -2723,10 +3154,27 @@ function saveLoc(){
   const name=document.getElementById('m-name').value.trim();
   const lat=parseFloat(document.getElementById('m-lat').value);
   const lng=parseFloat(document.getElementById('m-lng').value);
-  const note=document.getElementById('m-note').value.trim()||'Custom spot';
+  const note=document.getElementById('m-note').value.trim()||'';
+  const tags=[...selTags];
+  const editIdx=parseInt(document.getElementById('m-edit-idx').value);
   if(!name){alert('포인트 이름을 입력해줘!');return;}
   if(isNaN(lat)||isNaN(lng)){alert('위치를 선택해줘! (검색, GPS, 지도, 좌표 직접 입력)');return;}
-  LOCS.push({name,lat,lng,color:selColor,note});saveLocs();closeModal();selectLoc(LOCS.length-1);renderFavs();
+  if(editIdx>=0 && editIdx<LOCS.length){
+    // 수정 모드
+    LOCS[editIdx]={name,lat,lng,color:selColor,note,tags};
+    saveLocs();
+    selectLoc(editIdx);
+    renderFavs();
+    closeModal();
+    openModal();
+  } else {
+    // 신규 추가
+    LOCS.push({name,lat,lng,color:selColor,note,tags});
+    saveLocs();
+    closeModal();
+    selectLoc(LOCS.length-1);
+    renderFavs();
+  }
 }
 
 // ─── SEARCH ──────────────────────────────────────
