@@ -4,7 +4,7 @@
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Scott's Marine Insight V3.9.1</title>
+<title>Scott's Marine Insight V4.1</title>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -29,11 +29,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.5)}50%{box-shadow:0 0 0 5px rgba(0,212,255,0)}}
 .ib{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:14px}
 .ib.hi{border-color:var(--accent);color:var(--accent)}
-.bnav{display:flex;background:rgba(7,13,24,.98);border-top:1px solid var(--border);flex-shrink:0}
-.ni{flex:1;padding:9px 2px 14px;display:flex;flex-direction:column;align-items:center;gap:3px;border:none;background:none;color:var(--muted);cursor:pointer;font-family:inherit}
+.bnav{display:flex;background:rgba(7,13,24,.98);border-top:1px solid var(--border);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.bnav::-webkit-scrollbar{display:none}
+.ni{flex:1;min-width:44px;padding:7px 1px 11px;display:flex;flex-direction:column;align-items:center;gap:2px;border:none;background:none;color:var(--muted);cursor:pointer;font-family:inherit}
 .ni.on{color:var(--accent)}
-.ni-icon{font-size:17px}
-.ni-lbl{font-size:9px;font-weight:500;letter-spacing:.4px;text-transform:uppercase}
+.ni-icon{font-size:16px}
+.ni-lbl{font-size:8px;font-weight:500;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
 .stitle{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin:12px 0 7px}
 .stitle:first-child{margin-top:4px}
 .pill{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-weight:700;margin-left:4px}
@@ -457,7 +458,38 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
   letter-spacing: 0.5px;
 }
 
-/* DPI specific styles */
+/* ─── V4.1 NEW STYLES ─────────────────────────────── */
+/* 조황 로그 */
+.log-entry{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px;position:relative}
+.log-entry-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.log-date{font-size:11px;font-weight:700;color:var(--accent)}
+.log-score{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1}
+.log-conditions{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:7px}
+.log-cond-item{background:var(--bg3);border-radius:7px;padding:5px 6px;text-align:center}
+.log-cond-lbl{font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.log-cond-val{font-size:11px;font-weight:700;margin-top:1px}
+.log-note{font-size:11px;color:var(--muted);line-height:1.6;padding:7px 9px;background:var(--bg3);border-radius:8px;margin-bottom:6px}
+.log-species-tags{display:flex;flex-wrap:wrap;gap:4px}
+.log-del{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--warn);font-size:12px;cursor:pointer;padding:2px 6px}
+.log-empty{text-align:center;padding:30px 20px;color:var(--muted);font-size:13px}
+.log-form{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.log-form-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:10px}
+.log-input{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;font-family:inherit;width:100%;outline:none;margin-bottom:8px}
+.log-input:focus{border-color:var(--accent)}
+.log-save-btn{width:100%;padding:11px;border-radius:9px;background:rgba(0,212,255,.12);border:1px solid rgba(0,212,255,.3);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
+/* 지깅 계산기 */
+.jig-calc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.jig-calc-title{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px;font-weight:700}
+.jig-result{background:var(--bg3);border:1px solid rgba(245,166,35,.3);border-radius:10px;padding:12px 13px;display:none;margin-top:8px}
+.jig-result.on{display:block}
+/* 파핑 스코어 */
+.pop-score-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:10px}
+.pop-score-big{font-family:'Bebas Neue',sans-serif;font-size:52px;line-height:1;margin-bottom:4px}
+/* 조황 공유 템플릿 선택 */
+.share-tmpl-row{display:flex;gap:7px;margin-bottom:12px}
+.share-tmpl-btn{flex:1;padding:9px 4px;border-radius:10px;border:1px solid var(--border);background:var(--card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;text-align:center;transition:all .2s}
+.share-tmpl-btn.on{border-color:var(--accent);background:rgba(0,212,255,.1);color:var(--accent)}
+/* ─── END V4.1 ─────────────────────────────────────── */
 .dpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding-bottom:20px}
 .dpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .dpi-img{width:100%;height:80px;object-fit:cover;border-bottom:1px solid var(--border);background:#111f33}
@@ -689,7 +721,100 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <div id="wind-point-rec"></div>
     </div>
 
-  </div>
+    <!-- 조황 로그 탭 -->
+    <div class="tab" id="tab-log">
+      <div class="stitle">📓 조황 로그 <span class="pill pill-u">로컬 저장</span></div>
+
+      <!-- 새 기록 추가 폼 -->
+      <div class="log-form">
+        <div class="log-form-title">+ 오늘 조황 기록 추가</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">날짜</div>
+            <input class="log-input" id="log-date" type="date" style="margin-bottom:0">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">포인트</div>
+            <input class="log-input" id="log-spot" placeholder="예: Kiama" style="margin-bottom:0">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:8px">
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">스웰</div>
+            <input class="log-input" id="log-swell" placeholder="1.2m" style="margin-bottom:0">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">어종</div>
+            <input class="log-input" id="log-species" placeholder="Drummer" style="margin-bottom:0">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">조과</div>
+            <select class="log-input" id="log-result" style="margin-bottom:0">
+              <option value="great">🔥 대박</option>
+              <option value="good">✅ 좋음</option>
+              <option value="ok">🔵 평범</option>
+              <option value="bad">😔 꽝</option>
+            </select>
+          </div>
+        </div>
+        <textarea class="log-input" id="log-note" placeholder="메모: 미끼, 채비, 특이사항..." rows="2" style="resize:none;margin-bottom:8px"></textarea>
+        <button class="log-save-btn" onclick="saveLogEntry()">📓 기록 저장</button>
+      </div>
+
+      <!-- 로그 리스트 -->
+      <div id="log-list"></div>
+
+      <!-- 지깅 무게 계산기 -->
+      <div class="stitle" style="margin-top:6px">⚡ 지깅 전용 지그 무게 계산기</div>
+      <div class="jig-calc">
+        <div class="jig-calc-title">⚡ 지깅 지그 무게 계산기</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">수심 (m)</div>
+            <input class="log-input" id="jig-depth" type="number" placeholder="30" min="5" max="150" style="margin-bottom:0">
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">조류 강도</div>
+            <select class="log-input" id="jig-current" style="margin-bottom:0">
+              <option value="weak">약 (조차 &lt;0.8m)</option>
+              <option value="normal" selected>보통 (0.8–1.5m)</option>
+              <option value="strong">강 (1.5m+)</option>
+              <option value="extreme">매우 강 (조차 2m+)</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">지깅 타입</div>
+            <select class="log-input" id="jig-type" style="margin-bottom:0">
+              <option value="slow">슬로우 피치</option>
+              <option value="speed" selected>스피드 지깅</option>
+              <option value="super_slow">슈퍼슬로우</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">타겟 어종</div>
+            <select class="log-input" id="jig-target" style="margin-bottom:0">
+              <option value="kingfish">Kingfish</option>
+              <option value="snapper">Snapper</option>
+              <option value="tuna">Tuna</option>
+              <option value="general">일반</option>
+            </select>
+          </div>
+        </div>
+        <button style="width:100%;padding:11px;border-radius:9px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.35);color:var(--gold);font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:2px" onclick="calcJig()">⚡ 지그 무게 계산</button>
+        <div class="jig-result" id="jig-result"></div>
+      </div>
+
+      <!-- 파핑 조건 스코어 -->
+      <div class="stitle">🌊 파핑 조건 스코어</div>
+      <div class="pop-score-card" id="pop-score-card">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">오늘 파핑 조건 분석</div>
+        <div id="pop-score-content"><div style="font-size:11px;color:var(--muted)">포인트를 추가하면 파핑 조건이 표시돼</div></div>
+      </div>
+    </div>
+
+  </div><!-- end .content -->
   <nav class="bnav">
     <button class="ni on" onclick="showTab('solunar',this)"><span class="ni-icon">🎯</span><span class="ni-lbl">Solunar</span></button>
     <button class="ni" onclick="showTab('marine',this)"><span class="ni-icon">🌊</span><span class="ni-lbl">Marine</span></button>
@@ -697,6 +822,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
     <button class="ni" onclick="showTab('species',this)"><span class="ni-icon">🐟</span><span class="ni-lbl">어종</span></button>
     <button class="ni" onclick="showTab('eging',this)"><span class="ni-icon">🦑</span><span class="ni-lbl">에깅</span></button>
     <button class="ni" onclick="showTab('dpi',this)"><span class="ni-icon">⚖️</span><span class="ni-lbl">DPI</span></button>
+    <button class="ni" onclick="showTab('log',this)"><span class="ni-icon">📓</span><span class="ni-lbl">로그</span></button>
   </nav>
 
   <!-- MODAL -->
@@ -825,62 +951,27 @@ const TAG_LABELS = {kingfish:'🐠 Kingfish',snapper:'🔴 Snapper',bream:'⚪ B
 
 function saveLocs(){try{localStorage.setItem('nsw_locs',JSON.stringify(LOCS));}catch(e){}}
 
-// ─── NSW SHORE SPOTS DB (150km Random) ───────────
-const NSW_SHORE_SPOTS =[
-  {name: 'Byron Bay', lat: -28.642, lng: 153.628},
-  {name: 'Ballina', lat: -28.864, lng: 153.593},
-  {name: 'Yamba', lat: -29.434, lng: 153.362},
-  {name: 'Coffs Harbour', lat: -30.302, lng: 153.141},
-  {name: 'South West Rocks', lat: -30.884, lng: 153.041},
-  {name: 'Port Macquarie', lat: -31.433, lng: 152.920},
-  {name: 'Forster', lat: -32.180, lng: 152.520},
-  {name: 'Port Stephens', lat: -32.718, lng: 152.176},
-  {name: 'Newcastle', lat: -32.928, lng: 151.784},
-  {name: 'Catherine Hill Bay', lat: -33.158, lng: 151.628},
-  {name: 'Avoca', lat: -33.463, lng: 151.435},
-  {name: 'Palm Beach', lat: -33.598, lng: 151.323},
-  {name: 'Long Reef', lat: -33.738, lng: 151.319},
-  {name: 'Manly', lat: -33.800, lng: 151.296},
-  {name: 'Bondi', lat: -33.891, lng: 151.276},
-  {name: 'Maroubra', lat: -33.949, lng: 151.258},
-  {name: 'Cronulla', lat: -34.057, lng: 151.155},
-  {name: 'Wattamolla (RNP)', lat: -34.137, lng: 151.118},
-  {name: 'Stanwell Park', lat: -34.227, lng: 150.983},
-  {name: 'Wollongong', lat: -34.424, lng: 150.900},
-  {name: 'Shellharbour', lat: -34.580, lng: 150.870},
-  {name: 'Bombo', lat: -34.652, lng: 150.852},
-  {name: 'Kiama', lat: -34.670, lng: 150.854},
-  {name: 'Gerringong', lat: -34.747, lng: 150.829},
-  {name: 'Shoalhaven Heads', lat: -34.851, lng: 150.742},
-  {name: 'Jervis Bay', lat: -35.034, lng: 150.738},
-  {name: 'Ulladulla', lat: -35.357, lng: 150.474},
-  {name: 'Batemans Bay', lat: -35.714, lng: 150.176},
-  {name: 'Narooma', lat: -36.216, lng: 150.129},
-  {name: 'Bermagui', lat: -36.425, lng: 150.078},
-  {name: 'Eden', lat: -37.062, lng: 149.907}
-];
-
 // ─── DPI 20 SHORE FISHING SPECIES ────────────────
 const DPI_SPECIES =[
-  {name: 'Snapper', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0017/163430/snapper-juv.jpg?width=320', size: '30cm', bag: '10', desc: 'NSW 국민 어종'},
-  {name: 'Yellowtail Kingfish', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0005/116366/kingfish.jpg?width=320', size: '65cm', bag: '5', desc: '파워풀한 대상어'},
-  {name: 'Bream', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0014/116141/yellowfin-bream.jpg?width=320', size: '25cm', bag: '10', desc: '에스추어리 대표'},
-  {name: 'Dusky Flathead', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0014/116213/f-head-dusky.jpg?width=320', size: '36cm - 70cm', bag: '5', desc: '70cm 이상은 1마리만'},
-  {name: 'Tailor', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0006/163581/tailor.jpg?width=320', size: '30cm', bag: '20', desc: '표층 피딩'},
-  {name: 'Trevally', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/117058/silver-trevally.jpg?width=320', size: '30cm', bag: '10', desc: '강한 손맛'},
-  {name: 'Mulloway', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0017/116540/mulloway.jpg?width=320', size: '70cm', bag: '1', desc: '야간 낚시의 꽃'},
-  {name: 'Drummer', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0011/163559/rock-blackfish.jpg?width=320', size: '30cm', bag: '10', desc: '갯바위 파이터 (Silver)'},
-  {name: 'Luderick', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0008/116378/luderick.jpg?width=320', size: '27cm', bag: '10', desc: '잡초 미끼 (Blackfish)'},
+  {name: 'Snapper', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0017/163430/snapper-juv.jpg?width=320', size: '30cm', bag: '10', desc: '바다의 여왕'},
+  {name: 'Yellowtail Kingfish', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0005/116366/kingfish.jpg?width=320', size: '65cm', bag: '5', desc: '갯바위의 제왕'},
+  {name: 'Bream', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0014/116141/yellowfin-bream.jpg?width=320', size: '25cm', bag: '10', desc: '바다의 왕자'},
+  {name: 'Dusky Flathead', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0014/116213/f-head-dusky.jpg?width=320', size: '36cm - 70cm', bag: '5', desc: '모래 속 저격수'},
+  {name: 'Tailor', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0006/163581/tailor.jpg?width=320', size: '30cm', bag: '20', desc: '은빛 칼날'},
+  {name: 'Trevally', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/117058/silver-trevally.jpg?width=320', size: '30cm', bag: '10', desc: '황금 파이터'},
+  {name: 'Mulloway', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0017/116540/mulloway.jpg?width=320', size: '70cm', bag: '1', desc: '밤낚시의 유령'},
+  {name: 'Drummer', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0011/163559/rock-blackfish.jpg?width=320', size: '30cm', bag: '10', desc: '바다의 흑기사'},
+  {name: 'Luderick', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0008/116378/luderick.jpg?width=320', size: '27cm', bag: '10', desc: '블랙피쉬'},
   {name: 'Australian Salmon', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0017/163412/australian-salmon.jpg?width=320', size: 'No limit', bag: '5', desc: '표층 루어'},
-  {name: 'Bonito', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/164119/bonito.jpg?width=320', size: 'No limit', bag: '10', desc: '빠른 스피드'},
-  {name: 'Squid', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDMjn-G6BB_jwKGuN5Fnr1X4tlTLV1khULDg&s?width=320', size: 'No limit', bag: '20', desc: '에깅 타겟'},
-  {name: 'Garfish', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0018/164133/garfish.jpg?width=320', size: 'No limit', bag: '20', desc: '수면 위 유영'},
-  {name: 'Hairtail', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0003/115833/hairtail.jpg?width=320', size: 'no limit', bag: '10', desc: '포인트에 따라 다름'},
-  {name: 'Leatherjacket', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0015/164112/leatherjacket.jpg?width=320', size: 'No limit', bag: '20', desc: '채비 절단 주의'},
-  {name: 'Longtail Tuna', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/164551/tuna-Longtail.jpg?width=320', size: '90cm', bag: '2', desc: '강력한 회유성'},
+  {name: 'Bonito', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/164119/bonito.jpg?width=320', size: 'No limit', bag: '10', desc: '속도의 화신'},
+  {name: 'Squid', img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDMjn-G6BB_jwKGuN5Fnr1X4tlTLV1khULDg&s?width=320', size: 'No limit', bag: '20', desc: '오징어의 황제'},
+  {name: 'Garfish', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0018/164133/garfish.jpg?width=320', size: 'No limit', bag: '20', desc: '수면의 은빛 바늘'},
+  {name: 'Hairtail', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0003/115833/hairtail.jpg?width=320', size: 'no limit', bag: '10', desc: '심야의 헤어리'},
+  {name: 'Leatherjacket', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0015/164112/leatherjacket.jpg?width=320', size: 'No limit', bag: '20', desc: '채비 도둑'},
+  {name: 'Longtail Tuna', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/164551/tuna-Longtail.jpg?width=320', size: '90cm', bag: '2', desc: '보일의 신호탄'},
   {name: 'Yellowfin Tuna', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0019/117280/yf-tuna.jpg?width=320', size: '90cm', bag: '2', desc: '오프쇼어 트롤링'},
   {name: 'Cobia', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0014/351041/Cobia.jpg?width=320', size: '75cm', bag: '2', desc: '대물 타겟'},
-  {name: 'Red Morwong', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0019/163450/morwong-banded.jpg?width=320', size: '30cm', bag: '5', desc: '바닥 지형 선호'},
+  {name: 'Red Morwong', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0019/163450/morwong-banded.jpg?width=320', size: '30cm', bag: '5', desc: '바닥층 터줏대감'},
   {name: 'Black Marlin', img: 'https://www.dpi.nsw.gov.au/__data/assets/image/0004/163921/marlin-black.jpg?width=320', size: '110cm', bag: '1', desc: '빅게임 피싱의 꽃'}
 ];
 
@@ -1445,6 +1536,8 @@ async function loadWeather(locName){
     renderSafetyTimer(0);
     renderSolCalGrid();
     renderSeasonAlert();
+    // V4.1: 파핑 스코어 업데이트
+    try{ renderPoppingScore(); }catch(e){}
   }catch(e){
     if(mc)mc.innerHTML=`<div class="err-msg">⚠ WillyWeather 데이터 로드 실패: ${e.message}</div>`;
   }
@@ -1945,9 +2038,13 @@ function genShareText(){
 }
 
 function openShareModal(){
-  const text = genShareText();
+  const text = genShareText(activeShareTemplate);
   document.getElementById('share-text-content').textContent = text;
   document.getElementById('share-copy-btn').textContent = '📋 복사하기';
+  // 템플릿 버튼 상태 초기화
+  document.querySelectorAll('.share-tmpl-btn').forEach(b=>b.classList.remove('on'));
+  const activeBtn = document.getElementById('tmpl-'+activeShareTemplate);
+  if(activeBtn) activeBtn.classList.add('on');
   document.getElementById('share-modal').classList.add('on');
 }
 function closeShareModal(){
@@ -3250,6 +3347,321 @@ function renderFishPinMarkers(){
   });
 }
 
+// ─── V4.1: 조황 로그 시스템 ─────────────────────
+let FISH_LOG = [];
+try { FISH_LOG = JSON.parse(localStorage.getItem('nsw_fish_log') || '[]'); } catch(e){ FISH_LOG=[]; }
+function saveFishLog(){ try{ localStorage.setItem('nsw_fish_log', JSON.stringify(FISH_LOG)); }catch(e){} }
+
+function saveLogEntry(){
+  const date = document.getElementById('log-date').value;
+  const spot = document.getElementById('log-spot').value.trim();
+  const swell = document.getElementById('log-swell').value.trim();
+  const species = document.getElementById('log-species').value.trim();
+  const result = document.getElementById('log-result').value;
+  const note = document.getElementById('log-note').value.trim();
+  if(!date){ alert('날짜를 입력해줘!'); return; }
+  if(!spot){ alert('포인트를 입력해줘!'); return; }
+  const entry = { date, spot, swell, species, result, note, ts: Date.now() };
+  FISH_LOG.unshift(entry);
+  saveFishLog();
+  renderFishLog();
+  // 입력 초기화
+  document.getElementById('log-spot').value='';
+  document.getElementById('log-swell').value='';
+  document.getElementById('log-species').value='';
+  document.getElementById('log-note').value='';
+  document.getElementById('log-result').value='good';
+  const btn = document.querySelector('.log-save-btn');
+  if(btn){ btn.textContent='✅ 저장 완료!'; btn.style.color='var(--green)'; setTimeout(()=>{ btn.textContent='📓 기록 저장'; btn.style.color=''; }, 1500); }
+}
+
+function deleteLogEntry(idx){
+  if(!confirm('이 기록을 삭제할까?')) return;
+  FISH_LOG.splice(idx,1);
+  saveFishLog();
+  renderFishLog();
+}
+
+function renderFishLog(){
+  const el = document.getElementById('log-list');
+  if(!el) return;
+  if(!FISH_LOG.length){
+    el.innerHTML = '<div class="log-empty">아직 기록이 없어.<br>오늘 조황을 기록해봐! 📓</div>';
+    return;
+  }
+  const resultMap = { great:{icon:'🔥',col:'var(--gold)',label:'대박'}, good:{icon:'✅',col:'var(--green)',label:'좋음'}, ok:{icon:'🔵',col:'var(--accent)',label:'평범'}, bad:{icon:'😔',col:'var(--muted)',label:'꽝'} };
+  el.innerHTML = FISH_LOG.slice(0,30).map((e,i)=>{
+    const rm = resultMap[e.result] || resultMap.ok;
+    const dateObj = new Date(e.date);
+    const dateStr = dateObj.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+    // 같은 포인트 과거 조과와 비교
+    const sameSpot = FISH_LOG.filter((x,j)=>j>i && x.spot===e.spot);
+    const prevBest = sameSpot.find(x=>x.result==='great');
+    const compareBadge = prevBest ? `<span style="font-size:9px;background:rgba(176,106,255,.15);color:var(--purple);border-radius:5px;padding:1px 6px;margin-left:4px">${e.spot} 이전 대박 있음</span>` : '';
+    return `<div class="log-entry">
+      <button class="log-del" onclick="deleteLogEntry(${i})" title="삭제">✕</button>
+      <div class="log-entry-hd">
+        <div>
+          <div class="log-date">${dateStr} · ${e.spot}${compareBadge}</div>
+          ${e.species?`<div style="font-size:11px;color:var(--muted);margin-top:2px">🐟 ${e.species}</div>`:''}
+        </div>
+        <div class="log-score" style="color:${rm.col}">${rm.icon}</div>
+      </div>
+      <div class="log-conditions">
+        <div class="log-cond-item"><div class="log-cond-lbl">조과</div><div class="log-cond-val" style="color:${rm.col}">${rm.label}</div></div>
+        <div class="log-cond-item"><div class="log-cond-lbl">스웰</div><div class="log-cond-val" style="color:var(--accent)">${e.swell||'—'}</div></div>
+        <div class="log-cond-item"><div class="log-cond-lbl">날짜</div><div class="log-cond-val">${dateObj.getDate()}일</div></div>
+      </div>
+      ${e.note?`<div class="log-note">${e.note}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─── V4.1: 지깅 지그 무게 계산기 ────────────────
+function calcJig(){
+  const depth = parseFloat(document.getElementById('jig-depth').value) || 30;
+  const current = document.getElementById('jig-current').value;
+  const jigType = document.getElementById('jig-type').value;
+  const target = document.getElementById('jig-target').value;
+
+  // 기본 무게 공식: 수심(m) × 계수 (조류/타입별 보정)
+  const baseMultiplier = { weak: 2.2, normal: 3.0, strong: 4.2, extreme: 5.5 };
+  const typeMultiplier = { slow: 0.85, speed: 1.0, super_slow: 0.7 };
+  const targetBonus = { kingfish: 10, snapper: 0, tuna: 15, general: 0 };
+
+  let baseWeight = depth * baseMultiplier[current] * typeMultiplier[jigType] + targetBonus[target];
+  // 반올림 to nearest 10g
+  baseWeight = Math.round(baseWeight / 10) * 10;
+  const minWeight = Math.max(40, baseWeight - 20);
+  const maxWeight = baseWeight + 30;
+
+  // 타입별 추천
+  const jigTypeLabels = { slow: '슬로우 피치 지그', speed: '스피드 지그', super_slow: '슈퍼슬로우 지그' };
+  const colorRecs = {
+    kingfish: [{c:'#ff9ecd',n:'Pink/White',w:'메인'},{c:'#ccddee',n:'Silver/Blue',w:'맑은날'},{c:'#aadd00',n:'Chartreuse',w:'탁한물'}],
+    snapper:  [{c:'#ff4488',n:'Red/Pink',w:'메인'},{c:'#ff8800',n:'Orange',w:'흐린날'},{c:'#ffffff',n:'White/Pearl',w:'맑은날'}],
+    tuna:     [{c:'#60b8ff',n:'Blue/Silver',w:'메인'},{c:'#ff9ecd',n:'Pink',w:'보일 시'},{c:'#c6ff00',n:'Chartreuse',w:'녹조류'}],
+    general:  [{c:'#ccddee',n:'Silver',w:'올라운드'},{c:'#ff9ecd',n:'Pink',w:'흐린날'},{c:'#ff8800',n:'Orange',w:'탁한물'}],
+  };
+  const cols = colorRecs[target] || colorRecs.general;
+  const currentLabels = { weak:'약한 조류', normal:'보통 조류', strong:'강한 조류', extreme:'매우 강한 조류' };
+
+  // PE 호수 추천
+  const peRec = depth > 80 ? 'PE 3–4' : depth > 50 ? 'PE 2.5–3' : 'PE 2–2.5';
+  const leaderRec = target === 'kingfish' ? '80–100lb Fluoro' : target === 'tuna' ? '60–80lb Fluoro' : '40–60lb Fluoro';
+  const hookRec = jigType === 'slow' ? 'Assist hook 더블 세팅' : jigType === 'super_slow' ? 'Assist 롱샹크 싱글' : 'Assist hook 트윈';
+  const actionRec = jigType === 'slow' ? '슬로우폴 → 와인딩 1–2회 → 정지' : jigType === 'super_slow' ? '바닥 터치 → 초슬로우 폴 → 라인 텐션만 유지' : '고속 와인딩 → 폴 → 고속 반복';
+
+  const res = document.getElementById('jig-result');
+  res.classList.add('on');
+  res.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+      <div style="text-align:center;background:var(--bg);border-radius:9px;padding:10px">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">추천 무게 범위</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--gold);line-height:1">${minWeight}–${maxWeight}g</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">기준: ${depth}m · ${currentLabels[current]}</div>
+      </div>
+      <div style="text-align:center;background:var(--bg);border-radius:9px;padding:10px">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">메인 무게</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:34px;color:var(--accent);line-height:1">${baseWeight}g</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:2px">${jigTypeLabels[jigType]}</div>
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:8px">
+      <div style="font-size:9px;color:var(--gold);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px;font-weight:700">🎨 추천 컬러</div>
+      <div style="display:flex;gap:8px">${cols.map(c=>`<div style="display:flex;align-items:center;gap:5px"><div style="width:16px;height:16px;border-radius:4px;background:${c.c};flex-shrink:0"></div><div><div style="font-size:10px;font-weight:700">${c.n}</div><div style="font-size:9px;color:var(--muted)">${c.w}</div></div></div>`).join('')}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+      <div style="background:var(--bg);border-radius:8px;padding:8px 10px"><div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">PE 라인</div><div style="font-size:11px;font-weight:700">${peRec}</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 10px"><div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">리더</div><div style="font-size:11px;font-weight:700">${leaderRec}</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 10px"><div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">훅 세팅</div><div style="font-size:11px;font-weight:700">${hookRec}</div></div>
+      <div style="background:var(--bg);border-radius:8px;padding:8px 10px"><div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">액션</div><div style="font-size:10px;font-weight:600">${actionRec}</div></div>
+    </div>`;
+}
+
+// ─── V4.1: 파핑 조건 스코어 ──────────────────────
+function renderPoppingScore(){
+  const el = document.getElementById('pop-score-content');
+  if(!el) return;
+  const t = marineDays[0];
+  if(!t){ el.innerHTML = '<div style="font-size:11px;color:var(--muted)">포인트를 추가하면 파핑 조건이 표시돼</div>'; return; }
+
+  const sw = t.swellH || 0;
+  const wi = t.windKmh || 0;
+  const wd = t.windD || 'N';
+  const sst = t.sst;
+  const rain = t.rain || 0;
+  const pres = t.pressure || 1013;
+  const nh = t.tides.find(x=>x.type==='high');
+  const nl = t.tides.find(x=>x.type==='low');
+  const tideRange = (nh&&nl) ? Math.abs(nh.height-nl.height) : 1.0;
+
+  let score = 50;
+
+  // 파핑 최적 스웰: 0.8–1.5m (파도 있어야 포퍼 어필 됨)
+  if(sw >= 0.8 && sw <= 1.5) score += 25;
+  else if(sw >= 1.5 && sw <= 2.0) score += 15;
+  else if(sw > 2.5) score -= 25;
+  else if(sw < 0.5) score -= 10; // 너무 잔잔
+
+  // 바람: 10–25km/h 측면풍 최적
+  if(wi >= 10 && wi <= 25) score += 20;
+  else if(wi > 35) score -= 20;
+  else if(wi < 5) score -= 5;
+
+  // 수온: 킹피시/참치 수온
+  if(sst != null){
+    if(sst >= 21 && sst <= 27) score += 15;
+    else if(sst < 19) score -= 10;
+  }
+
+  // 기압
+  if(pres >= 1015) score += 10;
+  else if(pres < 1005) score -= 8;
+
+  // 조류
+  if(tideRange >= 1.0 && tideRange <= 2.0) score += 10;
+  else if(tideRange > 2.5) score -= 5;
+
+  // 강수
+  if(rain > 50) score -= 12;
+
+  score = Math.max(5, Math.min(99, score));
+
+  const col = score >= 80 ? 'var(--gold)' : score >= 60 ? 'var(--green)' : score >= 40 ? 'var(--accent)' : 'var(--warn)';
+  const label = score >= 80 ? '🔥 파핑 최상 조건!' : score >= 60 ? '✅ 파핑 좋은 날' : score >= 40 ? '🔵 파핑 가능' : '⚠ 파핑 비추천';
+
+  // 이상적 바람 방향 (SW~NW: 등 바람)
+  const idealDirs = ['SW','WSW','W','WNW','NW'];
+  const windFav = idealDirs.includes(wd);
+
+  // 추천 포퍼 사이즈
+  const popperSize = sw >= 1.2 ? '140–180mm (헤비)' : sw >= 0.8 ? '120–150mm (미디엄)' : '100–130mm (라이트)';
+  const popperWt = sw >= 1.2 ? '60–80g' : sw >= 0.8 ? '40–60g' : '30–45g';
+
+  const cf = 2*Math.PI*36;
+  const off = cf*(1-score/100);
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+      <div style="position:relative;flex-shrink:0">
+        <svg width="90" height="90" viewBox="0 0 90 90">
+          <circle cx="45" cy="45" r="36" fill="none" stroke="var(--border)" stroke-width="7"/>
+          <circle cx="45" cy="45" r="36" fill="none" stroke="${col}" stroke-width="7" stroke-dasharray="${cf.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}" stroke-linecap="round" transform="rotate(-90 45 45)"/>
+        </svg>
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
+          <div class="pop-score-big" style="font-size:32px;color:${col}">${score}</div>
+          <div style="font-size:8px;color:var(--muted)">점</div>
+        </div>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:${col};margin-bottom:4px">${label}</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.65">
+          스웰 ${sw}m · 바람 ${wi}km/h ${wd} ${windFav?'<span style="color:var(--green);font-weight:700">(등 바람 ✅)</span>':'<span style="color:var(--warn)">(마주 바람 ⚠)</span>'}<br>
+          ${sst!=null?`수온 ${sst}°C · `:''} 기압 ${pres}hPa · 조차 ${tideRange.toFixed(1)}m
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px">
+      <div style="background:var(--bg3);border-radius:9px;padding:10px 11px">
+        <div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">추천 포퍼 사이즈</div>
+        <div style="font-size:12px;font-weight:700;color:var(--gold)">${popperSize}</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px">무게: ${popperWt}</div>
+      </div>
+      <div style="background:var(--bg3);border-radius:9px;padding:10px 11px">
+        <div style="font-size:8px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px">최적 타이밍</div>
+        <div style="font-size:12px;font-weight:700;color:var(--accent)">들물 중반~만조</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:1px">아침 보일 집중 공략</div>
+      </div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(0,212,255,.15);border-radius:9px;padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.65">
+      💡 파핑 핵심: 파도 있는 날 암초 주변 조류 타는 지점에서 포퍼를 거칠게 쳐줘.<br>
+      ${sw < 0.5 ? '⚠ 너무 잔잔한 날 — 포퍼보단 스틱베이트나 지깅으로 전환 추천.' : ''}
+      ${sw > 2.0 ? '⚠ 파도 강함 — 안전한 포인트 또는 만 안쪽 집중.' : ''}
+      ${windFav ? '✅ 등바람 조건 — 롱캐스팅 유리, 비거리 극대화.' : '💨 맞바람 주의 — 캐스팅 각도 조정 필요.'}
+    </div>`;
+}
+
+// ─── V4.1: 조황 공유 템플릿 선택 ─────────────────
+let activeShareTemplate = 'jigging';
+function setShareTemplate(type, btn){
+  activeShareTemplate = type;
+  document.querySelectorAll('.share-tmpl-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  // 텍스트 재생성
+  const text = genShareText(type);
+  const el = document.getElementById('share-text-content');
+  if(el) el.textContent = text;
+}
+
+function genShareText(template){
+  const tmpl = template || activeShareTemplate || 'jigging';
+  const t = marineDays[activeMarineDay] || marineDays[0];
+  const loc = LOCS.length > 0 ? LOCS[activeIdx] : null;
+  const locName = loc ? loc.name : '—';
+  const d = solDays[0];
+  const blended = getBlendedForDay(0);
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ko-KR',{month:'long',day:'numeric',weekday:'short'});
+
+  let lines = [];
+  const sessionEmoji = {jigging:'⚡',popping:'🌊',eging:'🦑',rock:'🪨'};
+  const sessionLabel = {jigging:'지깅 세션',popping:'파핑 세션',eging:'에깅 세션',rock:'갯바위 세션'};
+
+  lines.push(`${sessionEmoji[tmpl]} Scott's Marine — ${sessionLabel[tmpl]}`);
+  lines.push(`📅 ${dateStr} · 📍 ${locName}`);
+  lines.push('');
+
+  if(t){
+    lines.push(`🌊 스웰: ${t.swellH}m ${t.swellD} · 주기 ${t.swellPer||'—'}s`);
+    lines.push(`💨 바람: ${t.windKmh}km/h ${t.windD}`);
+    if(t.sst!=null) lines.push(`🌡 수온: ${t.sst}°C`);
+    lines.push(`📊 기압: ${t.pressure}hPa`);
+    const nh = t.tides.find(x=>x.type==='high');
+    const nl = t.tides.find(x=>x.type==='low');
+    if(nh) lines.push(`↑ 만조: ${f2(nh.h,nh.m)} (${nh.height}m)`);
+    if(nl) lines.push(`↓ 간조: ${f2(nl.h,nl.m)} (${nl.height}m)`);
+  }
+
+  lines.push('');
+
+  // 세션별 특화 정보
+  if(tmpl === 'jigging'){
+    const nh = t && t.tides.find(x=>x.type==='high');
+    const nl = t && t.tides.find(x=>x.type==='low');
+    const tr = (nh&&nl) ? Math.abs(nh.height-nl.height).toFixed(1) : '—';
+    lines.push(`⚡ 지깅 세팅:`);
+    lines.push(`   조차 ${tr}m · ${tr>1.5?'슬로우지그 무거운 쪽':tr<0.8?'라이트 지그':'표준 무게'}`);
+    lines.push(`   타겟: Kingfish / Snapper`);
+  } else if(tmpl === 'popping'){
+    lines.push(`🌊 파핑 세팅:`);
+    lines.push(`   포퍼 ${t&&t.swellH>=1.2?'140–180mm':'120–150mm'} 헤비`);
+    lines.push(`   조류 타는 암초 엣지 집중`);
+  } else if(tmpl === 'eging'){
+    const nh = t && t.tides.find(x=>x.type==='high');
+    const nl = t && t.tides.find(x=>x.type==='low');
+    const tr = (nh&&nl) ? Math.abs(nh.height-nl.height).toFixed(1) : '—';
+    lines.push(`🦑 에깅 세팅:`);
+    lines.push(`   에기 3.5호 · 조차 ${tr}m`);
+    if(t&&t.sst) lines.push(`   수온 ${t.sst}°C · 오징어 활성 ${t.sst>=17&&t.sst<=22?'최고':'보통'}`);
+  } else if(tmpl === 'rock'){
+    lines.push(`🪨 갯바위 세팅:`);
+    lines.push(`   Cunjevoi / Cabbage weed`);
+    lines.push(`   만조 전후 2시간 집중`);
+  }
+
+  if(d){
+    lines.push('');
+    lines.push(`🌙 달: ${d.moon.n} (${d.moon.pct}%)`);
+    lines.push(`⭐ 조과 지수: ${blended.score}점 ${blended.score>=90?'— PRIME':blended.score>=70?'— 좋음':blended.score>=50?'— 양호':''}`);
+    lines.push(`🕐 피크: ${d.peaks.m1} / ${d.peaks.m2}`);
+  }
+
+  lines.push('');
+  lines.push(`📱 Scott's Marine Insight V4.1`);
+  return lines.join('\n');
+}
+
 window.addEventListener('DOMContentLoaded',()=>{
   console.log('[INIT] NSW Fishing App V3.4 starting...');
   applyTheme();
@@ -3274,6 +3686,16 @@ window.addEventListener('DOMContentLoaded',()=>{
   }catch(e){console.error('[INIT] Locations error:',e);}
   // Fish pins
   try{ renderFishPins(); renderFishPinMarkers(); }catch(e){ console.warn('[INIT] Fish pins:',e); }
+  // V4.1: 조황 로그 & 파핑
+  try{
+    // 오늘 날짜 자동 입력
+    const todayStr = new Date().toISOString().split('T')[0];
+    const logDateEl = document.getElementById('log-date');
+    if(logDateEl) logDateEl.value = todayStr;
+    renderFishLog();
+    // 활성 포인트가 있으면 파핑 스코어도 렌더
+    if(LOCS.length > 0) renderPoppingScore();
+  }catch(e){ console.warn('[INIT] Log/Popping:', e); }
   console.log('[INIT] Complete');
 });
 </script>
@@ -3283,6 +3705,14 @@ window.addEventListener('DOMContentLoaded',()=>{
     <div class="share-box-title">
       <span>📤 조황 공유 텍스트</span>
       <span onclick="closeShareModal()" style="cursor:pointer;color:var(--muted);font-size:18px">✕</span>
+    </div>
+    <!-- V4.1: 템플릿 선택 -->
+    <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:7px">세션 타입 선택</div>
+    <div class="share-tmpl-row">
+      <button class="share-tmpl-btn on" id="tmpl-jigging" onclick="setShareTemplate('jigging',this)">⚡ 지깅</button>
+      <button class="share-tmpl-btn" id="tmpl-popping" onclick="setShareTemplate('popping',this)">🌊 파핑</button>
+      <button class="share-tmpl-btn" id="tmpl-eging" onclick="setShareTemplate('eging',this)">🦑 에깅</button>
+      <button class="share-tmpl-btn" id="tmpl-rock" onclick="setShareTemplate('rock',this)">🪨 갯바위</button>
     </div>
     <div class="share-text-area" id="share-text-content"></div>
     <button class="share-copy-btn" onclick="copyShareText()" id="share-copy-btn">📋 복사하기</button>
