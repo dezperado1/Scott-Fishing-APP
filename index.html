@@ -64,7 +64,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
 .dc-num,.sc-num{font-family:'Bebas Neue',sans-serif;font-size:22px;line-height:1;margin:1px 0}
 .dc-sw,.sc-score-sm{font-size:9px;color:var(--muted);margin-top:1px}
 .tide-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px}
-.tide-svg-w{height:80px;margin:7px 0}
+.tide-svg-w{height:auto;margin:7px 0}
 .tide-row{display:flex;justify-content:space-between}
 .tide-item{text-align:center}
 .t-hi{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:var(--green)}
@@ -615,6 +615,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM San
       <!-- 추천 명당 (GPS 기반) -->
       <div class="stitle" style="margin-top:4px">📍 주변 추천 명당 <span style="font-size:9px;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">GPS 150km 이내</span></div>
       <div id="rec-spots"></div>
+
+      <!-- 직접 저장한 낚시자리 -->
+      <div class="stitle" style="margin-top:4px">📌 내가 저장한 낚시자리 <span style="font-size:9px;color:var(--muted);text-transform:none;letter-spacing:0">지도 길게 눌러 추가</span></div>
+      <div id="fish-pins-list"></div>
     </div>
 
     <!-- 어종 -->
@@ -1007,14 +1011,43 @@ function haversine(a,b,c,d){const R=6371,dL=(c-a)*Math.PI/180,dN=(d-b)*Math.PI/1
 function distStr(lat,lng){if(userLat===null)return'—';const d=haversine(userLat,userLng,lat,lng);return d<1?Math.round(d*1000)+'m':d.toFixed(1)+' km';}
 function gpsLocate(){if(!navigator.geolocation){alert('GPS 미지원');return;}navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;renderFavs();renderSavedList();renderRecSpots();if(mapL)mapL.setView([userLat,userLng],12);},()=>alert('GPS 오류'));}
 function useGPS(){if(!navigator.geolocation){alert('GPS 미지원');return;}navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLng=p.coords.longitude;document.getElementById('m-lat').value=userLat.toFixed(5);document.getElementById('m-lng').value=userLng.toFixed(5);showSel('📡 현재 GPS',userLat.toFixed(4)+'°S · '+userLng.toFixed(4)+'°E');renderRecSpots();},()=>alert('GPS 오류'));}
+// ─── NSW 추천 명당 데이터 ─────────────────────────
+const NSW_SHORE_SPOTS=[
+  {name:'Kiama Blowhole',lat:-34.671,lng:150.856,species:['drummer','blackfish'],type:'rock'},
+  {name:'Jervis Bay',lat:-35.100,lng:150.790,species:['snapper','bream'],type:'bay'},
+  {name:'Cronulla Point',lat:-34.058,lng:151.150,species:['kingfish','trevally'],type:'rock'},
+  {name:'Long Reef',lat:-33.738,lng:151.309,species:['drummer','snapper'],type:'reef'},
+  {name:'Terrigal Haven',lat:-33.447,lng:151.451,species:['bream','flathead'],type:'bay'},
+  {name:'Merimbula Bar',lat:-36.888,lng:149.905,species:['flathead','bream'],type:'estuary'},
+  {name:'Bermagui Blue Pool',lat:-36.423,lng:150.068,species:['drummer','luderick'],type:'rock'},
+  {name:'Narooma Bar',lat:-36.216,lng:150.131,species:['flathead','snapper'],type:'bar'},
+  {name:'Tathra Wharf',lat:-36.733,lng:149.983,species:['trevally','tailor'],type:'pier'},
+  {name:'Eden Snug Cove',lat:-37.072,lng:149.903,species:['snapper','kingfish'],type:'bay'},
+  {name:'Ulladulla Harbour',lat:-35.356,lng:150.474,species:['snapper','bream'],type:'harbour'},
+  {name:'Batemans Bay',lat:-35.708,lng:150.178,species:['flathead','bream'],type:'estuary'},
+  {name:'Wollongong Breakwall',lat:-34.423,lng:150.910,species:['tailor','kingfish'],type:'breakwall'},
+  {name:'Port Kembla',lat:-34.477,lng:150.904,species:['snapper','bream'],type:'harbour'},
+  {name:'Stanwell Park',lat:-34.226,lng:150.981,species:['drummer','blackfish'],type:'rock'},
+  {name:'Avoca Beach',lat:-33.462,lng:151.432,species:['drummer','snapper'],type:'rock'},
+  {name:'Norah Head',lat:-33.283,lng:151.573,species:['kingfish','longtail_tuna'],type:'headland'},
+  {name:'Forster Breakwall',lat:-32.183,lng:152.515,species:['tailor','snapper'],type:'breakwall'},
+  {name:'Coffs Harbour',lat:-30.298,lng:153.115,species:['kingfish','tuna'],type:'harbour'},
+  {name:'Byron Bay Cape',lat:-28.638,lng:153.636,species:['longtail_tuna','kingfish'],type:'headland'},
+  {name:'Fingal Head',lat:-28.193,lng:153.558,species:['tuna','kingfish'],type:'headland'},
+  {name:'Malabar Headland',lat:-33.978,lng:151.256,species:['drummer','snapper'],type:'headland'},
+  {name:'Cape Solander',lat:-34.033,lng:151.178,species:['drummer','blackfish'],type:'rock'},
+  {name:'Bundeena',lat:-34.091,lng:151.150,species:['bream','flathead'],type:'bay'},
+  {name:'Currarong',lat:-35.016,lng:150.828,species:['drummer','snapper'],type:'rock'},
+];
+
 function renderRecSpots(){
-  const row=document.getElementById('rec-row');if(!row)return;
+  const row=document.getElementById('rec-spots');if(!row)return;
   if(userLat===null){row.innerHTML='<div class="loading-msg" style="padding:10px 0;text-align:left">GPS를 켜면 150km 이내 추천 명당이 표시돼</div>';return;}
   let nearby=NSW_SHORE_SPOTS.map(s=>{s.dist=haversine(userLat,userLng,s.lat,s.lng);return s;}).filter(s=>s.dist<=150);
   if(!nearby.length){row.innerHTML='<div class="loading-msg" style="padding:10px 0;text-align:left">150km 이내 추천 명당이 없습니다.</div>';return;}
   nearby = nearby.sort(()=>0.5-Math.random()).slice(0,10);
   nearby.sort((a,b)=>a.dist-b.dist);
-  row.innerHTML=nearby.map(s=>`<div class="fc" onclick="showOnMap(${s.lat},${s.lng},'${s.name.replace(/'/g,"\\'")}')"><div class="fc-dot" style="background:var(--gold)"></div><div><div class="fc-name">${s.name}</div><div class="fc-dist">${s.dist.toFixed(1)} km</div></div></div>`).join('');
+  row.innerHTML='<div class="fav-scroll"><div class="fav-row">'+nearby.map(s=>`<div class="fc" onclick="showSpotOnMap(${s.lat},${s.lng},'${s.name.replace(/'/g,"\\'")}')"><div class="fc-dot" style="background:var(--gold)"></div><div><div class="fc-name">${s.name}</div><div class="fc-dist">${s.dist.toFixed(1)} km · ${s.type||'shore'}</div></div></div>`).join('')+'</div></div>';
 }
 
 // ─── LUNAR MATH ──────────────────────────────────
@@ -1613,8 +1646,37 @@ function renderMarineDay(i){
   const wBd=d.warn==='good'?'rgba(0,230,118,.3)':d.warn==='rough'?'rgba(255,107,53,.3)':'rgba(245,166,35,.3)';
   const tides4=d.tides.slice(0,4);
   const tideRowHtml=tides4.map(t=>`<div class="tide-item"><div class="${t.type==='high'?'t-hi':'t-lo'}">${t.type==='high'?'HIGH':'LOW'}</div><div class="tide-time">${f2(t.h,t.m)}</div><div class="tide-ht">${t.height} m</div></div>`).join('');
-  const pts=[];for(let x=0;x<=340;x+=5){let y=40;tides4.forEach(t=>{const ph=x/340*24-(t.h+t.m/60);y+=(t.type==='high'?-25:25)*Math.exp(-ph*ph/8);});pts.push([x,Math.max(10,Math.min(70,y))]);}
-  const path=pts.map((p,j)=>(j===0?'M':'L')+p[0]+','+p[1]).join(' ');
+  // ── 개선된 타이드 그래프 ──
+  const W_TIDE=340,H_TIDE=90,PAD_T=10;
+  const allTides=d.tides.length>=2?d.tides:tides4;
+  const tidePoints=[];
+  for(let min=0;min<=1440;min+=8){
+    let y=0,wSum=0;
+    allTides.forEach(t=>{const diff=Math.abs(min-(t.h*60+t.m));const w=Math.exp(-(diff*diff)/(2*190*190));y+=(t.type==='high'?1:-1)*w;wSum+=w;});
+    const norm=wSum>0?y/wSum:0;
+    const px=PAD_T+(min/1440)*(W_TIDE-PAD_T*2);
+    const py=H_TIDE/2-norm*(H_TIDE/2-PAD_T-4);
+    tidePoints.push([px,Math.max(PAD_T,Math.min(H_TIDE-PAD_T,py))]);
+  }
+  const tidePath=tidePoints.map((p,j)=>(j===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const tideArea=tidePath+' L'+tidePoints[tidePoints.length-1][0].toFixed(1)+','+H_TIDE+' L'+tidePoints[0][0].toFixed(1)+','+H_TIDE+' Z';
+  const nowHr=new Date().getHours()+new Date().getMinutes()/60;
+  const nowTX=PAD_T+(nowHr/24)*(W_TIDE-PAD_T*2);
+  const nowTY=tidePoints[Math.min(tidePoints.length-1,Math.round(nowHr*60/8))][1];
+  const solD2=solDays[i]||solDays[0];
+  let feedRects='';
+  if(solD2&&solD2.peaks){
+    [[solD2.peaks.m1,120,true],[solD2.peaks.m2,120,true],[solD2.peaks.n1,60,false],[solD2.peaks.n2,60,false]].forEach(([pk,dur,maj])=>{
+      const [ph2,pm2]=pk.split(':').map(Number);const pkMin=ph2*60+pm2;
+      const rx=PAD_T+((pkMin-dur/2)/1440)*(W_TIDE-PAD_T*2);const rw=(dur/1440)*(W_TIDE-PAD_T*2);
+      feedRects+='<rect x="'+Math.max(PAD_T,rx).toFixed(1)+'" y="0" width="'+Math.min(rw,W_TIDE).toFixed(1)+'" height="'+H_TIDE+'" fill="'+(maj?'rgba(245,166,35,.16)':'rgba(0,212,255,.1)')+'" rx="3"/>';
+    });
+  }
+  let tGrid='';
+  for(let h2=0;h2<=24;h2+=6){const tx=PAD_T+(h2/24)*(W_TIDE-PAD_T*2);tGrid+='<line x1="'+tx.toFixed(1)+'" y1="0" x2="'+tx.toFixed(1)+'" y2="'+H_TIDE+'" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="'+tx.toFixed(1)+'" y="'+(H_TIDE+11)+'" text-anchor="middle" fill="var(--muted)" font-size="7.5">'+(h2===0?'12AM':h2<12?h2+'AM':h2===12?'12PM':(h2-12)+'PM')+'</text>';}
+  const tMarkers2=tides4.map(t=>{const tx=PAD_T+((t.h*60+t.m)/1440)*(W_TIDE-PAD_T*2);const isH=t.type==='high';const col=isH?'var(--green)':'var(--warn)';const idx2=Math.min(tidePoints.length-1,Math.round((t.h*60+t.m)/8));const tpy=tidePoints[idx2][1];return '<circle cx="'+tx.toFixed(1)+'" cy="'+tpy.toFixed(1)+'" r="5.5" fill="'+col+'" stroke="var(--bg)" stroke-width="1.5"/><text x="'+Math.max(20,Math.min(W_TIDE-20,tx)).toFixed(1)+'" y="'+(isH?(tpy-11).toFixed(1):(tpy+17).toFixed(1))+'" fill="'+col+'" font-size="9" text-anchor="middle" font-weight="700">'+t.height+'m</text><text x="'+Math.max(20,Math.min(W_TIDE-20,tx)).toFixed(1)+'" y="'+(isH?(tpy-22).toFixed(1):(tpy+28).toFixed(1))+'" fill="'+col+'" font-size="7.5" text-anchor="middle" opacity=".85">'+f2(t.h,t.m)+'</text>';}).join('');
+  const tNowLine=i===0?'<line x1="'+nowTX.toFixed(1)+'" y1="0" x2="'+nowTX.toFixed(1)+'" y2="'+H_TIDE+'" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="3,2" opacity=".9"/><circle cx="'+nowTX.toFixed(1)+'" cy="'+nowTY.toFixed(1)+'" r="4" fill="#ff6b35" stroke="white" stroke-width="1.2"/><text x="'+(nowTX+6).toFixed(1)+'" y="10" fill="#ff6b35" font-size="7.5" font-weight="700">NOW</text>':'';
+  const tideSvgHtml='<svg viewBox="0 0 '+W_TIDE+' '+(H_TIDE+16)+'" style="width:100%;display:block;overflow:visible"><defs><linearGradient id="tideGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(0,212,255,.28)"/><stop offset="100%" stop-color="rgba(0,212,255,.02)"/></linearGradient></defs>'+feedRects+tGrid+'<line x1="'+PAD_T+'" y1="'+(H_TIDE/2).toFixed(1)+'" x2="'+(W_TIDE-PAD_T).toFixed(1)+'" y2="'+(H_TIDE/2).toFixed(1)+'" stroke="var(--dim)" stroke-width="0.8" stroke-dasharray="4,3"/><path d="'+tideArea+'" fill="url(#tideGrad2)"/><path d="'+tidePath+'" fill="none" stroke="var(--accent)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'+tMarkers2+tNowLine+'</svg><div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap"><div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:2px;background:rgba(245,166,35,.35)"></div><span style="font-size:8.5px;color:var(--muted)">Major 피크</span></div><div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:10px;border-radius:2px;background:rgba(0,212,255,.2)"></div><span style="font-size:8.5px;color:var(--muted)">Minor 피크</span></div>'+(i===0?'<div style="display:flex;align-items:center;gap:4px"><div style="width:10px;height:3px;background:#ff6b35;border-radius:1px"></div><span style="font-size:8.5px;color:var(--muted)">현재</span></div>':'')+'</div>';
   const hHtml=d.hours.map(h=>`<div class="hc ${h.now?'now':''}"><div style="font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:600">${h.t}</div><div style="font-size:14px;font-weight:600;color:var(--accent)">${h.sw}</div><div style="font-size:9px;color:var(--muted)">${h.per}</div><div style="font-size:16px;margin:3px 0">${h.dir}</div><div style="font-size:10px">${h.wind}</div><div style="font-size:10px;color:#88aaff;margin-top:1px">${h.rain}</div></div>`).join('');
   
   const eid=id=>document.getElementById(id);
@@ -1716,7 +1778,7 @@ function renderMarineDay(i){
           </div>`;
         })()}
       </div>
-      <div class="tide-svg-w"><svg viewBox="0 0 340 80" preserveAspectRatio="none" style="width:100%;height:100%"><defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(0,212,255,.25)"/><stop offset="100%" stop-color="rgba(0,212,255,0)"/></linearGradient></defs><path d="${path} L340,80 L0,80 Z" fill="url(#tg)"/><path d="${path}" fill="none" stroke="var(--accent)" stroke-width="1.5"/>${tides4.map(t=>{const x=(t.h+t.m/60)/24*340;const col=t.type==='high'?'var(--green)':'var(--warn)';const y=t.type==='high'?12:62;return`<circle cx="${x}" cy="${y}" r="4" fill="${col}"/><text x="${Math.max(18,Math.min(322,x))}" y="${t.type==='high'?10:74}" fill="${col}" font-size="8" text-anchor="middle" font-weight="600">${t.height}m</text>`;}).join('')}${i===0?'<line x1="170" y1="0" x2="170" y2="80" stroke="var(--warn)" stroke-width="1" stroke-dasharray="3,3" opacity=".5"/><text x="174" y="9" fill="var(--warn)" font-size="7">Now</text>':''}</svg></div>
+      <div class="tide-svg-w" style="height:auto">${tideSvgHtml}</div>
       <div class="tide-row">${tideRowHtml}</div>
     </div>
     <div class="stitle">Hourly Forecast <span class="pill pill-u">WillyWeather</span></div>
@@ -2970,6 +3032,7 @@ function renderSpResult(id){
     </div>`;
 }
 function refreshAnalysis(id){const box=document.getElementById('abox-'+id);if(!box)return;box.innerHTML='<div style="display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px"><span class="ai-dot"></span><span class="ai-dot"></span><span class="ai-dot"></span><span style="margin-left:6px">분석 중...</span></div>';setTimeout(()=>{const a=genAnalysis(id);box.innerHTML=`<div class="analysis-text">${a.split('\n\n').map(p=>`<p>${p}</p>`).join('')}</div><div class="refresh-btn" onclick="refreshAnalysis('${id}')">↻ 다시 분석</div>`;},600);}
+function showSpotOnMap(lat,lng,name){showOnMap(lat,lng,name);}
 function showOnMap(lat,lng,name){const btn=document.querySelector('.ni:nth-child(3)');if(btn)showTab('map',btn);setTimeout(()=>{initMap();if(mapL){mapL.setView([lat,lng],14);L.marker([lat,lng],{icon:makeIcon('#f5a623')}).addTo(mapL).bindPopup('<b>'+name+'</b>').openPopup();}},150);}
 
 // ─── MAP (GOOGLE MAPS - SATELLITE ONLY) ──────────
@@ -3718,6 +3781,71 @@ window.addEventListener('DOMContentLoaded',()=>{
     <button class="share-copy-btn" onclick="copyShareText()" id="share-copy-btn">📋 복사하기</button>
   </div>
 </div>
+
+
+<!-- PWA Service Worker + 오프라인 캐시 -->
+<script>
+if('serviceWorker' in navigator){
+  const SW_SRC = `
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open('scotts-marine-v4').then(cache => cache.addAll([
+      location.pathname,
+      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
+      'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js',
+      'https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap'
+    ]).catch(()=>{}))
+  );
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => { e.waitUntil(
+  caches.keys().then(keys => Promise.all(keys.filter(k=>k!=='scotts-marine-v4').map(k=>caches.delete(k))))
+); });
+self.addEventListener('fetch', e => {
+  const url = e.request.url;
+  // WillyWeather API는 항상 네트워크 우선, 실패시 캐시
+  if(url.includes('willyweather') || url.includes('open-meteo') || url.includes('marine-api')){
+    e.respondWith(
+      fetch(e.request).then(res => {
+        if(res.ok){ const clone=res.clone(); caches.open('scotts-weather-v4').then(c=>c.put(e.request,clone)); }
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+    return;
+  }
+  // 정적 자원: 캐시 우선
+  e.respondWith(caches.match(e.request).then(cached => cached || fetch(e.request).catch(()=>new Response('', {status: 408}))));
+});
+`;
+  const blob = new Blob([SW_SRC], {type:'application/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url, {scope: '/'})
+    .then(reg => {
+      console.log('[SW] Registered:', reg.scope);
+      // 오프라인 감지 배너
+      window.addEventListener('offline', () => showOfflineBanner(true));
+      window.addEventListener('online',  () => showOfflineBanner(false));
+    })
+    .catch(e => console.warn('[SW] Registration failed:', e));
+}
+function showOfflineBanner(offline){
+  let bar = document.getElementById('offline-bar');
+  if(!bar){
+    bar = document.createElement('div');
+    bar.id = 'offline-bar';
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;max-width:390px;margin:0 auto;background:rgba(255,107,53,.95);color:#fff;font-size:11px;font-weight:700;text-align:center;padding:7px 12px;z-index:9999;letter-spacing:.5px;transition:all .3s';
+    document.body.appendChild(bar);
+  }
+  if(offline){
+    bar.textContent = '📡 오프라인 — 마지막 저장 데이터로 표시 중';
+    bar.style.display = 'block';
+  } else {
+    bar.textContent = '✅ 온라인 연결됨';
+    bar.style.background = 'rgba(0,230,118,.95)';
+    setTimeout(()=>{ bar.style.display='none'; bar.style.background='rgba(255,107,53,.95)'; }, 2500);
+  }
+}
+</script>
 
 </body>
 </html>
