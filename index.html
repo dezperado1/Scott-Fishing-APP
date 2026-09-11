@@ -1289,9 +1289,9 @@ function dirToDeg(dir){
 }
 function compassRoseSVG(dir, mode){
   const deg = dirToDeg(dir);
-  // swell/wind 모두 WillyWeather directionText는 "~에서 불어오는/밀려오는" FROM 방향
-  // 화살표는 실제 이동 방향(TO)을 보여줘야 직관적이므로 180도 반전
-  const arrowDeg = (deg + 180) % 360;
+  // swell: FROM 방향 — 화살표가 갯바위로 밀려오는 방향 (180도 반전)
+  // wind:  TO 방향   — 바람이 부는 방향 그대로
+  const arrowDeg = (mode === 'swell') ? (deg + 180) % 360 : deg;
   const ac = (mode === 'swell') ? '#f5a623' : '#00d4ff';
   const r = 26, cx = 28, cy = 28;
   return `<svg width="56" height="56" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
@@ -1339,29 +1339,46 @@ function pressColor(hpa){
 
 // ─── WILLYWEATHER API ─────────────────────────────
 const WILLY_KEY = 'NjlkY2U4NDMyNTAxYzcxMjU1NTE4Ym';
+// ── 자체 Worker URL (설정 후 여기에 입력) ─────────
+const CUSTOM_WORKER = ''; // 예: 'https://xxx.workers.dev'
+
 const PROXIES=[
+  // 자체 Cloudflare Worker (설정된 경우 최우선)
+  u=> CUSTOM_WORKER ? CUSTOM_WORKER+'?url='+encodeURIComponent(u) : null,
+  // 공개 프록시 (불안정)
   u=>'https://corsproxy.io/?'+encodeURIComponent(u),
   u=>'https://api.allorigins.win/get?url='+encodeURIComponent(u),
+  u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
   u=>'https://api.codetabs.com/v1/proxy/?quest='+encodeURIComponent(u),
-];
+  u=>'https://cors.eu.org/'+u,
+  u=>'https://thingproxy.freeboard.io/fetch/'+u,
+  u=>'https://yacdn.org/proxy/'+u,
+].filter(f=>f);
 
 async function willyFetch(path){
   const raw='https://api.willyweather.com.au/v2/'+WILLY_KEY+path;
-  for(let i=0;i<PROXIES.length;i++){
-    const url=PROXIES[i](raw);
+  const hdrs={'User-Agent':'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15','Accept':'application/json'};
+  const fns = PROXIES.map(fn=>fn(raw)).filter(Boolean);
+  let lastErr;
+  for(let i=0;i<fns.length;i++){
+    const url=fns[i];
     try{
       const ctrl=new AbortController();
       const tid=setTimeout(()=>ctrl.abort(),9000);
-      const res=await fetch(url,{signal:ctrl.signal});
+      const res=await fetch(url,{signal:ctrl.signal,headers:hdrs});
       clearTimeout(tid);
       if(!res.ok) throw new Error('HTTP '+res.status);
       const json=await res.json();
       const raw2=(json&&json.contents!==undefined)?json.contents:JSON.stringify(json);
-      return JSON.parse(raw2);
+      const parsed=JSON.parse(raw2);
+      console.log('[WillyFetch] 성공:', url.split('/')[2]);
+      return parsed;
     }catch(e){
-      if(i===PROXIES.length-1) throw new Error('API Request Failed');
+      console.warn('[WillyFetch] 실패 ('+i+'):', e.message);
+      lastErr=e;
     }
   }
+  throw new Error('모든 프록시 실패 — Cloudflare Worker 설정 필요');
 }
 
 async function getWillyLocationId(locName){
@@ -1462,7 +1479,7 @@ function parseWillyData(data){
     }
 
     days.push({date,dayName:DNs[date.getDay()],dayNum:date.getDate(),isToday:d===0,
-      swellH,swellD,swellPer,windKmh,windD,windGust:gustKmh,rain,pressure,sst:null,
+      swellH,swellD,swellPer,windKmh,windD,windGust:gustKmh,rain,pressure,sst:21,
       warn,hours,sunrise,sunset,tides,
       condIcon:swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀'});
   }
@@ -1503,32 +1520,23 @@ function setCachedWeather(locName, data){
 }
 
 // ─── OPEN-METEO SST ─────────────────────────────
-async function fetchOpenMeteoSSTRaw(lat, lng) {
-  const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&hourly=sea_surface_temperature&forecast_days=7&timezone=Australia%2FSydney`;
-  const ctrl = new AbortController();
-  const tid = setTimeout(() => ctrl.abort(), 8000);
-  const res = await fetch(url, {signal: ctrl.signal});
-  clearTimeout(tid);
-  if (!res.ok) throw new Error('SST HTTP ' + res.status);
-  const data = await res.json();
-  const temps = (data.hourly && data.hourly.sea_surface_temperature) || [];
-  const dailySst = [];
-  for (let d = 0; d < 7; d++) {
-    const slice = temps.slice(d * 24, d * 24 + 24).filter(v => v != null);
-    dailySst.push(slice.length ? +( slice.reduce((a,b)=>a+b,0)/slice.length ).toFixed(1) : null);
-  }
-  return dailySst;
-}
 async function fetchOpenMeteoSST(lat, lng) {
   try {
-    let result = await fetchOpenMeteoSSTRaw(lat, lng);
-    // 해안 인접/항구 안쪽 좌표는 모델 그리드가 육지로 판정해 null 반환되는 경우가 있음
-    // → 동쪽(외해) 방향으로 살짝 이동 후 재시도 (NSW 동해안 기준)
-    if (result.every(v => v == null)) {
-      console.warn('[SST] 전체 null — 외해 좌표로 재시도');
-      result = await fetchOpenMeteoSSTRaw(lat, lng + 0.18);
+    const url = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat.toFixed(4)}&longitude=${lng.toFixed(4)}&hourly=sea_surface_temperature&forecast_days=7&timezone=Australia%2FSydney`;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(url, {signal: ctrl.signal});
+    clearTimeout(tid);
+    if (!res.ok) throw new Error('SST HTTP ' + res.status);
+    const data = await res.json();
+    const temps = (data.hourly && data.hourly.sea_surface_temperature) || [];
+    // 하루 평균으로 7일치 SST 배열 생성
+    const dailySst = [];
+    for (let d = 0; d < 7; d++) {
+      const slice = temps.slice(d * 24, d * 24 + 24).filter(v => v != null);
+      dailySst.push(slice.length ? +( slice.reduce((a,b)=>a+b,0)/slice.length ).toFixed(1) : null);
     }
-    return result;
+    return dailySst;
   } catch(e) {
     console.warn('[SST] Open-Meteo 실패:', e.message);
     return Array(7).fill(null);
@@ -1581,7 +1589,14 @@ async function loadWeather(locName){
     // V4.1: 파핑 스코어 업데이트
     try{ renderPoppingScore(); }catch(e){}
   }catch(e){
-    if(mc)mc.innerHTML=`<div class="err-msg">⚠ WillyWeather 데이터 로드 실패: ${e.message}</div>`;
+    if(mc)mc.innerHTML=`<div class="err-msg">
+      ⚠ WillyWeather 연결 실패<br>
+      <span style="font-size:11px;color:var(--muted);line-height:1.8;display:block;margin-top:6px">
+        ${e.message.includes('Worker')||e.message.includes('Request Failed')
+          ? '📡 공개 CORS 프록시가 모두 차단됨<br>→ <b style="color:var(--accent)">Cloudflare Worker 설정 필요</b><br><a href="https://workers.cloudflare.com" target="_blank" style="color:var(--accent)">workers.cloudflare.com</a> 에서 무료 Worker 설정 후<br>코드의 CUSTOM_WORKER 값에 URL 입력'
+          : e.message}
+      </span>
+    </div>`;
   }
 }
 
@@ -3078,9 +3093,8 @@ function renderMapMarkers(){
   if(d && d.windD && LOCS[activeIdx]){
     const l = LOCS[activeIdx];
     const dirMap={'N':0,'NNE':22.5,'NE':45,'ENE':67.5,'E':90,'ESE':112.5,'SE':135,'SSE':157.5,'S':180,'SSW':202.5,'SW':225,'WSW':247.5,'W':270,'WNW':292.5,'NW':315,'NNW':337.5};
-    // FROM 방향 데이터 → 화살표는 이동(TO) 방향으로 180도 반전
-    const wAngle = ((dirMap[d.windD] || 0) + 180) % 360;
-    const swAngle = ((dirMap[d.swellD||d.windD] || 0) + 180) % 360;
+    const wAngle = dirMap[d.windD] || 0;
+    const swAngle = dirMap[d.swellD||d.windD] || 0;
     // 바람 화살표
     const windSvg=`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="-18 -18 36 36"><polygon points="0,-14 4,6 0,2 -4,6" fill="rgba(0,212,255,.85)" stroke="white" stroke-width=".8" transform="rotate(${wAngle})"/><circle r="3" fill="rgba(0,212,255,.9)"/></svg>`;
     const windIcon=L.divIcon({html:windSvg,iconSize:[36,36],iconAnchor:[18,18],className:''});
