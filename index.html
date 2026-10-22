@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1565C0">
-<title>Scott Fishing</title>
+<title>Scott Fishing v7</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -44,6 +44,8 @@
   --radius:       14px;
   --shadow:       0 2px 12px rgba(21,101,192,.10);
   --shadow-sm:    0 1px 4px rgba(0,0,0,.07);
+  --warn:         #E65100;
+  --dim:          rgba(0,0,0,.06);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body {
@@ -97,7 +99,7 @@ html, body {
   opacity: 0; transition: opacity .25s;
 }
 #drawer-overlay.open { display: block; opacity: 1; }
-#drawer {
+#side-drawer {
   position: fixed; top: 0; left: 50%; margin-left: -215px;
   width: 280px; height: 100%;
   background: var(--surface); z-index: 2001;
@@ -106,7 +108,7 @@ html, body {
   display: flex; flex-direction: column;
   box-shadow: 4px 0 20px rgba(0,0,0,.18);
 }
-#drawer.open { transform: translateX(0); }
+#side-drawer.open { transform: translateX(0); }
 #drawer-header {
   background: var(--topbar);
   padding: 48px 20px 20px;
@@ -887,6 +889,183 @@ html, body {
   to   { opacity: 1; transform: translateY(0); }
 }
 .tab-panel.active { animation: fadeSlideUp .25s ease; }
+
+/* ═══════════════════════════════════════════════
+   JS_LOGIC GENERATED CLASSES (renderMarineDay)
+   ═══════════════════════════════════════════════ */
+
+/* Marine calendar cells (js_logic uses .mar-cell not .mar-cal-cell) */
+.mar-cell {
+  padding: 8px 2px; text-align: center;
+  border-right: 1px solid var(--border);
+  cursor: pointer; transition: background .15s;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.mar-cell:last-child { border-right: none; }
+.mar-cell.today { background: var(--accent-light); }
+.mar-cell.on { background: var(--accent); }
+.mar-cell.on .mc-day, .mar-cell.on .mc-num, .mar-cell.on .mc-sw, .mar-cell.on .mc-wi { color: #fff !important; }
+.mar-cell.rough { background: rgba(230,81,0,.06); }
+.mar-cell.good:not(.on) { background: rgba(46,125,50,.04); }
+.mar-cell:hover:not(.on) { background: var(--accent-light); }
+.mc-day { font-size: 8px; font-weight: 700; color: var(--muted); letter-spacing: .5px; }
+.mc-num { font-size: 15px; font-weight: 800; color: var(--text); }
+.mc-icon { font-size: 12px; line-height: 1; }
+.mc-sw { font-size: 10px; font-weight: 700; }
+.mc-wi { font-size: 9px; color: var(--muted); }
+
+/* Danger banner */
+.danger-banner {
+  background: rgba(198,40,40,.10);
+  border: 1px solid rgba(198,40,40,.4);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 8px 12px 0;
+  font-size: 14px; font-weight: 700; color: var(--red);
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Error message */
+.err-msg {
+  text-align: center; padding: 32px 16px;
+  color: var(--muted); font-size: 15px;
+}
+
+/* Hero card */
+.mhero-card {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow); margin: 8px 12px 0;
+  padding: 16px 16px 14px;
+}
+.mhero-top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 14px;
+}
+.mhero-cond {
+  font-size: 22px; font-weight: 800; letter-spacing: -.3px; line-height: 1;
+}
+.mhero-date {
+  font-size: 12px; color: var(--muted); margin-top: 3px;
+}
+.mhero-badge {
+  font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 20px;
+}
+.mhero-stats {
+  display: flex; gap: 0; align-items: stretch;
+}
+.mhero-stat {
+  flex: 1; text-align: center; padding: 0 8px;
+}
+.mhero-val {
+  font-size: 26px; font-weight: 800; color: var(--text); line-height: 1;
+}
+.mhero-unit {
+  font-size: 13px; font-weight: 600; color: var(--muted); margin-left: 1px;
+}
+.mhero-lbl {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .6px; margin-top: 4px;
+}
+.mhero-sub {
+  font-size: 11px; color: var(--muted); margin-top: 2px;
+}
+.mhero-div {
+  width: 1px; background: var(--border); align-self: stretch; flex-shrink: 0;
+}
+
+/* Tide hero card */
+.tide-hero-card {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); margin: 8px 12px 0;
+  padding: 14px 16px;
+}
+.tide-hero-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 8px;
+}
+.tide-svg-w svg { width: 100%; display: block; overflow: visible; }
+.tide-row {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;
+}
+
+/* Tide items inside tide chart */
+.tide-item {
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--bg2); border-radius: 10px;
+  padding: 6px 12px; min-width: 64px;
+}
+.t-hi {
+  font-size: 9px; font-weight: 800; letter-spacing: .8px;
+  color: var(--green); background: var(--green-bg);
+  padding: 1px 6px; border-radius: 8px; margin-bottom: 3px;
+}
+.t-lo {
+  font-size: 9px; font-weight: 800; letter-spacing: .8px;
+  color: var(--accent); background: var(--accent-light);
+  padding: 1px 6px; border-radius: 8px; margin-bottom: 3px;
+}
+.tide-time {
+  font-size: 15px; font-weight: 700; color: var(--text);
+}
+.tide-ht {
+  font-size: 12px; color: var(--muted); margin-top: 1px;
+}
+
+/* 2x2 stats grid */
+.mstats-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 8px; margin: 8px 12px 0;
+}
+.mstat-card {
+  background: var(--surface); border-radius: var(--radius);
+  box-shadow: var(--shadow-sm); padding: 14px 14px;
+}
+.mstat-label {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px;
+}
+.mstat-val {
+  font-size: 26px; font-weight: 800; color: var(--text); line-height: 1;
+}
+.mstat-unit {
+  font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 1px;
+}
+.mstat-sub {
+  font-size: 11px; color: var(--muted); margin-top: 3px;
+}
+
+/* Badge variants used by js_logic */
+.badge.b-warn { background: rgba(230,81,0,.12); color: var(--warn); }
+.badge.b-ok   { background: rgba(46,125,50,.12); color: var(--green); }
+
+/* Hourly cell (hc) */
+.hc {
+  display: inline-flex; flex-direction: column; align-items: center;
+  padding: 6px 8px; min-width: 48px;
+  background: var(--bg2); border-radius: 8px;
+  font-size: 11px; color: var(--muted); cursor: pointer;
+  transition: background .15s;
+}
+.hc.now { background: var(--accent); color: #fff; }
+.hc:hover:not(.now) { background: var(--accent-light); }
+
+/* Compass rose SVG inside mstat-card */
+.mstat-card svg { display: block; }
+
+/* Animated card entrance */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.mhero-card, .tide-hero-card, .mstats-grid .mstat-card, .danger-banner {
+  animation: fadeSlideUp .3s ease forwards;
+}
+.mstats-grid .mstat-card:nth-child(2) { animation-delay: .05s; }
+.mstats-grid .mstat-card:nth-child(3) { animation-delay: .10s; }
+.mstats-grid .mstat-card:nth-child(4) { animation-delay: .15s; }
+
+/* ─── END JS_LOGIC CLASSES ─── */
 </style>
 </head>
 <body>
@@ -920,7 +1099,7 @@ html, body {
 
 <!-- ══ DRAWER OVERLAY ═══════════════════════════ -->
 <div id="drawer-overlay" onclick="closeDrawer()"></div>
-<div id="drawer">
+<div id="side-drawer">
   <div id="drawer-header">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <div style="background:rgba(255,255,255,.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px">🎣</div>
@@ -956,7 +1135,7 @@ html, body {
       <span class="di">📍</span><span>위치 변경</span>
     </div>
     <div class="dnav-divider"></div>
-    <div style="padding:14px 20px;font-size:11px;color:var(--muted)">Scott Fishing v6.0 — NSW</div>
+    <div style="padding:14px 20px;font-size:11px;color:var(--muted)">Scott Fishing v7.0 — NSW</div>
   </div>
 </div>
 
@@ -964,10 +1143,10 @@ html, body {
 <div id="date-strip"></div>
 
 <!-- ══ MAIN CONTENT ══════════════════════════════ -->
-<div id="main">
+<div id="main" class="content">
 
 <!-- ─── SOLUNAR TAB ─────────────────────────────── -->
-<div id="tab-solunar" class="tab-panel active with-date">
+<div id="tab-solunar" class="tab tab-panel active with-date">
   <!-- Top 3 peaks -->
   <div class="section-title">오늘의 피크 타임</div>
   <div id="sol-top3" class="sol-top-grid">
@@ -1002,7 +1181,7 @@ html, body {
 </div>
 
 <!-- ─── MARINE TAB ──────────────────────────────── -->
-<div id="tab-marine" class="tab-panel with-date">
+<div id="tab-marine" class="tab tab-panel with-date">
   <!-- Current conditions -->
   <div class="marine-cond-card">
     <div class="marine-cond-header">
@@ -1026,8 +1205,19 @@ html, body {
         <div class="mcg-label">🕐 기압</div>
         <div class="mcg-value"><span id="lb-pres">--</span><span class="unit">hPa</span></div>
       </div>
+      <div class="mcg-item">
+        <div class="mcg-label">🌊 만조</div>
+        <div class="mcg-value"><span id="lb-tide">--</span></div>
+      </div>
     </div>
   </div>
+  <!-- Hidden elements for js_logic species/eging tabs -->
+  <span id="cb-swell" style="display:none"></span>
+  <span id="cb-dir"   style="display:none"></span>
+  <span id="cb-wind"  style="display:none"></span>
+  <span id="cb-wdir"  style="display:none"></span>
+  <span id="cb-moon"  style="display:none"></span>
+  <span id="cb-sst"   style="display:none"></span>
 
   <!-- 7-day marine calendar -->
   <div class="section-title" style="margin-top:6px">7일 해양 예보</div>
@@ -1094,38 +1284,14 @@ html, body {
     </div>
   </div>
 
-  <!-- Tide chart -->
-  <div id="marine-content">
-    <div id="lb-tide" class="tide-chart-card">
-      <div class="tide-chart-title">🌊 조석 예보</div>
-      <div class="tide-chart-wrap">
-        <svg id="tide-chart-svg" viewBox="0 0 340 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="tideGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stop-color="#1565C0" stop-opacity="0.20"/>
-              <stop offset="100%" stop-color="#1565C0" stop-opacity="0.02"/>
-            </linearGradient>
-          </defs>
-          <path id="tide-fill" fill="url(#tideGrad)" d="M0,120 L340,120 Z"/>
-          <path id="tide-line" fill="none" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d=""/>
-        </svg>
-      </div>
-      <div class="tide-stats">
-        <div class="tide-stat">
-          <div class="ts-label">만조</div>
-          <div class="ts-value" id="tide-high">-- : -- — -- m</div>
-        </div>
-        <div class="tide-stat">
-          <div class="ts-label">간조</div>
-          <div class="ts-value" id="tide-low">-- : -- — -- m</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- Marine content rendered by js_logic renderMarineDay() -->
+  <div id="marine-content" style="padding-bottom:4px"></div>
 </div>
 
 <!-- ─── MAP TAB ─────────────────────────────────── -->
-<div id="tab-map" class="tab-panel">
+<div id="tab-map" class="tab tab-panel">
+  <!-- Hidden windy link -->
+  <a id="windy-link" href="https://www.windy.com" target="_blank" style="display:none"></a>
   <!-- Fav row -->
   <div id="fav-row">
     <div class="fav-chip" onclick="openModal()">
@@ -1188,7 +1354,7 @@ html, body {
 </div>
 
 <!-- ─── SPECIES TAB ──────────────────────────────── -->
-<div id="tab-species" class="tab-panel">
+<div id="tab-species" class="tab tab-panel">
   <div class="species-subtab-bar">
     <button class="species-subtab active" id="sub-fish" onclick="switchSpeciesTab('fish',this)">🐟 어종</button>
     <button class="species-subtab" id="sub-eging" onclick="switchSpeciesTab('eging',this)">🦑 에깅</button>
@@ -1198,7 +1364,7 @@ html, body {
 </div>
 
 <!-- ─── LOG TAB ──────────────────────────────────── -->
-<div id="tab-log" class="tab-panel">
+<div id="tab-log" class="tab tab-panel">
   <!-- Pop score card -->
   <div id="pop-score-card">
     <div class="psc-row">
@@ -1287,7 +1453,7 @@ html, body {
 </div>
 
 <!-- ─── NSW TAB ──────────────────────────────────── -->
-<div id="tab-nsw" class="tab-panel">
+<div id="tab-nsw" class="tab tab-panel">
   <div class="nsw-item">
     <span class="nsw-icon">🎣</span>
     <div class="nsw-info">
@@ -1424,11 +1590,11 @@ html, body {
 // ── DRAWER ─────────────────────────────────────
 function openDrawer(){
   document.getElementById('drawer-overlay').classList.add('open');
-  document.getElementById('drawer').classList.add('open');
+  document.getElementById('side-drawer').classList.add('open');
 }
 function closeDrawer(){
   document.getElementById('drawer-overlay').classList.remove('open');
-  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('side-drawer').classList.remove('open');
 }
 
 // ── TAB SWITCHING ───────────────────────────────
@@ -1440,7 +1606,15 @@ function switchTab(tab){
   // Panels
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   const panel = document.getElementById('tab-'+tab);
-  if(panel) panel.classList.add('active');
+  if(panel){
+    panel.classList.add('active');
+    // Animate cards inside the tab
+    panel.querySelectorAll('.card,.sol-peak-card,.marine-data-card,.marine-cond-card,.map-card,.species-card,.log-entry,.nsw-card,.eging-card').forEach((el,i)=>{
+      el.style.animation='none';
+      el.offsetHeight;
+      el.style.animation=`fadeSlideUp .25s ease ${i*0.04}s both`;
+    });
+  }
 
   // Nav buttons
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
