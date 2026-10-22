@@ -514,6 +514,10 @@ html, body {
   cursor: pointer; transition: all .2s; text-align: center;
 }
 .species-subtab.active { border-bottom-color: var(--accent); color: var(--accent); }
+.egi-calc-result { display:none; padding:10px; background:var(--card2); border:1px solid var(--border); border-radius:12px; }
+.egi-calc-result.on { display:block; }
+.ecr-main { font-family:'Bebas Neue',cursive; font-size:24px; line-height:1.1; }
+.ecr-sub { font-size:14px; color:var(--muted); line-height:1.5; }
 
 .species-card {
   background: var(--surface); border-radius: var(--radius);
@@ -1120,9 +1124,9 @@ html, body {
 .tl-v { font-size:9px; color:var(--muted); text-align:center; }
 .now-dot { position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); animation:pulse 1.5s ease-in-out infinite; }
 
-/* TOP3 cards horizontal override (js_logic uses inline flex-direction:column on parent — we override the cards) */
-#sol-top3 > div { display:flex !important; flex-direction:row !important; gap:8px !important; }
-#sol-top3 > div > div { flex:1 !important; min-width:0 !important; }
+/* TOP3 section — keep js_logic's vertical layout, just clean up overflow */
+#sol-top3 { overflow:hidden; }
+#sol-top3 > div > div > div { min-width:0; word-break:keep-all; }
 
 /* ─── END SOLUNAR CLASSES ─── */
 </style>
@@ -1722,7 +1726,72 @@ function switchSpeciesTab(type, el){
   document.querySelectorAll('.species-subtab').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
   activeSpecies = type;
-  renderSpeciesTab(type);
+  if(type === 'eging'){
+    // Render the full eging scaffold before calling renderEgingTab
+    document.getElementById('species-content').innerHTML = `
+      <div style="padding:4px 0 8px">
+        <div style="font-size:13px;color:var(--muted)" id="egi-date-sub">오늘 조건 기반 실시간 에깅 전략</div>
+      </div>
+      <div id="egi-conditions-bar"></div>
+      <div id="egi-depth-section"></div>
+      <div id="egi-color-section"></div>
+      <div id="egi-rotation-section"></div>
+      <div id="egi-compare-section"></div>
+      <div id="egi-session-timer"></div>
+      <div id="egi-cast-guide"></div>
+      <div id="egi-point-types"></div>
+      <!-- ── 에기 계산기 ── -->
+      <div class="egi-section" style="margin-top:10px">
+        <div class="egi-section-title">🎯 에기 계산기</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">수심 (m)</label>
+            <input id="calc-depth" type="number" min="1" max="30" value="6"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">바람 (km/h)</label>
+            <input id="calc-wind" type="number" min="0" max="80" value="0"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">조류</label>
+            <select id="calc-current"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px">
+              <option value="weak">약 (약조류)</option>
+              <option value="normal" selected>보통</option>
+              <option value="strong">강 (강조류)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">시간대</label>
+            <select id="calc-time"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px">
+              <option value="day" selected>낮</option>
+              <option value="dusk">황혼</option>
+              <option value="night">야간</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1">
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:3px">날씨</label>
+            <select id="calc-weather"
+              style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:14px">
+              <option value="clear">맑음</option>
+              <option value="cloudy" selected>흐림</option>
+              <option value="rough">비/강풍</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button onclick="autoFillEgiCalc()" style="flex:1;padding:9px;background:var(--accent-dim);border:1px solid var(--accent);border-radius:9px;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer">⚡ 현재 조건 자동 입력</button>
+          <button onclick="calcEgi()" style="flex:1;padding:9px;background:var(--purple-dim,rgba(176,106,255,.15));border:1px solid var(--purple,#b06aff);border-radius:9px;color:var(--purple,#b06aff);font-size:13px;font-weight:700;cursor:pointer">🦑 추천 계산</button>
+        </div>
+        <div id="egi-calc-result" class="egi-calc-result"></div>
+      </div>`;
+    renderEgingTab();
+  } else {
+    renderSpeciesTab(type);
+  }
 }
 
 // ── PICKER HELPERS ──────────────────────────────
@@ -1930,7 +1999,7 @@ const EGING_DATA = [
 
 function renderSpeciesTab(type) {
   const cont = document.getElementById('species-content');
-  if(type === 'fish' || type === activeSpecies) {
+  if(type === 'fish') {
     cont.innerHTML = FISH_DATA.map(f => `
       <div class="species-card">
         <div class="species-card-body">
@@ -2097,10 +2166,10 @@ function renderMarineSubTab(idx){
   if(idx===0){
     // Waves
     if(bigLabel) bigLabel.textContent='파고 (Waves)';
-    if(bigNum) bigNum.textContent = day.waveH?day.waveH.toFixed(1):'--';
+    if(bigNum) bigNum.textContent = day.swellH?day.swellH.toFixed(1):'--';
     if(bigUnit) bigUnit.textContent='m';
-    if(period) period.textContent = day.period?day.period+'s':'--';
-    if(dir) dir.textContent = day.waveDir||'--';
+    if(period) period.textContent = day.swellPer?day.swellPer+'s':'--';
+    if(dir) dir.textContent = day.swellD||'--';
     drawWaveChartFromDay(day,'wave');
   } else if(idx===1){
     // Tide
@@ -2115,8 +2184,8 @@ function renderMarineSubTab(idx){
     if(bigLabel) bigLabel.textContent='풍속 (Wind)';
     if(bigNum) bigNum.textContent = day.windKmh?Math.round(day.windKmh):'--';
     if(bigUnit) bigUnit.textContent='km/h';
-    if(period) period.innerHTML='<div class="st-label">풍향</div><div class="st-value">'+(day.windDir||'--')+'</div>';
-    if(dir) dir.innerHTML='<div class="st-label">돌풍</div><div class="st-value">'+(day.gustKmh?Math.round(day.gustKmh)+' km/h':'--')+'</div>';
+    if(period) period.innerHTML='<div class="st-label">풍향</div><div class="st-value">'+(day.windD||'--')+'</div>';
+    if(dir) dir.innerHTML='<div class="st-label">돌풍</div><div class="st-value">'+(day.windGust?Math.round(day.windGust)+' km/h':'--')+'</div>';
     drawWaveChartFromDay(day,'wind');
   }
 }
@@ -2129,7 +2198,7 @@ function drawWaveChartFromDay(day, type){
   else if(type==='tide' && day.tideHourly) pts = day.tideHourly.map((v,i)=>({v,t:i}));
   else {
     // Generate smooth placeholder from day value
-    const base = type==='wave'?(day.waveH||1.2):type==='wind'?(day.windKmh||15):(day.tideMax||1.0);
+    const base = type==='wave'?(day.swellH||1.2):type==='wind'?(day.windKmh||15):(day.tideMax||1.0);
     pts = Array.from({length:12},(_, i)=>({v: base*(0.7+Math.sin(i/11*Math.PI)*0.6),t:i}));
   }
   if(pts.length>1) drawWaveChart(pts,'marine-chart-svg','marine-chart-fill','marine-chart-line');
@@ -2138,6 +2207,94 @@ function drawWaveChartFromDay(day, type){
 // Initialize
 renderSpeciesTab('fish');
 setTimeout(renderLogList, 100);
+
+// ── MOON PHASE SVG INJECTOR ─────────────────────
+let _moonSvgId = 0;
+function moonPhaseSVG(pct, phase) {
+  const uid = 'mp' + (++_moonSvgId);
+  const r = 28;
+  const size = r * 2 + 8;
+  const cx = r + 4, cy = r + 4;
+  const illum = Math.max(0, Math.min(100, pct||0)) / 100;
+  const isWaning = /waning/i.test(phase||'');
+  const tx = r * Math.abs(Math.cos(Math.PI * illum)); // terminator x-radius
+
+  let litShape = '';
+  if (illum >= 0.98) {
+    // Full moon — whole circle lit
+    litShape = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${uid}L)"/>`;
+  } else if (illum > 0.02) {
+    // Crescent/quarter/gibbous — two-arc path
+    let d;
+    if (!isWaning) {
+      // Waxing: right side lit. Outer arc right-sweep (1,1), terminator closes back
+      const ts = illum > 0.5 ? 1 : 0;
+      d = `M${cx},${cy-r} A${r},${r} 0 1,1 ${cx},${cy+r} A${tx},${r} 0 1,${ts} ${cx},${cy-r}`;
+    } else {
+      // Waning: left side lit. Outer arc left-sweep (1,0), terminator closes back
+      const ts = illum > 0.5 ? 0 : 1;
+      d = `M${cx},${cy-r} A${r},${r} 0 1,0 ${cx},${cy+r} A${tx},${r} 0 1,${ts} ${cx},${cy-r}`;
+    }
+    litShape = `<path d="${d}" fill="url(#${uid}L)"/>`;
+  }
+  // Craters (outlined circles for texture)
+  const craters = [
+    [cx-8,cy+6,3.5,.18,1],[cx+9,cy-9,2.5,.15,.8],[cx+4,cy+12,2,.12,.6],[cx-11,cy-4,1.5,.1,.5]
+  ].map(([x,y,rc,op,sw])=>`<circle cx="${x}" cy="${y}" r="${rc}" fill="none" stroke="rgba(0,0,0,${op})" stroke-width="${sw}"/>`).join('');
+
+  return `<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg"
+    width="${size}" height="${size}"
+    style="filter:drop-shadow(0 0 8px rgba(255,220,100,.75));display:inline-block;vertical-align:middle;flex-shrink:0">
+  <defs>
+    <radialGradient id="${uid}L" cx="38%" cy="30%" r="65%">
+      <stop offset="0%" stop-color="#fffde7"/>
+      <stop offset="40%" stop-color="#fdd835"/>
+      <stop offset="100%" stop-color="#a07000"/>
+    </radialGradient>
+    <radialGradient id="${uid}D" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1c2040"/>
+      <stop offset="100%" stop-color="#07091a"/>
+    </radialGradient>
+  </defs>
+  <circle cx="${cx}" cy="${cy}" r="${r}" fill="url(#${uid}D)"/>
+  ${litShape}
+  ${craters}
+</svg>`;
+}
+
+function injectMoonSVG() {
+  const strip = document.querySelector('.sol-moon-strip');
+  if (!strip) return;
+  const firstSpan = strip.querySelector('span:first-child');
+  if (!firstSpan) return;
+  // Get moon data from sol day
+  const d = (typeof solDays !== 'undefined' && solDays[activeSolDay]) ? solDays[activeSolDay] : null;
+  if (!d) return;
+  const pct = d.moon.pct || 50;
+  const phase = d.moon.n || '';
+  // Check if already injected for THIS day to avoid flicker, but allow re-inject on day change
+  const dayKey = activeSolDay + '_' + pct;
+  if (firstSpan.dataset.moonDay === dayKey) return;
+  firstSpan.innerHTML = moonPhaseSVG(pct, phase);
+  firstSpan.style.fontSize = '0';
+  firstSpan.dataset.moonDay = dayKey;
+}
+
+// Watch for sol-content changes to inject moon SVG
+const _moonObserver = new MutationObserver(() => {
+  setTimeout(injectMoonSVG, 50);
+});
+const _solContent = document.getElementById('sol-content');
+if (_solContent) _moonObserver.observe(_solContent, {childList:true, subtree:false});
+
+// Also patch selectSolDay to re-inject after render
+const _origSelectSolDay = window.selectSolDay;
+if (_origSelectSolDay) {
+  window.selectSolDay = function(i) {
+    _origSelectSolDay(i);
+    setTimeout(injectMoonSVG, 80);
+  };
+}
 </script>
 
 <script>
@@ -2777,9 +2934,28 @@ function parseWillyData(data){
         solDays[d].moon.n = mpe[0]?.phase || solDays[d].moon.n;
     }
 
+    // Build hourly arrays for charts (24 values)
+    const waveHourly = Array.from({length:24}, (_,h) => {
+      const e = se.find(x => Math.abs(new Date(x.dateTime||0).getHours() - h) <= 1);
+      return e ? +(e.height||swellH).toFixed(2) : swellH;
+    });
+    const windHourly = Array.from({length:24}, (_,h) => {
+      const e = we.find(x => Math.abs(new Date(x.dateTime||0).getHours() - h) <= 1);
+      return e ? Math.round(e.speed||windKmh) : windKmh;
+    });
+    const tideHourly = (() => {
+      if (!te.length) return null;
+      const arr = Array(24).fill(null);
+      te.forEach(e => { const h = new Date(e.dateTime||0).getHours(); arr[h] = +(e.height||0).toFixed(2); });
+      // interpolate nulls
+      for (let i=0;i<24;i++) { if(arr[i]==null) { let p=i-1,n=i+1; while(n<24&&arr[n]==null)n++; arr[i]=arr[p]!=null&&arr[n]!=null?(arr[p]+arr[n])/2:arr[p]!=null?arr[p]:arr[n]||0.5; } }
+      return arr;
+    })();
+
     days.push({date,dayName:DNs[date.getDay()],dayNum:date.getDate(),isToday:d===0,
-      swellH,swellD,swellPer,windKmh,windD,windGust:gustKmh,rain,pressure,sst:21,
+      swellH,swellD,swellPer,windKmh,windD,windGust:gustKmh,rain,pressure,sst:null,
       warn,hours,sunrise,sunset,tides,
+      waveHourly,windHourly,tideHourly,
       condIcon:swellH>3?'⛈':swellH>2?'🌊':rain>50?'🌧':rain>20?'🌦':'☀'});
   }
   
@@ -4120,11 +4296,15 @@ function autoFillEgiCalc(){
 }
 
 function calcEgi(){
-  const depth = parseFloat(document.getElementById('calc-depth').value) || 5;
-  const current = document.getElementById('calc-current').value;
-  const time = document.getElementById('calc-time').value;
-  const weather = document.getElementById('calc-weather').value;
-  const windKmh = parseFloat(document.getElementById('calc-wind').value) || 0;
+  const dEl=document.getElementById('calc-depth'), cEl=document.getElementById('calc-current'),
+        tEl=document.getElementById('calc-time'), wEl=document.getElementById('calc-weather'),
+        wdEl=document.getElementById('calc-wind'), res=document.getElementById('egi-calc-result');
+  if(!dEl||!res){ return; }
+  const depth = parseFloat(dEl.value) || 5;
+  const current = cEl ? cEl.value : 'normal';
+  const time = tEl ? tEl.value : 'day';
+  const weather = wEl ? wEl.value : 'cloudy';
+  const windKmh = parseFloat(wdEl ? wdEl.value : 0) || 0;
 
   // ─── 맥스 사용 에기 데이터베이스 (실측 기반) ───
   // 사이즈: 3.0호 / 3.5호
@@ -4198,7 +4378,6 @@ function calcEgi(){
   }
 
   const timeLabel = time === 'night' ? '야간' : time === 'dusk' ? '황혼' : '낮';
-  const res = document.getElementById('egi-calc-result');
   res.classList.add('on');
   res.innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px">
