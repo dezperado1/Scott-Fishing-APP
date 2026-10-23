@@ -519,30 +519,57 @@ html, body {
 .ecr-main { font-family:'Bebas Neue',cursive; font-size:24px; line-height:1.1; }
 .ecr-sub { font-size:14px; color:var(--muted); line-height:1.5; }
 
-.species-card {
-  background: var(--surface); border-radius: var(--radius);
-  box-shadow: var(--shadow-sm); margin: 8px 12px; overflow: hidden;
-}
-.species-card img { width: 100%; height: 160px; object-fit: cover; display: block; }
-.species-card-body { padding: 12px 14px; }
-.species-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-.species-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 11px; font-weight: 700; padding: 3px 9px;
-  border-radius: 20px;
-}
-.badge.blue { background: var(--accent-light); color: var(--accent); }
-.badge.green { background: var(--green-bg); color: var(--green); }
-.badge.orange { background: var(--orange-bg); color: var(--orange); }
-.badge.red { background: var(--red-bg); color: var(--red); }
-.badge.grey { background: #F3F4F6; color: #4B5563; }
-.species-stat-row {
-  display: flex; gap: 16px; padding-top: 8px;
-  border-top: 1px solid var(--border);
-}
-.species-stat .ss-label { font-size: 10px; color: var(--muted); text-transform: uppercase; }
-.species-stat .ss-value { font-size: 14px; font-weight: 700; color: var(--text); }
+/* Legacy species-card (kept for compat) */
+.species-card { background:var(--surface); border-radius:var(--radius); box-shadow:var(--shadow-sm); margin:8px 12px; overflow:hidden; }
+.species-card img { width:100%; height:160px; object-fit:cover; display:block; }
+.species-card-body { padding:12px 14px; }
+.species-name { font-size:16px; font-weight:700; color:var(--text); margin-bottom:6px; }
+.species-badges { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+.badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; }
+.badge.blue { background:var(--accent-light); color:var(--accent); }
+.badge.green { background:var(--green-bg); color:var(--green); }
+.badge.orange { background:var(--orange-bg); color:var(--orange); }
+.badge.red { background:var(--red-bg); color:var(--red); }
+.badge.grey { background:rgba(255,255,255,.07); color:var(--muted); }
+.badge.gold { background:rgba(255,200,0,.15); color:var(--gold); }
+.species-stat-row { display:flex; gap:16px; padding-top:8px; border-top:1px solid var(--border); }
+.species-stat .ss-label { font-size:10px; color:var(--muted); text-transform:uppercase; }
+.species-stat .ss-value { font-size:14px; font-weight:700; color:var(--text); }
+
+/* New species search/list */
+.sp-search-row { padding:10px 12px 0; }
+.sp-search-wrap { position:relative; }
+.sp-filter-bar { display:flex; gap:6px; padding:8px 12px; }
+.sp-filter-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--bg3); color:var(--muted); font-size:12px; font-weight:700; cursor:pointer; }
+.sp-filter-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+.sp-fish-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .15s; }
+.sp-fish-row:active { background:var(--card2); }
+.sp-fish-icon { width:50px; height:34px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(0,212,255,.06); border-radius:8px; border:1px solid rgba(0,212,255,.12); padding:3px; }
+.sp-fish-info { flex:1; min-width:0; }
+.sp-fish-name { font-size:14px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-fish-meta { font-size:11px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-fish-badges { display:flex; flex-direction:column; align-items:flex-end; gap:3px; flex-shrink:0; }
+.sp-fish-size { font-size:11px; color:var(--muted); }
+.sp-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px; }
+.sp-badge.gold { background:rgba(255,200,0,.15); color:var(--gold); }
+.sp-badge.blue { background:rgba(0,212,255,.12); color:var(--accent); }
+.sp-badge.red { background:rgba(255,80,80,.12); color:#ff5555; }
+.sp-badge.grey { background:rgba(255,255,255,.07); color:var(--muted); }
+/* Fish detail view */
+.sp-detail { padding:4px 12px 20px; }
+.sp-back-btn { background:none; border:none; color:var(--accent); font-size:14px; font-weight:700; padding:8px 0 12px; cursor:pointer; display:block; }
+.sp-detail-hero { display:flex; align-items:center; gap:12px; margin-bottom:10px; }
+.sp-detail-icon { width:60px; height:42px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:rgba(0,212,255,.07); border-radius:12px; border:1px solid rgba(0,212,255,.15); padding:4px; }
+.sp-detail-name { font-size:20px; font-weight:800; color:var(--text); line-height:1.2; }
+.sp-detail-habitat { font-size:12px; color:var(--muted); margin-top:3px; }
+.sp-detail-tags { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; }
+.sp-detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px; }
+.sp-detail-cell { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:10px 12px; }
+.sp-detail-lbl { font-size:10px; color:var(--muted); margin-bottom:3px; }
+.sp-detail-val { font-size:16px; font-weight:700; color:var(--text); }
+.sp-detail-section { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:12px 14px; }
+.sp-detail-sec-title { font-size:12px; font-weight:700; color:var(--muted); margin-bottom:6px; }
+.sp-detail-sec-body { font-size:14px; color:var(--text); line-height:1.5; }
 
 /* Eging cards */
 .eging-card {
@@ -627,21 +654,31 @@ html, body {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
   width: 100%; max-width: 430px;
   height: var(--bottom-h);
-  background: var(--surface); border-top: 1px solid var(--border);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
   display: flex; align-items: stretch;
   z-index: 1000;
-  box-shadow: 0 -2px 10px rgba(0,0,0,.07);
+  box-shadow: 0 -4px 20px rgba(0,0,0,.15);
+  backdrop-filter: blur(12px);
 }
 .nav-btn {
   flex: 1; background: none; border: none;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 3px; cursor: pointer; color: var(--muted);
-  font-size: 10px; font-weight: 600; transition: color .2s;
-  padding: 4px 0;
+  gap: 2px; cursor: pointer; color: var(--muted);
+  font-size: 9px; font-weight: 700; letter-spacing: .3px;
+  transition: color .2s; padding: 6px 0;
+  position: relative;
 }
-.nav-btn .nav-icon { font-size: 22px; transition: transform .2s; }
+.nav-btn .nav-icon { display:flex; align-items:center; justify-content:center; transition: transform .2s; }
+.nav-btn .nav-icon svg { transition: all .2s; }
 .nav-btn.active { color: var(--accent); }
-.nav-btn.active .nav-icon { transform: scale(1.1); }
+.nav-btn.active .nav-icon { transform: scale(1.12); }
+.nav-btn.active::after {
+  content: '';
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 28px; height: 2.5px;
+  background: var(--accent); border-radius: 0 0 3px 3px;
+}
 .nav-btn:hover { color: var(--accent2); }
 
 /* ── MODALS ───────────────────────────────────── */
@@ -1078,14 +1115,22 @@ html, body {
 .sol-label { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; }
 .sol-note { font-size:13px; color:var(--muted); background:var(--bg); border-radius:8px; padding:8px 12px; margin-bottom:10px; border:1px solid var(--border); }
 
-/* Moon strip */
-.sol-moon-strip { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--border); border-radius:12px; padding:10px 14px; margin-bottom:10px; }
-.sol-moon-name { font-size:14px; color:var(--text); font-weight:600; flex-shrink:0; }
-.sol-moon-bar-wrap { flex:1; height:6px; background:var(--bg); border-radius:3px; overflow:hidden; }
-.sol-moon-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--gold)); border-radius:3px; transition:width .5s ease; }
-.sol-moon-pct { font-size:13px; color:var(--muted); flex-shrink:0; }
+/* Moon card */
+.sol-moon-card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:10px; }
+.smc-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.smc-emoji { font-size:28px; display:inline-block; flex-shrink:0; }
+.smc-phase { flex:1; }
+.smc-name { font-size:14px; color:var(--text); font-weight:700; margin-bottom:5px; }
+.smc-bar-row { display:flex; align-items:center; gap:7px; }
+.smc-bar-wrap { flex:1; height:6px; background:var(--bg); border-radius:3px; overflow:hidden; }
+.smc-bar-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--gold)); border-radius:3px; transition:width .5s ease; }
+.smc-pct { font-size:12px; color:var(--muted); flex-shrink:0; }
+.smc-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.smc-stat { background:var(--bg); border-radius:10px; padding:8px 4px; text-align:center; }
+.smc-stat-val { font-family:'Bebas Neue',cursive; font-size:18px; color:var(--gold); line-height:1; letter-spacing:.5px; }
+.smc-stat-lbl { font-size:10px; color:var(--muted); margin-top:2px; }
 
-/* Animated moon emoji in strip */
+/* Animated moon emoji in card */
 @keyframes moonGlow {
   0%,100% { filter:drop-shadow(0 0 4px rgba(255,220,100,.3)); transform:scale(1) rotate(0deg); }
   50% { filter:drop-shadow(0 0 12px rgba(255,220,100,.95)); transform:scale(1.15) rotate(8deg); }
@@ -1095,7 +1140,7 @@ html, body {
   50% { transform:translateY(-3px); }
   100% { transform:translateY(0px); }
 }
-.sol-moon-strip > span:first-child {
+.smc-emoji {
   animation:moonGlow 3s ease-in-out infinite, moonOrbit 4s ease-in-out infinite;
   display:inline-block;
 }
@@ -1124,9 +1169,35 @@ html, body {
 .tl-v { font-size:9px; color:var(--muted); text-align:center; }
 .now-dot { position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:7px; height:7px; background:var(--accent); border-radius:50%; box-shadow:0 0 6px var(--accent); animation:pulse 1.5s ease-in-out infinite; }
 
-/* TOP3 section — keep js_logic's vertical layout, just clean up overflow */
-#sol-top3 { overflow:hidden; }
-#sol-top3 > div > div > div { min-width:0; word-break:keep-all; }
+/* ── TOP3: FORCE HORIZONTAL ────────────────────── */
+#sol-top3 {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 8px !important;
+  overflow: visible !important;
+}
+/* Override any nested flex/block that js_logic injects */
+#sol-top3 > * {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  min-width: 0 !important;
+  word-break: keep-all !important;
+}
+/* Rank badge + shimmer animation on best day */
+.top3-rank-1 { animation: top3glow 2.5s ease-in-out infinite; }
+@keyframes top3glow {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,200,0,0); }
+  50%      { box-shadow: 0 0 16px 4px rgba(255,200,0,.35); }
+}
+/* Entrance animation for each card */
+#sol-top3 > *:nth-child(1) { animation: slideUpIn .4s .05s both; }
+#sol-top3 > *:nth-child(2) { animation: slideUpIn .4s .15s both; }
+#sol-top3 > *:nth-child(3) { animation: slideUpIn .4s .25s both; }
+@keyframes slideUpIn {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0); }
+}
 
 /* ─── END SOLUNAR CLASSES ─── */
 </style>
@@ -1334,8 +1405,8 @@ html, body {
       </div>
     </div>
     <!-- SVG Chart -->
-    <div class="wave-chart-wrap" id="marine-chart-wrap">
-      <svg id="marine-chart-svg" viewBox="0 0 340 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="wave-chart-wrap" id="marine-chart-wrap" style="position:relative;touch-action:pan-y;">
+      <svg id="marine-chart-svg" viewBox="0 0 340 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="cursor:crosshair">
         <defs>
           <linearGradient id="waveGrad" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="#1565C0" stop-opacity="0.25"/>
@@ -1345,7 +1416,11 @@ html, body {
         <path id="marine-chart-fill" fill="url(#waveGrad)" d="M0,120 L340,120 Z"/>
         <path id="marine-chart-line" fill="none" stroke="#1565C0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d=""/>
         <line x1="0" y1="0" x2="0" y2="120" stroke="#E4EBF5" stroke-width="1" stroke-dasharray="4,3" id="chart-now-line"/>
+        <!-- Interactive crosshair -->
+        <line id="chart-xhair" x1="0" y1="0" x2="0" y2="120" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3,2" opacity="0" pointer-events="none"/>
+        <circle id="chart-dot" cx="0" cy="0" r="5" fill="var(--accent)" stroke="var(--bg)" stroke-width="2" opacity="0" pointer-events="none"/>
       </svg>
+      <div id="chart-tooltip" style="display:none;position:absolute;top:6px;background:var(--surface);border:1px solid var(--accent);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--text);pointer-events:none;z-index:10;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.3)"></div>
     </div>
     <div class="chart-axis-labels" id="marine-time-labels">
       <span>4 am</span><span>8 am</span><span>12 pm</span><span>4 pm</span><span>8 pm</span>
@@ -1575,23 +1650,50 @@ html, body {
 <!-- ══ BOTTOM NAV ════════════════════════════════ -->
 <nav id="bottom-nav">
   <button class="nav-btn active" onclick="switchTab('solunar')" id="nav-solunar">
-    <span class="nav-icon">🌙</span>
+    <span class="nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </span>
     <span>솔루나</span>
   </button>
   <button class="nav-btn" onclick="switchTab('marine')" id="nav-marine">
-    <span class="nav-icon">🌊</span>
+    <span class="nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <path d="M2 12c1.5-2.5 3-2.5 4.5 0s3 2.5 4.5 0 3-2.5 4.5 0 3 2.5 4.5 0"/>
+        <path d="M2 17c1.5-2.5 3-2.5 4.5 0s3 2.5 4.5 0 3-2.5 4.5 0 3 2.5 4.5 0" opacity=".4"/>
+      </svg>
+    </span>
     <span>해양</span>
   </button>
   <button class="nav-btn" onclick="switchTab('map')" id="nav-map">
-    <span class="nav-icon">🗺️</span>
+    <span class="nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/>
+        <line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>
+      </svg>
+    </span>
     <span>지도</span>
   </button>
   <button class="nav-btn" onclick="switchTab('species')" id="nav-species">
-    <span class="nav-icon">🐟</span>
+    <span class="nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 5c-1.5 2-4 3-7 3S7 7 5.5 5C4 3 2 2 2 2s0 5 4 8c-2 1-3.5 3-3.5 3s2.5 0 4.5-1.5c1.5 2.5 4 4 8 4.5"/>
+        <path d="M20 5s1 3 1 7-1 7-1 7" opacity=".5"/>
+        <circle cx="17" cy="7" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+    </span>
     <span>어종</span>
   </button>
   <button class="nav-btn" onclick="switchTab('log')" id="nav-log">
-    <span class="nav-icon">📝</span>
+    <span class="nav-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </span>
     <span>일지</span>
   </button>
 </nav>
@@ -1939,7 +2041,8 @@ function syncMapLiveBar(){
 }
 
 // ── MARINE CHART RENDERING ──────────────────────
-function drawWaveChart(points, svgId, fillId, lineId){
+let _chartPoints = [], _chartType = 'wave';
+function drawWaveChart(points, svgId, fillId, lineId, chartType){
   const svg = document.getElementById(svgId||'marine-chart-svg');
   const fill = document.getElementById(fillId||'marine-chart-fill');
   const line = document.getElementById(lineId||'marine-chart-line');
@@ -1951,12 +2054,51 @@ function drawWaveChart(points, svgId, fillId, lineId){
   const pts = points.map((p,i)=>{
     const x = (i/(points.length-1))*(W-PAD*2)+PAD;
     const y = H-PAD - ((p.v-min)/(max-min))*(H-PAD*2);
-    return [x,y];
+    return [x,y,p.v,p.t];
   });
   const pathD = pts.map((p,i)=>i===0?`M${p[0]},${p[1]}`:`L${p[0]},${p[1]}`).join(' ');
   const fillD = `M${pts[0][0]},${H} ${pathD.replace('M','L')} L${pts[pts.length-1][0]},${H} Z`;
   if(line) line.setAttribute('d', pathD);
   if(fill) fill.setAttribute('d', fillD);
+  _chartPoints = pts;
+  _chartType = chartType || 'wave';
+  // Attach tooltip events once
+  if(!svg._tooltipBound){
+    svg._tooltipBound = true;
+    const showTooltip = (clientX) => {
+      const rect = svg.getBoundingClientRect();
+      const px = (clientX - rect.left) / rect.width * 340;
+      if(!_chartPoints.length) return;
+      // Find nearest point
+      let best = _chartPoints[0], bestDx = Infinity;
+      for(const p of _chartPoints){ const dx = Math.abs(p[0]-px); if(dx<bestDx){bestDx=dx;best=p;} }
+      const xhair = document.getElementById('chart-xhair');
+      const dot = document.getElementById('chart-dot');
+      const tip = document.getElementById('chart-tooltip');
+      if(xhair){xhair.setAttribute('x1',best[0]);xhair.setAttribute('x2',best[0]);xhair.setAttribute('opacity','0.8');}
+      if(dot){dot.setAttribute('cx',best[0]);dot.setAttribute('cy',best[1]);dot.setAttribute('opacity','1');}
+      if(tip){
+        const h = best[3]!==undefined ? best[3] : Math.round(best[0]/340*23);
+        const tStr = h===0?'12 AM':h<12?h+' AM':h===12?'12 PM':(h-12)+' PM';
+        const unit = _chartType==='wave'?'m':_chartType==='tide'?'m':_chartType==='wind'?'km/h':'';
+        const val = _chartType==='wave'?best[2].toFixed(1):_chartType==='tide'?best[2].toFixed(1):Math.round(best[2]);
+        tip.textContent = `${tStr}  ${val}${unit}`;
+        tip.style.display = 'block';
+        const tipX = (best[0]/340)*rect.width;
+        tip.style.left = Math.min(tipX - 30, rect.width - 110) + 'px';
+      }
+    };
+    const hideTooltip = () => {
+      const xhair=document.getElementById('chart-xhair'), dot=document.getElementById('chart-dot'), tip=document.getElementById('chart-tooltip');
+      if(xhair)xhair.setAttribute('opacity','0');
+      if(dot)dot.setAttribute('opacity','0');
+      if(tip)tip.style.display='none';
+    };
+    svg.addEventListener('mousemove', e=>showTooltip(e.clientX));
+    svg.addEventListener('mouseleave', hideTooltip);
+    svg.addEventListener('touchmove', e=>{e.preventDefault();showTooltip(e.touches[0].clientX);},{passive:false});
+    svg.addEventListener('touchend', ()=>setTimeout(hideTooltip,1200));
+  }
 }
 </script>
 
@@ -1997,33 +2139,84 @@ const EGING_DATA = [
   {id:'cuttlefish',name:'Giant Cuttlefish',emoji:'🦑',season:'Jun–Aug',peak:'Jul',technique:'Slow presentation near sandy/rocky interface. Watch for flashing color change — strike immediately.',size:'No minimum',bag:'20',habitat:'Sandy reef edges'},
 ];
 
+let _spFilter = 'all', _spSearch = '';
+
+function _renderFishList() {
+  const cont = document.getElementById('species-list-items');
+  if(!cont) return;
+  const q = _spSearch.toLowerCase();
+  const list = FISH_DATA.filter(f => {
+    if(_spFilter==='saltwater' && !f.tags.includes('saltwater')) return false;
+    if(_spFilter==='freshwater' && !f.tags.includes('freshwater')) return false;
+    if(q && !f.name.toLowerCase().includes(q) && !f.habitat.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(!list.length){ cont.innerHTML=`<div style="text-align:center;padding:40px 0;color:var(--muted);font-size:14px">검색 결과 없음</div>`; return; }
+  cont.innerHTML = list.map(f=>`
+    <div class="sp-fish-row" onclick="showFishDetail('${f.id}')">
+      <div class="sp-fish-icon">${FISH_ICONS[f.id]||'🐟'}</div>
+      <div class="sp-fish-info">
+        <div class="sp-fish-name">${f.name}</div>
+        <div class="sp-fish-meta">${f.habitat} · ${f.peak}</div>
+      </div>
+      <div class="sp-fish-badges">
+        ${f.tags.includes('premium')?'<span class="sp-badge gold">★</span>':f.tags.includes('rare')?'<span class="sp-badge red">희귀</span>':''}
+        <div class="sp-fish-size">${f.size}</div>
+      </div>
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24" style="color:var(--muted);flex-shrink:0"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  `).join('');
+}
+
+function showFishDetail(id) {
+  const f = FISH_DATA.find(x=>x.id===id);
+  if(!f) return;
+  const cont = document.getElementById('species-content');
+  cont.innerHTML = `
+    <div class="sp-detail">
+      <button class="sp-back-btn" onclick="renderSpeciesTab('fish')">← 뒤로</button>
+      <div class="sp-detail-hero">
+        <div class="sp-detail-icon">${FISH_ICONS[f.id]||'🐟'}</div>
+        <div>
+          <div class="sp-detail-name">${f.name}</div>
+          <div class="sp-detail-habitat">📍 ${f.habitat}</div>
+        </div>
+      </div>
+      <div class="sp-detail-tags">${f.tags.map(t=>`<span class="sp-badge ${t==='premium'?'gold':t==='offshore'?'blue':t==='rare'?'red':'grey'}">${t}</span>`).join('')}</div>
+      <div class="sp-detail-grid">
+        <div class="sp-detail-cell"><div class="sp-detail-lbl">최소 사이즈</div><div class="sp-detail-val">${f.size}</div></div>
+        <div class="sp-detail-cell"><div class="sp-detail-lbl">조업 한도</div><div class="sp-detail-val">${f.bag}/일</div></div>
+        <div class="sp-detail-cell"><div class="sp-detail-lbl">시즌</div><div class="sp-detail-val">${f.season}</div></div>
+        <div class="sp-detail-cell"><div class="sp-detail-lbl">피크</div><div class="sp-detail-val">${f.peak}</div></div>
+      </div>
+      <div class="sp-detail-section">
+        <div class="sp-detail-sec-title">🎣 낚시 방법</div>
+        <div class="sp-detail-sec-body">${f.method}</div>
+      </div>
+    </div>
+  `;
+}
+
 function renderSpeciesTab(type) {
   const cont = document.getElementById('species-content');
   if(type === 'fish') {
-    cont.innerHTML = FISH_DATA.map(f => `
-      <div class="species-card">
-        <div class="species-card-body">
-          <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="width:52px;height:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(0,212,255,.08);border-radius:10px;border:1px solid rgba(0,212,255,.15);padding:4px">${FISH_ICONS[f.id]||'🐟'}</div>
-            <div style="flex:1">
-              <div class="species-name">${f.name}</div>
-              <div class="species-badges">
-                ${f.tags.map(t=>`<span class="badge ${t==='premium'?'gold':t==='offshore'?'blue':t==='rare'?'red':'grey'}">${t}</span>`).join('')}
-              </div>
-            </div>
-          </div>
-          <div class="species-stat-row" style="margin-top:10px">
-            <div class="species-stat"><div class="ss-label">Min Size</div><div class="ss-value">${f.size}</div></div>
-            <div class="species-stat"><div class="ss-label">Bag Limit</div><div class="ss-value">${f.bag}/day</div></div>
-            <div class="species-stat"><div class="ss-label">Peak Season</div><div class="ss-value">${f.peak}</div></div>
-          </div>
-          <div style="font-size:12px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-            <b style="color:var(--text)">🎣 Method:</b> ${f.method}<br>
-            <b style="color:var(--text)">📍 Habitat:</b> ${f.habitat}
-          </div>
+    cont.innerHTML = `
+      <div class="sp-search-row">
+        <div class="sp-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)"><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="sp-search-input" type="text" placeholder="어종 검색..." value="${_spSearch}"
+            oninput="_spSearch=this.value;_renderFishList()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 10px 8px 34px;color:var(--text);font-size:14px;outline:none">
         </div>
       </div>
-    `).join('');
+      <div class="sp-filter-bar">
+        <button class="sp-filter-btn ${_spFilter==='all'?'active':''}" onclick="_spFilter='all';document.querySelectorAll('.sp-filter-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');_renderFishList()">전체</button>
+        <button class="sp-filter-btn ${_spFilter==='saltwater'?'active':''}" onclick="_spFilter='saltwater';document.querySelectorAll('.sp-filter-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');_renderFishList()">바다낚시</button>
+        <button class="sp-filter-btn ${_spFilter==='freshwater'?'active':''}" onclick="_spFilter='freshwater';document.querySelectorAll('.sp-filter-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');_renderFishList()">민물낚시</button>
+      </div>
+      <div id="species-list-items"></div>
+    `;
+    _renderFishList();
   } else if(type === 'eging') {
     cont.innerHTML = EGING_DATA.map(e => `
       <div class="eging-card">
@@ -2201,7 +2394,7 @@ function drawWaveChartFromDay(day, type){
     const base = type==='wave'?(day.swellH||1.2):type==='wind'?(day.windKmh||15):(day.tideMax||1.0);
     pts = Array.from({length:12},(_, i)=>({v: base*(0.7+Math.sin(i/11*Math.PI)*0.6),t:i}));
   }
-  if(pts.length>1) drawWaveChart(pts,'marine-chart-svg','marine-chart-fill','marine-chart-line');
+  if(pts.length>1) drawWaveChart(pts,'marine-chart-svg','marine-chart-fill','marine-chart-line',type);
 }
 
 // Initialize
@@ -2263,9 +2456,7 @@ function moonPhaseSVG(pct, phase) {
 }
 
 function injectMoonSVG() {
-  const strip = document.querySelector('.sol-moon-strip');
-  if (!strip) return;
-  const firstSpan = strip.querySelector('span:first-child');
+  const firstSpan = document.querySelector('.smc-emoji');
   if (!firstSpan) return;
   // Get moon data from sol day
   const d = (typeof solDays !== 'undefined' && solDays[activeSolDay]) ? solDays[activeSolDay] : null;
@@ -2674,6 +2865,21 @@ function renderSolContent(i){
       warningsHtml += `<div style="background:rgba(0,230,118,0.1); border:1px solid rgba(0,230,118,0.5); color:var(--green); padding:8px 12px; border-radius:8px; margin-bottom:10px; font-size:15px; font-weight:bold; text-align:center;">✨ 일출/일몰 겹침: 피딩 증폭!</div>`;
   }
 
+  // Moon distance & age calculation
+  const _mn = (d.moon.n||'').toLowerCase(), _mp = d.moon.pct||50;
+  let _mAge;
+  if(_mn.includes('new')) _mAge=0.5;
+  else if(_mn.includes('waxing crescent')) _mAge=+((_mp/50)*7.4).toFixed(1);
+  else if(_mn.includes('first quarter')) _mAge=7.4;
+  else if(_mn.includes('waxing gibbous')) _mAge=+(7.4+(_mp-50)/50*7.4).toFixed(1);
+  else if(_mn.includes('full')) _mAge=14.8;
+  else if(_mn.includes('waning gibbous')) _mAge=+(14.8+(100-_mp)/50*7.4).toFixed(1);
+  else if(_mn.includes('last quarter')) _mAge=22.1;
+  else if(_mn.includes('waning crescent')) _mAge=+(22.1+(50-_mp)/50*7.4).toFixed(1);
+  else _mAge=+(_mp/100*14.77).toFixed(1);
+  if(_mAge<0)_mAge=0; if(_mAge>29.5)_mAge=29.5;
+  const _mDist = Math.round(384400 - 21000*Math.cos(2*Math.PI*_mAge/27.55));
+
   document.getElementById('sol-content').innerHTML=`
     ${warningsHtml}
     <div class="sol-hero">
@@ -2694,13 +2900,31 @@ function renderSolContent(i){
     </div>
     ${rawNote ? `<div class="sol-note">${rawNote.replace(/<div[^>]*>/,'').replace(/<\/div>/,'')}</div>` : ''}
     ${blendBadge}
-    <div class="sol-moon-strip">
-      <span style="font-size:22px">${d.moon.e}</span>
-      <span class="sol-moon-name">${d.moon.n}</span>
-      <div class="sol-moon-bar-wrap">
-        <div class="sol-moon-bar-fill" style="width:${d.moon.pct}%"></div>
+    <div class="sol-moon-card">
+      <div class="smc-top">
+        <span class="smc-emoji">${d.moon.e}</span>
+        <div class="smc-phase">
+          <div class="smc-name">${d.moon.n}</div>
+          <div class="smc-bar-row">
+            <div class="smc-bar-wrap"><div class="smc-bar-fill" style="width:${d.moon.pct}%"></div></div>
+            <span class="smc-pct">${d.moon.pct}%</span>
+          </div>
+        </div>
       </div>
-      <span class="sol-moon-pct">${d.moon.pct}%</span>
+      <div class="smc-stats">
+        <div class="smc-stat">
+          <div class="smc-stat-val">${_mDist.toLocaleString()}</div>
+          <div class="smc-stat-lbl">거리 (km)</div>
+        </div>
+        <div class="smc-stat">
+          <div class="smc-stat-val">${d.moon.pct}%</div>
+          <div class="smc-stat-lbl">조명도</div>
+        </div>
+        <div class="smc-stat">
+          <div class="smc-stat-val">${_mAge}</div>
+          <div class="smc-stat-lbl">월령 (일)</div>
+        </div>
+      </div>
     </div>
     <div class="sol-peaks-section">
       <div class="sol-peaks-label">PEAK FEEDING TIMES</div>
