@@ -2027,6 +2027,36 @@ function setLayer(l, el){
   if(typeof updateMapLayer==='function') updateMapLayer(l);
 }
 
+// ── MAP LAYER TOGGLE ─────────────────────────────
+function updateMapLayer(l){
+  // Swap tile layer based on selected type
+  if(!mapL) return;
+  if(window._mapTileLayer){ try{mapL.removeLayer(window._mapTileLayer);}catch(e){} }
+  let url, attr;
+  if(l==='satellite'){
+    url='https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+    attr='Tiles &copy; Esri';
+  } else if(l==='wind'||l==='swell'||l==='temp'){
+    // Use Windy embed or fallback to standard map + overlay notice
+    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    attr='© OpenStreetMap';
+    // Show overlay label
+    const notice = l==='wind'?'💨 Wind layer — WillyWeather 데이터 참조':l==='swell'?'🌊 Swell layer — 해양탭 참조':'🌡️ SST layer — 해양탭 참조';
+    const existNotice = document.getElementById('map-layer-notice');
+    if(existNotice) existNotice.remove();
+    const div = document.createElement('div');
+    div.id='map-layer-notice';
+    div.style.cssText='position:absolute;bottom:70px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;z-index:1000;pointer-events:none';
+    div.textContent=notice;
+    document.getElementById('tab-map').appendChild(div);
+    setTimeout(()=>{const n=document.getElementById('map-layer-notice');if(n)n.remove();},3000);
+  } else {
+    url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    attr='© OpenStreetMap';
+  }
+  window._mapTileLayer = L.tileLayer(url,{attribution:attr,maxZoom:19}).addTo(mapL);
+}
+
 // ── MAP LB SYNC ─────────────────────────────────
 // Sync map live bar from main live bar values
 function syncMapLiveBar(){
@@ -2120,17 +2150,40 @@ const FISH_ICONS = {
 };
 
 const FISH_DATA = [
-  {id:'drummer',name:'Drummer (Rock Blackfish)',season:'Year-round',peak:'May–Sep',method:'Float fishing, bread/cabbage',size:'30cm',bag:'10',habitat:'Rocky shores',tags:['saltwater','inshore']},
-  {id:'snapper',name:'Snapper',season:'Year-round',peak:'Nov–Mar',method:'Jigging, bait',size:'30cm',bag:'10',habitat:'Reefs, offshore',tags:['saltwater','offshore']},
-  {id:'bream',name:'Yellowfin Bream',season:'Year-round',peak:'Winter',method:'Light line, prawn/worm',size:'25cm',bag:'10',habitat:'Estuaries, rocks',tags:['saltwater','estuaries']},
-  {id:'flathead',name:'Dusky Flathead',season:'Year-round',peak:'Summer',method:'Soft plastics, bait',size:'36cm (max 70cm)',bag:'5',habitat:'Sand/weed flats',tags:['saltwater','inshore']},
-  {id:'kingfish',name:'Yellowtail Kingfish',season:'Oct–Apr',peak:'Nov–Feb',method:'Jigging, popping, live bait',size:'65cm',bag:'5',habitat:'Offshore reefs',tags:['saltwater','offshore','premium']},
-  {id:'tailor',name:'Tailor (Bluefish)',season:'Year-round',peak:'Autumn',method:'Casting lures, metal slugs',size:'30cm',bag:'20',habitat:'Beaches, headlands',tags:['saltwater','surf']},
-  {id:'trevally',name:'Silver Trevally',season:'Year-round',peak:'Autumn',method:'Light jigging, bait',size:'30cm',bag:'10',habitat:'Reefs, beaches',tags:['saltwater','inshore']},
-  {id:'mulloway',name:'Mulloway (Jewfish)',season:'Year-round',peak:'Winter nights',method:'Large bait, night fishing',size:'70cm',bag:'1',habitat:'Deep channels',tags:['saltwater','rare']},
-  {id:'luderick',name:'Luderick',season:'Apr–Oct',peak:'Jun–Aug',method:'Float, green weed',size:'27cm',bag:'10',habitat:'Rocky platforms',tags:['saltwater','seasonal']},
-  {id:'aus_salmon',name:'Australian Salmon',season:'Year-round',peak:'Autumn',method:'Metal lures, pilchards',size:'30cm',bag:'15',habitat:'Surf beaches',tags:['saltwater','surf']},
-  {id:'longtail_tuna',name:'Longtail Tuna',season:'Nov–Apr',peak:'Jan–Mar',method:'Trolling, casting poppers',size:'45cm',bag:'5',habitat:'Offshore blue water',tags:['saltwater','offshore','pelagic']},
+  // ── SALTWATER – REEF & INSHORE ──
+  {id:'drummer',name:'Drummer (Rock Blackfish)',emoji:'⚫',season:'Year-round',peak:'May–Sep',method:'Float fishing with cabbage or bread, light 4–6kg line, running float rig. Fish rock ledges at dawn around kelp beds. Patience is key.',size:'30cm',bag:'10',habitat:'Rocky shores, kelp beds',desc:'One of NSW\'s most popular rock fishing targets. Dark coloured with a small mouth, feeds almost exclusively on weed. Highly prized for their strong fight on light gear.',tags:['saltwater','inshore']},
+  {id:'snapper',name:'Snapper (Red Bream)',emoji:'🔴',season:'Year-round',peak:'Nov–Mar',method:'Snapper leads, bait rigs with pilchard/squid/prawn, or slow-pitch jigging 80–200g jigs over deep reefs. Berley works well.',size:'30cm',bag:'10',habitat:'Deep reefs 20–80m',desc:'NSW\'s iconic reef fish. Pink-red with a blue-speckled pattern. Juveniles (called "pinkies") are common in estuaries. Adults haunt deep offshore pinnacles.',tags:['saltwater','offshore']},
+  {id:'bream',name:'Yellowfin Bream',emoji:'⚪',season:'Year-round',peak:'Jun–Sep',method:'Light 4kg line, size 4–8 hook, prawn/worm/nippers. Work estuaries, canals and rock walls. Soft plastics work well in clear water.',size:'25cm',bag:'10',habitat:'Estuaries, harbour walls, rocks',desc:'The most widespread estuary fish in NSW. Silver-yellow with a yellowish belly. Schooling fish, best targeted at dawn and dusk around structure.',tags:['saltwater','estuaries']},
+  {id:'flathead',name:'Dusky Flathead',emoji:'🟤',season:'Year-round',peak:'Oct–Mar',method:'Soft plastics (3–5") on 1/4–1/2oz jighead, bait rigs with live prawns. Work shallow sand/weed flats. Note: females over 70cm must be released.',size:'36cm (max 70cm to keep)',bag:'5',habitat:'Sand & weed flats, estuaries',desc:'NSW\'s most popular estuary target. Lies flat on the sand, ambushing prey. Excellent eating. Females grow much larger than males.',tags:['saltwater','inshore']},
+  {id:'whiting',name:'Sand Whiting',emoji:'🤍',season:'Year-round',peak:'Nov–Feb',method:'Light 2–4kg line, small #6–8 hook, beach worm or nippers. Fish sand gutters and channel edges. Running sinker rig.',size:'27cm',bag:'20',habitat:'Sandy beaches, estuaries, flats',desc:'Fast and fun to catch on light gear. Silvery with a small pointed mouth. Found in schools in sandy estuaries and ocean beaches. Superb table fish.',tags:['saltwater','inshore','surf']},
+  {id:'luderick',name:'Luderick (Blackfish)',emoji:'🎣',season:'Apr–Oct',peak:'Jun–Aug',method:'Float fishing with fresh green weed (cabbage/sea lettuce), 2–3kg line, fine wire hook. Highly technical and rewarding.',size:'27cm',bag:'10',habitat:'Rocky platforms, estuaries',desc:'A unique challenge requiring specific weed bait and fine tackle. Dark olive-brown, feeds entirely on green weed attached to rocks.',tags:['saltwater','seasonal']},
+  {id:'tarwhine',name:'Tarwhine',emoji:'🐡',season:'Year-round',peak:'Autumn–Winter',method:'Similar to bream — light line, small hooks, prawn or worm bait around rocky headlands and reefs.',size:'20cm',bag:'20',habitat:'Rocky reefs, estuaries',desc:'Often caught while bream fishing. Silver body with yellow-gold fins. Good eating when fresh. Often caught in schools around Sydney Harbour.',tags:['saltwater','inshore']},
+  {id:'leatherjacket',name:'Leatherjacket',emoji:'🟡',season:'Year-round',peak:'Summer–Autumn',method:'Small hook #8–12, squid strip or worm. They nibble bait aggressively — use a small sharp hook. Best near weed beds and jetties.',size:'No minimum',bag:'20',habitat:'Weed beds, jetties, reefs',desc:'Rough sandpaper-like skin. Excellent eating if you can get past the pesky bait-stealing behaviour. Dozens of species in NSW waters.',tags:['saltwater','inshore']},
+  {id:'wirrah',name:'Rock Cod (Wirrah)',emoji:'🟠',season:'Year-round',peak:'Year-round',method:'Bait fishing in rock pools and on reef edges. Will take any bait — pilchard, squid, worm.',size:'No minimum',bag:'5',habitat:'Rock platforms, shallow reefs',desc:'Distinctive spotted pattern. Common rock fishing by-catch. Can be territorial and aggressive. Generally small but excellent eating.',tags:['saltwater','inshore']},
+  // ── SALTWATER – SURF & BEACH ──
+  {id:'tailor',name:'Tailor (Bluefish)',emoji:'⚡',season:'Year-round',peak:'Mar–Jun',method:'Metal slugs, hardbody lures, ganged pilchard rigs. Cast into surf gutters at dawn/dusk. Fast retrieve, they hit hard.',size:'30cm',bag:'20',habitat:'Ocean beaches, headlands, rock ledges',desc:'Aggressive school predator with razor-sharp teeth. Use a wire trace or heavy leader. Hits lures with savage speed. Excellent smoked or as fish and chips.',tags:['saltwater','surf']},
+  {id:'aus_salmon',name:'Australian Salmon',emoji:'🐟',season:'Year-round',peak:'Mar–Jun',method:'Metal slugs, soft plastics, pillies. Schools visible as baitfish scatter at the surface. Long casting from rocks and beaches.',size:'30cm',bag:'15',habitat:'Surf beaches, rock platforms',desc:'Not a true salmon — more like a herring. Bronze-olive back, forked tail. Fights hard and is found in massive schools. Best used as live bait for larger fish.',tags:['saltwater','surf']},
+  {id:'garfish',name:'Garfish',emoji:'🔵',season:'Year-round',peak:'Spring–Summer',method:'Tiny #12–14 hook, bread or dough bait under a float. Burley with berley bread to attract surface schools.',size:'No minimum',bag:'30',habitat:'Surface estuaries, harbours, bays',desc:'Long slender silver fish with a distinctive beak. Often seen in large schools near the surface. Light fun fishing, great bait for larger species.',tags:['saltwater','estuaries']},
+  {id:'mullet',name:'Sea Mullet',emoji:'🐠',season:'Year-round',peak:'Autumn–Winter',method:'Very fine hook #12–16, dough or bread crumb berley. Difficult to hook — mouth is small and soft. Float or fly fishing.',size:'30cm',bag:'20',habitat:'Estuaries, beaches, harbour',desc:'Common harbour fish with silvery-grey flanks. Makes a spectacular run when hooked. Schooling species found along beaches and estuaries.',tags:['saltwater','estuaries']},
+  // ── SALTWATER – PELAGICS & OFFSHORE ──
+  {id:'kingfish',name:'Yellowtail Kingfish',emoji:'👑',season:'Oct–May',peak:'Nov–Feb',method:'Slow-pitch jigging 100–300g, popping 60–130g PE4–8, live bait (yakka, squid) at anchor. Fight hard — use heavy drag and stout rods.',size:'65cm',bag:'5',habitat:'Offshore reefs, FADs, headlands',desc:'NSW\'s premier sport fish. Powerful, fast and tackle-breaking. Schools around offshore reefs and flotsam. High-quality sashimi. Max size 50kg+.',tags:['saltwater','offshore','premium']},
+  {id:'trevally',name:'Silver Trevally',emoji:'💛',season:'Year-round',peak:'Mar–Jun',method:'Light jigging 20–60g, bait rigs with prawn/squid. Fish reef edges and channels. Schooling fish.',size:'30cm',bag:'10',habitat:'Reefs, estuaries, beaches',desc:'Prized table fish and strong fighter. Distinctive silver flanks with yellow-gold fins. Found from beaches to offshore reefs.',tags:['saltwater','inshore']},
+  {id:'gt',name:'Giant Trevally (GT)',emoji:'🏆',season:'Nov–Apr',peak:'Dec–Feb',method:'Large poppers 150–200g PE8+, heavy jigs. Target structure at first light. Explosive top-water strikes.',size:'60cm',bag:'5',habitat:'Offshore reefs, rocky headlands',desc:'One of the world\'s most sought-after game fish. Huge silver predator known for explosive surface strikes. Tests the limits of any tackle.',tags:['saltwater','offshore','premium']},
+  {id:'longtail_tuna',name:'Longtail Tuna',emoji:'🔵',season:'Nov–Apr',peak:'Jan–Mar',method:'Casting poppers/stickbaits, trolling with feathers or skirted lures. Follow bird activity and feeding schools.',size:'45cm',bag:'5',habitat:'Blue water offshore, headlands',desc:'Incredibly fast schooling pelagic. Bronze-blue back with no stripes. Stunning light-tackle target. Excellent eating as sashimi.',tags:['saltwater','offshore','pelagic']},
+  {id:'yellowfin_tuna',name:'Yellowfin Tuna',emoji:'🌊',season:'Nov–May',peak:'Dec–Mar',method:'Trolling skirted lures 6–15 knots, casting stickbaits, or chunking from anchored boats with berley. 30–80kg tackle.',size:'75cm',bag:'5',habitat:'Blue water 30–200nm offshore',desc:'Deep blue-black back with brilliant yellow fins. Grows to 200kg. Requires overnight runs to blue water off NSW. Pinnacle of offshore sport fishing.',tags:['saltwater','offshore','pelagic','premium']},
+  {id:'mahi',name:'Mahi-Mahi (Dolphinfish)',emoji:'💚',season:'Nov–Apr',peak:'Jan–Mar',method:'Trolling near floating debris, weed lines or FADs. Cast poppers when schools are spotted. Brilliant colours fade quickly after capture.',size:'50cm',bag:'10',habitat:'Blue water, weed lines, floating debris',desc:'One of the most spectacular fish in colour — electric green, yellow and blue. Fast-growing, short-lived. Excellent eating.',tags:['saltwater','offshore','pelagic']},
+  {id:'cobia',name:'Cobia',emoji:'🟫',season:'Oct–Apr',peak:'Nov–Feb',method:'Live bait under a float near rays and sharks, large jigs, surface lures. Often seen as a single fish cruising near structure.',size:'75cm',bag:'5',habitat:'Offshore reefs, wrecks, near sharks/rays',desc:'Dark brown with white lateral stripe. Remora-like in behaviour — follows large marine animals. Exceptional eating and tough fighter.',tags:['saltwater','offshore']},
+  {id:'mulloway',name:'Mulloway (Jewfish)',emoji:'🌙',season:'Year-round',peak:'Winter nights, Jun–Sep',method:'Large fresh mullet/tailor/squid bait, heavy 15–24kg line, night fishing in deep channels and rock gutters during incoming tide.',size:'70cm',bag:'1',habitat:'Deep channels, estuaries, rock gutters',desc:'NSW\'s most mysterious fish. Silver-blue, grows to 180cm. Strictly nocturnal and hard to target. The 1-per-day bag limit reflects its value.',tags:['saltwater','rare']},
+  {id:'snook',name:'Short-finned Pike (Snook)',emoji:'🔪',season:'Year-round',peak:'Apr–Aug',method:'Metal slugs, small hardbody lures, soft plastics. Cast to feeding schools near surface. Very sharp teeth — use light wire trace.',size:'40cm',bag:'10',habitat:'Estuaries, bays, near channel entrances',desc:'Elongated silver body, very sharp teeth. Schooling predator that attacks lures viciously. Underrated eating fish — firm white flesh.',tags:['saltwater','estuaries']},
+  {id:'barramundi',name:'Barramundi',emoji:'🐋',season:'Sep–Mar (N NSW)',peak:'Oct–Dec',method:'Lure casting around snags, live bait (prawns/fish), surface lures at dawn. Favourite targets: timber, rock bars, channels.',size:'58cm',bag:'5 (catch and release recommended)',habitat:'Tropical estuaries, rock bars (North NSW)',desc:'Iconic Australian sport fish. Found in northern NSW estuaries. Silver juvenile, gold-bronze adult. Jumps spectacularly when hooked.',tags:['saltwater','inshore']},
+  // ── FRESHWATER ──
+  {id:'bass',name:'Australian Bass',emoji:'🎯',season:'Year-round',peak:'May–Aug (spawning Sep–Nov, no-take)',method:'Surface lures (poppers, cicadas), soft plastics in deeper pools. Fish at dawn/dusk around submerged timber and rocky substrate.',size:'25cm',bag:'2 (catch & release recommended)',habitat:'Fast-flowing coastal rivers, estuaries',desc:'NSW\'s premier native freshwater sport fish. Dark olive with bronze sheen. Aggressive surface strikes. Protected during spawning — Sept–Nov.',tags:['freshwater','native']},
+  {id:'murray_cod',name:'Murray Cod',emoji:'🐊',season:'Year-round',peak:'Sep–Dec (closed in NSW Aug–Sep)',method:'Large surface lures, cod lures, large soft plastics, bait (live shrimp, yabby). Fish snags and deep holes at night.',size:'55cm',bag:'2 (trophy catch and release recommended)',habitat:'Murray-Darling system, large inland rivers',desc:'Australia\'s largest native freshwater fish, reaching 1.8m and 113kg. Olive-green with cream belly and yellow spots. Protected Aug–Sep.',tags:['freshwater','native']},
+  {id:'golden_perch',name:'Golden Perch (Yellowbelly)',emoji:'🌟',season:'Year-round',peak:'Oct–Mar',method:'Lures (bibbed divers, spinners), soft plastics, live bait (yabbies, scrub worm). Schools in warm months.',size:'30cm',bag:'5',habitat:'Murray-Darling rivers, reservoirs',desc:'Golden-yellow colouration. NSW\'s second most important native freshwater sport fish. Good eating, strong fighter on light gear.',tags:['freshwater','native']},
+  {id:'silver_perch',name:'Silver Perch',emoji:'🪙',season:'Year-round',peak:'Spring',method:'Small lures, soft plastics, worm bait.',size:'20cm',bag:'5',habitat:'Murray-Darling rivers (rare)',desc:'Threatened species — only found in limited locations. Silver body. Handle carefully and release.',tags:['freshwater','native']},
+  {id:'redfin',name:'Redfin Perch (English Perch)',emoji:'🔴',season:'Year-round',peak:'Spring–Summer',method:'Small spinners, worm bait. Fish around weed beds, jetties, rocky structure.',size:'No minimum',bag:'Noxious — unlimited',habitat:'Lakes, reservoirs, slow rivers',desc:'Introduced invasive pest species. Red fins, dark vertical striping. Must be killed immediately if caught — illegal to return to water in NSW.',tags:['freshwater','invasive']},
+  {id:'trout',name:'Rainbow & Brown Trout',emoji:'🌈',season:'Oct–Jun (closed Jun–Sep)',method:'Fly fishing, spinning with small spinners/spoons, worm bait in mountain streams. Stealthy approach essential.',size:'25–30cm (varies by water)',bag:'5 (combined limit)',habitat:'Alpine streams, stocked dams, Southern Highlands',desc:'Introduced sport fish, highly prized in the NSW alpine region. Rainbow has pink stripe; brown has red-orange spots. Excellent eating.',tags:['freshwater']},
+  {id:'carp',name:'European Carp',emoji:'🟤',season:'Year-round',peak:'Spring–Summer',method:'Dough bait, corn, worm on small hooks. Common in slow murky water. Must be killed — cannot be returned to water.',size:'No minimum',bag:'Noxious — unlimited',habitat:'Slow rivers, lakes, wetlands',desc:'Highly invasive pest. Destroys habitats by stirring up sediment. Large fish provide strong sport on light tackle but must be destroyed when caught.',tags:['freshwater','invasive']},
 ];
 
 const EGING_DATA = [
@@ -2189,6 +2242,7 @@ function showFishDetail(id) {
         <div class="sp-detail-cell"><div class="sp-detail-lbl">시즌</div><div class="sp-detail-val">${f.season}</div></div>
         <div class="sp-detail-cell"><div class="sp-detail-lbl">피크</div><div class="sp-detail-val">${f.peak}</div></div>
       </div>
+      ${f.desc ? `<div class="sp-detail-section"><div class="sp-detail-sec-title">🐟 특징</div><div class="sp-detail-sec-body">${f.desc}</div></div>` : ''}
       <div class="sp-detail-section">
         <div class="sp-detail-sec-title">🎣 낚시 방법</div>
         <div class="sp-detail-sec-body">${f.method}</div>
@@ -2218,22 +2272,128 @@ function renderSpeciesTab(type) {
     `;
     _renderFishList();
   } else if(type === 'eging') {
-    cont.innerHTML = EGING_DATA.map(e => `
-      <div class="eging-card">
-        <div class="eging-header">
-          <div class="eging-icon">${e.emoji}</div>
-          <div>
-            <div class="eging-name">${e.name}</div>
-            <div class="eging-season">🗓️ ${e.season} — Peak: ${e.peak}</div>
-          </div>
-        </div>
-        <div style="margin-bottom:8px">
-          <span class="badge green">Min: ${e.size}</span>
-          <span class="badge blue" style="margin-left:6px">Bag: ${e.bag}</span>
-        </div>
-        <div class="eging-detail">🎣 <b>Technique:</b> ${e.technique}<br>📍 <b>Habitat:</b> ${e.habitat}</div>
+    cont.innerHTML = `
+    <!-- SECTION 1: Conditions at a glance -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:20px">🎯</span>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">BEST CONDITIONS</div>
       </div>
-    `).join('');
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div style="background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:22px">🌅</div>
+          <div style="font-size:12px;font-weight:700;color:var(--green);margin-top:4px">새벽/황혼</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">日出 前後 1時間</div>
+        </div>
+        <div style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:22px">🌊</div>
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-top:4px">5–15m 수심</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">잘피밭 근처</div>
+        </div>
+        <div style="background:rgba(176,106,255,.1);border:1px solid rgba(176,106,255,.3);border-radius:10px;padding:10px;text-align:center">
+          <div style="font-size:22px">🌙</div>
+          <div style="font-size:12px;font-weight:700;color:var(--purple);margin-top:4px">야간 조명</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">부두 불빛 아래</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px">
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">🌡️</span>
+          <div><div style="font-size:12px;font-weight:700;color:var(--text)">수온 16–22°C</div><div style="font-size:11px;color:var(--muted)">최적 활성 온도</div></div>
+        </div>
+        <div style="background:var(--bg3);border-radius:10px;padding:10px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">💨</span>
+          <div><div style="font-size:12px;font-weight:700;color:var(--text)">바람 15km/h 이하</div><div style="font-size:11px;color:var(--muted)">약한 바람 선호</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: EGI Size chart -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:20px">📐</span>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">EGI 사이즈 가이드</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:6px 4px;color:var(--muted)">사이즈</th>
+            <th style="padding:6px 4px;color:var(--muted)">수심</th>
+            <th style="padding:6px 4px;color:var(--muted)">상황</th>
+            <th style="padding:6px 4px;color:var(--muted)">색상</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:7px 4px;font-weight:700;color:var(--accent)">2.5호</td><td style="padding:7px 4px;text-align:center;color:var(--text)">1–8m</td><td style="padding:7px 4px;color:var(--muted)">맑은 물, 소형</td><td style="padding:7px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ff69b4;margin-right:3px"></span><span style="color:var(--muted)">핑크/오렌지</span></td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:7px 4px;font-weight:700;color:var(--green)">3.0호</td><td style="padding:7px 4px;text-align:center;color:var(--text)">5–12m</td><td style="padding:7px 4px;color:var(--muted)">범용, 기본</td><td style="padding:7px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#ff8c00;margin-right:3px"></span><span style="color:var(--muted)">오렌지/금</span></td></tr>
+            <tr style="border-bottom:1px solid rgba(255,255,255,.05)"><td style="padding:7px 4px;font-weight:700;color:var(--gold)">3.5호</td><td style="padding:7px 4px;text-align:center;color:var(--text)">8–18m</td><td style="padding:7px 4px;color:var(--muted)">탁한 물, 대형</td><td style="padding:7px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#8b0000;margin-right:3px"></span><span style="color:var(--muted)">레드/브라운</span></td></tr>
+            <tr><td style="padding:7px 4px;font-weight:700;color:var(--warn)">4.0호</td><td style="padding:7px 4px;text-align:center;color:var(--text)">15m+</td><td style="padding:7px 4px;color:var(--muted)">야간, 깊은 수심</td><td style="padding:7px 4px"><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1a1a2e;border:1px solid rgba(255,255,255,.3);margin-right:3px"></span><span style="color:var(--muted)">다크/야광</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SECTION 3: Color selection -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:20px">🎨</span>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">컬러 선택법</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,230,118,.07);border-radius:10px;padding:10px">
+          <div style="display:flex;gap:3px;flex-shrink:0">
+            <span style="width:16px;height:16px;border-radius:50%;background:#ff69b4;display:inline-block"></span>
+            <span style="width:16px;height:16px;border-radius:50%;background:#ff8c00;display:inline-block"></span>
+          </div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">맑은 물</div><div style="font-size:11px;color:var(--muted)">핑크 · 오렌지 · 레몬</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,212,255,.07);border-radius:10px;padding:10px">
+          <div style="display:flex;gap:3px;flex-shrink:0">
+            <span style="width:16px;height:16px;border-radius:50%;background:#8b4513;display:inline-block"></span>
+            <span style="width:16px;height:16px;border-radius:50%;background:#654321;display:inline-block"></span>
+          </div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">탁한 물 / 흐린 날</div><div style="font-size:11px;color:var(--muted)">레드 · 브라운 · 자주</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(176,106,255,.07);border-radius:10px;padding:10px">
+          <div style="display:flex;gap:3px;flex-shrink:0">
+            <span style="width:16px;height:16px;border-radius:50%;background:#ffffff;border:1px solid rgba(255,255,255,.3);display:inline-block"></span>
+            <span style="width:16px;height:16px;border-radius:50%;background:#00ffff;display:inline-block"></span>
+          </div>
+          <div><div style="font-size:13px;font-weight:600;color:var(--text)">야간</div><div style="font-size:11px;color:var(--muted)">화이트 · 야광 · 시스루</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: Technique steps -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <span style="font-size:20px">⚙️</span>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">기본 테크닉</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        ${[['1','캐스팅','최대한 멀리 캐스트 → 에기 착저까지 카운트다운','var(--accent)'],['2','팁 런','로드 팁을 빠르게 ×2–3 저킹 → 장선으로 승강','var(--green)'],['3','폴','에기가 천천히 가라앉는 동안 입질 집중 — 대부분 폴 중 hit','var(--gold)'],['4','텐션 폴','라인을 팽팽하게 유지하며 폴 — 입질 감도 향상','var(--purple)'],['5','훅셋','로드를 빠르게 올려치기 (스윕) — 두 번은 금물','var(--warn)']].map(([n,t,d,c])=>`
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="min-width:24px;height:24px;border-radius:50%;background:${c};color:#000;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${n}</div>
+            <div><div style="font-size:13px;font-weight:700;color:var(--text)">${t}</div><div style="font-size:11px;color:var(--muted);margin-top:1px">${d}</div></div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- SECTION 5: Species quick cards -->
+    <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">NSW 에깅 대상어</div>
+    ${EGING_DATA.map(e => `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start">
+      <div style="font-size:32px;line-height:1;flex-shrink:0">${e.emoji}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:700;color:var(--text)">${e.name}</div>
+        <div style="display:flex;gap:6px;margin:4px 0;flex-wrap:wrap">
+          <span style="font-size:11px;background:rgba(0,230,118,.15);color:var(--green);border-radius:6px;padding:2px 7px">🗓️ ${e.peak}</span>
+          <span style="font-size:11px;background:rgba(0,212,255,.15);color:var(--accent);border-radius:6px;padding:2px 7px">📦 ${e.bag}마리</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">${e.technique}</div>
+      </div>
+    </div>`).join('')}
+    `;
   } else if(type === 'dpi') {
     cont.innerHTML = DPI_SPECIES.map((s,i) => `
       <div class="dpi-card" onclick="">
@@ -2806,7 +2966,9 @@ function renderSolTop3(){
       + '</div>';
   });
 
-  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">' + rows + '</div>';
+  // Set grid directly on #sol-top3 via JS (overrides any CSS/class conflicts)
+  el.style.cssText = 'display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;padding:4px 0!important';
+  el.innerHTML = rows;
 }
 function selectSolDay(i){activeSolDay=i;renderSolCalGrid();renderSolContent(i);renderSafetyTimer(i);}
 function renderSolContent(i){
@@ -2887,7 +3049,7 @@ function renderSolContent(i){
       <div class="sol-hero-inner">
         <div class="sol-score" style="color:${displayC}">${displayScore}</div>
         <div class="sol-grade" style="color:${displayC}">${displayG.replace(/^[^ ]+ /,'')}</div>
-        <div class="sol-label">조과 지수</div>
+        <div class="sol-label">낚시 점수</div>
         ${dl}
       </div>
     </div>
