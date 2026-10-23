@@ -1238,7 +1238,7 @@ html, body {
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
       <div style="background:rgba(255,255,255,.2);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px">🎣</div>
       <div>
-        <div id="drawer-loc-name" style="font-size:17px;font-weight:700;color:#fff">Lidcombe</div>
+        <div id="drawer-loc-name" style="font-size:17px;font-weight:700;color:#fff">—</div>
         <div id="drawer-sub" style="font-size:11px;color:rgba(255,255,255,.7)">NSW Fishing App</div>
       </div>
     </div>
@@ -1320,7 +1320,7 @@ html, body {
   <div class="marine-cond-card">
     <div class="marine-cond-header">
       <div class="marine-cond-title">🌊 현재 해상 조건</div>
-      <div class="loc-chip" id="marine-loc-chip">Lidcombe</div>
+      <div class="loc-chip" id="marine-loc-chip">📍 —</div>
     </div>
     <div class="marine-cond-grid">
       <div class="mcg-item">
@@ -2794,26 +2794,19 @@ function renderSolTop3(){
     const bgStyle = rank===0 ? 'rgba(245,166,35,.06)' : 'var(--bg3)';
     const bdStyle = rank===0 ? 'rgba(245,166,35,.25)' : 'var(--border)';
 
-    rows += '<div onclick="selectSolDay(' + r.i + ')" style="display:flex;align-items:center;gap:10px;padding:7px 8px;background:' + bgStyle + ';border:1px solid ' + bdStyle + ';border-radius:9px;cursor:pointer">'
-      + '<div style="font-size:18px;flex-shrink:0">' + medals[rank] + '</div>'
-      + '<div style="flex:1;min-width:0">'
-      + '<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'
-      + '<span style="font-size:15px;font-weight:700;color:' + cols[rank] + '">' + dayLabel + '</span>'
-      + todayTag + safetyTag
-      + '</div>'
-      + '<div style="font-size:16px;color:var(--muted);margin-top:2px">' + swellLine + '</div>'
-      + '</div>'
-      + '<div style="text-align:right;flex-shrink:0">'
-      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:22px;color:' + col + ';line-height:1">' + r.score + '</div>'
-      + '<div style="font-size:14px;color:var(--muted)">점</div>'
-      + '</div>'
+    const animStyle = rank===0 ? 'animation:top3glow 2.5s ease-in-out infinite,slideUpIn .4s .05s both' : rank===1 ? 'animation:slideUpIn .4s .15s both' : 'animation:slideUpIn .4s .25s both';
+    rows += '<div onclick="selectSolDay(' + r.i + ')" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 8px;background:' + bgStyle + ';border:1px solid ' + bdStyle + ';border-radius:12px;cursor:pointer;gap:4px;' + animStyle + '">'
+      + '<div style="font-size:22px;line-height:1">' + medals[rank] + '</div>'
+      + '<div style="font-size:13px;font-weight:700;color:' + cols[rank] + ';line-height:1.2">' + dayLabel.replace(' (TODAY)','') + '</div>'
+      + (r.d.isToday ? '<div style="font-size:11px;background:rgba(176,106,255,.2);color:var(--purple);border-radius:8px;padding:1px 6px">TODAY</div>' : '')
+      + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:28px;color:' + col + ';line-height:1">' + r.score + '</div>'
+      + '<div style="font-size:11px;color:var(--muted)">점</div>'
+      + '<div style="font-size:12px;color:var(--muted);line-height:1.3">' + r.d.moon.e + ' <span style="color:' + (r.swH>=2.0?'var(--warn)':r.swH>=1.2?'var(--gold)':'var(--green)') + '">' + r.swH + 'm</span></div>'
+      + (r.di>=18 ? '<div style="font-size:10px;color:var(--warn)">⚠ 위험</div>' : r.di>=12 ? '<div style="font-size:10px;color:var(--gold)">⚡ 주의</div>' : '')
       + '</div>';
   });
 
-  el.innerHTML = '<div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:10px">'
-    + '<div style="font-size:16px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">🏆 이번 주 최고 출조일 TOP 3</div>'
-    + '<div style="display:flex;flex-direction:column;gap:6px">' + rows + '</div>'
-    + '</div>';
+  el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px">' + rows + '</div>';
 }
 function selectSolDay(i){activeSolDay=i;renderSolCalGrid();renderSolContent(i);renderSafetyTimer(i);}
 function renderSolContent(i){
@@ -4964,6 +4957,8 @@ function selectLoc(idx){
   const l=LOCS[idx];
   document.getElementById('tb-name').textContent=l.name;
   document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
+  const _mlc=document.getElementById('marine-loc-chip');if(_mlc)_mlc.textContent='📍 '+l.name;
+  const _dln=document.getElementById('drawer-loc-name');if(_dln)_dln.textContent=l.name;
   renderFavs();
   if(mapL){mapL.setView([l.lat,l.lng],11);renderMapMarkers();}
   loadWeather(l.name);
@@ -5529,6 +5524,8 @@ window.addEventListener('DOMContentLoaded',()=>{
       const l=LOCS[activeIdx];
       document.getElementById('tb-name').textContent=l.name;
       document.getElementById('tb-sub').textContent=l.lat.toFixed(3)+', '+l.lng.toFixed(3)+' · NSW';
+      const _mlcI=document.getElementById('marine-loc-chip');if(_mlcI)_mlcI.textContent='📍 '+l.name;
+      const _dlnI=document.getElementById('drawer-loc-name');if(_dlnI)_dlnI.textContent=l.name;
       loadWeather(l.name);
     }else{
       document.getElementById('marine-content').innerHTML='<div class="loading-msg">📍 포인트를 추가하면 WillyWeather 실시간 날씨가 표시돼</div>';
